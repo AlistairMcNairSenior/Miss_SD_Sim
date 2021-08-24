@@ -1,7 +1,7 @@
 
 # Simulation to Support Nakagawa et al. A practical and readily implementable method for handling missing standard deviation in the meta-analysis of response ratios. 
 
-# This script includes a random effect for study ID (i.e. multilevel meta-analysis)
+# This script contains 2 functions for the simulation
 
 # First written by AM Senior @ The University of Sydney, 25/06/2021.
 
