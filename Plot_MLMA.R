@@ -1,15 +1,13 @@
 
 # Simulation to Support Nakagawa et al. A practical and readily implementable method for handling missing standard deviation in the meta-analysis of response ratios. 
 
-# This script includes a random effect for study ID (i.e. multilevel meta-analysis)
-
-# First written by AM Senior @ The University of Sydney, 25/06/2021.
+# This script includes is for plotting the results of the aggregated simulation
 
 # Clean up the R Environment 
 rm(list=ls())
 
 # Set the working directory
-wd<-"/Users/alistairsenior/Dropbox (Sydney Uni)/Nakagawa_Ecology_Missing_SD/Full_Simulation" # MacMini Home
+wd<-"/Users/alistairsenior/Dropbox (Sydney Uni)/Nakagawa_Ecology_Missing_SD/Miss_SD_Sim" # MacMini Home
 setwd(wd)
 
 # Load the relevant libraries, and header
