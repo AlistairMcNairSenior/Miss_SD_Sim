@@ -1,9 +1,7 @@
 
 # Simulation to Support Nakagawa et al. A practical and readily implementable method for handling missing standard deviation in the meta-analysis of response ratios. 
 
-# This script includes a random effect for study ID (i.e. multilevel meta-analysis)
-
-# First written by AM Senior @ The University of Sydney, 25/06/2021.
+# This script was used to aggregate multiple instances from the array job on the HPC. It also then calculates the bias, coverage and aggregate statsitics used in the plotting
 
 # Clean up the R Environment 
 rm(list=ls())
