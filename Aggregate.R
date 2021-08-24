@@ -7,7 +7,7 @@
 rm(list=ls())
 
 # Set the working directory
-wd<-"/Users/alistairsenior/Dropbox (Sydney Uni)/Nakagawa_Ecology_Missing_SD/Full_Simulation/Miss_Sim"
+wd<-"/Users/alistairsenior/Dropbox (Sydney Uni)/Nakagawa_Ecology_Missing_SD/Full_Simulation/Miss_Sim" # Note this directory is not in the git repo. Contains a massive amount of raw data. Hence this file will not run from the repo.
 setwd(wd)
 
 # Load the relevant libraries, and header
