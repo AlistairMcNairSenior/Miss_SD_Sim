@@ -1,9 +1,7 @@
 
 # Simulation to Support Nakagawa et al. A practical and readily implementable method for handling missing standard deviation in the meta-analysis of response ratios. 
 
-# This script includes a random effect for study ID (i.e. multilevel meta-analysis)
-
-# First written by AM Senior @ The University of Sydney, 25/06/2021.
+# This script runs the simulation for the MLMA (i.e. multilevel meta-analysis). It is designed to run as an array job on the HPC and Sydney UNI. There are only 10 reps in here, but I ran on an array 0-999
 
 # Clean up the R Environment 
 rm(list=ls())
