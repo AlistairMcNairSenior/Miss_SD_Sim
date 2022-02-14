@@ -1,0 +1,237 @@
+﻿Study,Comparison,CN,CM,CSD,TN,TM,TSD,Climate,Region,Rest:graze ratio,Stock type,Stocking rate difference,Common control
+Alemseged et al. 2011,CG-SRG,6,1080,171.464282,13,280,144.222051,Arid/Semi arid,Australia/New Zealand,NA,Unknown,NA,1
+Anderson 1988,UG-SRG,40,771.5,85.55992052,8,2067.5,40.30508653,Arid/Semi arid,Nth America,9,Cattle,NA,1
+Anderson 1988,CG-SRG,40,771.5,85.55992052,38,971,195.1614716,Arid/Semi arid,Nth America,9,Cattle,Greater,2
+Badgery 2017,CG-SRG,360,2550,NA,360,2000,NA,Temperate,Australia/New Zealand,19,Sheep,Equal,3
+Badgery 2017,CG-SRG,360,2150,NA,360,2000,NA,Temperate,Australia/New Zealand,19,Sheep,Equal,4
+Badgery 2017,CG-SRG,360,2800,NA,360,2000,NA,Temperate,Australia/New Zealand,19,Sheep,Equal,5
+Badgery 2017,CG-SRG,360,1850,NA,360,1450,NA,Temperate,Australia/New Zealand,19,Sheep,Equal,6
+Badgery 2017,CG-SRG,360,1850,NA,360,1200,NA,Temperate,Australia/New Zealand,19,Sheep,Equal,6
+Badgery 2017,CG-SRG,360,1900,NA,360,1450,NA,Temperate,Australia/New Zealand,19,Sheep,Equal,7
+Badgery 2017,CG-SRG,360,2000,NA,360,1450,NA,Temperate,Australia/New Zealand,19,Sheep,Equal,8
+Badgery 2017,CG-SRG,360,2250,NA,360,1200,NA,Temperate,Australia/New Zealand,19,Sheep,Equal,9
+Badgery 2017,CG-SRG,360,1650,NA,360,1200,NA,Temperate,Australia/New Zealand,19,Sheep,Equal,10
+Badgery et al. 2017a,CG-SRG,540,2480,940,540,2760,1170,Temperate,Australia/New Zealand,3,Sheep,Equal,11
+Badgery et al. 2017a,CG-SRG,540,3160,1240,540,2970,1310,Temperate,Australia/New Zealand,3,Sheep,Equal,12
+Badgery et al. 2017a,CG-SRG,540,4280,1200,540,3570,1320,Temperate,Australia/New Zealand,3,Sheep,Equal,13
+Badgery et al. 2017a,CG-SRG,540,3270,1370,540,2760,1170,Temperate,Australia/New Zealand,19,Sheep,Equal,14
+Badgery et al. 2017a,CG-SRG,540,3610,1320,540,2970,1310,Temperate,Australia/New Zealand,19,Sheep,Equal,15
+Badgery et al. 2017a,CG-SRG,540,4590,1280,540,3570,1320,Temperate,Australia/New Zealand,19,Sheep,Equal,16
+Beck et al. 2016,CG-SRG,240,3657,NA,240,2567,NA,Temperate,Nth America,6,Cattle,Greater,17
+Beck et al. 2016,CG-SRG,240,3530,NA,240,2567,NA,Temperate,Nth America,6,Cattle,Equal,18
+Beck et al. 2016,CG-SRG,240,2097,NA,240,3024,NA,Temperate,Nth America,6,Cattle,Greater,19
+Beck et al. 2016,CG-SRG,240,2672,NA,240,3024,NA,Temperate,Nth America,6,Cattle,Equal,20
+Biondini and Manske 1996,UG-SRG,180,1900,529.1502622,180,2000,100,Cold,Nth America,3,Cattle,Equal,2
+Biondini and Manske 1996,UG-SRG,180,1633.333333,404.1451884,180,2116.666667,1290.67166,Cold,Nth America,3,Cattle,Equal,3
+Biondini and Manske 1996,UG-SRG,180,1850,653.8348415,180,2300,793.7253933,Cold,Nth America,3,Cattle,Equal,4
+Biondini and Manske 1996,CG-SRG,180,1900,529.1502622,270,1800,565.6854249,Cold,Nth America,3,Cattle,Equal,21
+Biondini and Manske 1996,CG-SRG,180,1633.333333,404.1451884,180,1616.666667,212.1320344,Cold,Nth America,3,Cattle,Equal,22
+Biondini and Manske 1996,CG-SRG,180,1850,653.8348415,180,1766.666667,848.5281374,Cold,Nth America,3,Cattle,Equal,23
+Birrell et al. 1978,CG-SRG,384,4444,NA,384,4444,NA,Temperate,Australia/New Zealand,NA,Sheep,Equal,24
+Birrell et al. 1978,CG-SRG,384,4212,NA,384,4241,NA,Temperate,Australia/New Zealand,NA,Sheep,Equal,25
+Birrell et al. 1978,CG-SRG,384,2211,NA,384,1112,NA,Temperate,Australia/New Zealand,NA,Sheep,Equal,26
+Birrell et al. 1978,CG-SRG,384,1121,NA,384,1111,NA,Temperate,Australia/New Zealand,NA,Sheep,Equal,27
+Birrell et al. 1978,CG-SRG,384,4333,NA,384,4444,NA,Temperate,Australia/New Zealand,9,Sheep,Equal,28
+Birrell et al. 1978,CG-SRG,384,1433,NA,384,4241,NA,Temperate,Australia/New Zealand,9,Sheep,Equal,29
+Birrell et al. 1978,CG-SRG,384,3223,NA,384,1112,NA,Temperate,Australia/New Zealand,9,Sheep,Equal,30
+Birrell et al. 1978,CG-SRG,384,4322,NA,384,1111,NA,Temperate,Australia/New Zealand,9,Sheep,Equal,31
+Bryant et al. 1961,CG-SRG,150,1077.697275,311.035875,90,763.29885,0,Temperate,Nth America,9.091,Cattle,NA,33
+Bryant et al. 1961,CG-SRG,150,761.6507709,230.635145,90,147.9522,0,Temperate,Nth America,9.091,Cattle,NA,34
+Cassels et al. 1995,CG-SRG,540,3450,282.8427125,540,2975,35.35533906,Cold,Nth America,7,Cattle,Equal,35
+Chen et al. 2008,CG-SRG,180,3060,56.56854249,180,3200,84.85281374,Cold,Eurasia,8.13,Mixed,Lower,36
+Chen et al. 2008,CG-SRG,180,3100,1301.391563,180,3260,1462.388457,Cold,Eurasia,8.13,Mixed,Lower,37
+Cui et al. 2014,UG-SRG,12,5075,306.8658773,12,3912.5,779.2892061,Cold,Eurasia,90.25,Sheep,NA,5
+Cui et al. 2014,UG-SRG,12,3487.5,700.4462863,12,3912.5,779.2892061,Cold,Eurasia,90.25,Sheep,NA,6
+Davies and Southey 2001,CG-SRG,288,2528.125,1084.813801,288,2604,1212.974738,Temperate,Australia/New Zealand,NA,Sheep,Equal,38
+Davies and Southey 2001,CG-SRG,288,2572.25,1224.400932,288,1849.375,1189.172694,Temperate,Australia/New Zealand,NA,Sheep,Equal,39
+Davies and Southey 2001,CG-SRG,288,1865,1468.860102,288,997.125,978.4114585,Temperate,Australia/New Zealand,NA,Sheep,Equal,40
+Derner and Hart 2007a,CG-SRG,10,525,276.6992953,10,450,237.1708245,Arid/Semi arid,Nth America,7,Cattle,Equal,41
+Derner and Hart 2007a,CG-SRG,10,450,237.1708245,10,450,237.1708245,Arid/Semi arid,Nth America,7,Cattle,Equal,42
+Derner and Hart 2007a,CG-SRG,44,1125,414.5780988,44,1250,497.4937186,Arid/Semi arid,Nth America,7,Cattle,Equal,43
+Derner and Hart 2007a,CG-SRG,44,1175,331.662479,44,1250,497.4937186,Arid/Semi arid,Nth America,7,Cattle,Equal,44
+Derner and Hart 2007a,CG-SRG,12,1550,562.9165125,12,1775,649.5190528,Arid/Semi arid,Nth America,7,Cattle,Equal,45
+Derner and Hart 2007a,CG-SRG,12,1500,519.6152423,12,1475,433.0127019,Arid/Semi arid,Nth America,7,Cattle,Equal,46
+Di Grigoli et al. 2012 ,CG-SRG,24,3111,NA,24,2801,NA,Temperate,Europe,NA,Sheep,Equal,47
+Di Grigoli et al. 2012 ,CG-SRG,24,4903,NA,24,3477,NA,Temperate,Europe,NA,Sheep,Equal,48
+Di Grigoli et al. 2012 ,CG-SRG,24,1686,NA,24,1237,NA,Temperate,Europe,NA,Sheep,Equal,49
+Di Grigoli et al. 2012 ,CG-SRG,24,2766,NA,24,1756,NA,Temperate,Europe,NA,Sheep,Equal,50
+Donkor et al. 2002,UG-SRG,80,1307.5,300.5966289,40,2660,541.6641026,Cold,Nth America,4.12,Unknown,NA,7
+Donkor et al. 2002,CG-SRG,80,1307.5,300.5966289,80,1687.5,453.7528696,Cold,Nth America,4.12,Unknown,Greater,51
+Dormaar et al. 1997,UG-SRG,200,509,128.6,200,509,123,Arid/Semi arid,Nth America,3,Cattle,NA,8
+Dowling et al. 2006,CG-SRG,120,2735,1094.125221,120,3250,1220.590021,Temperate,Australia/New Zealand,25,Mixed,Equal,52
+Dowling et al. 2006,CG-SRG,120,2161.666667,576.8679803,120,1871.666667,516.620428,Temperate,Australia/New Zealand,25,Mixed,Equal,53
+Dowling et al. 2006,CG-SRG,80,3357.5,2547.775173,80,3150,1626.489061,Temperate,Australia/New Zealand,29,Mixed,Equal,54
+Dowling et al. 2006,CG-SRG,80,2850,1092.36746,80,3295,1356.429136,Temperate,Australia/New Zealand,29,Mixed,Equal,55
+Dowling et al. 2006,CG-SRG,120,2288.333333,1092.381191,120,2526.666667,1386.213067,Temperate,Australia/New Zealand,18,Mixed,Equal,56
+Dowling et al. 2006,CG-SRG,120,3633.333333,1828.29611,120,3281.666667,1393.160675,Temperate,Australia/New Zealand,18,Mixed,Equal,57
+Dowling et al. 2006,CG-SRG,120,2530,698.3122511,120,2038.5,927.867178,Temperate,Australia/New Zealand,30,Mixed,Greater,58
+Dowling et al. 2006,CG-SRG,120,2260,854.7748241,120,1941.666667,869.952106,Temperate,Australia/New Zealand,30,Mixed,Greater,59
+Dowling et al. 2006,CG-SRG,80,1690,926.984358,80,1370,661.8912297,Temperate,Australia/New Zealand,17,Sheep,Lower,60
+Dowling et al. 2006,CG-SRG,80,1376.666667,665.6074919,80,1136.666667,446.5795935,Temperate,Australia/New Zealand,17,Sheep,Lower,61
+Eaton et al. 2011,CG-SRG,240,2945.833333,1306.184299,240,841.6666667,499.9242367,Cold,Sth America,4,Cattle,Greater,62
+Enri et al. 2017,CG-SRG,180,3560,336.1547263,180,3250,671.7514421,Cold,Eurasia,0.82,Sheep,Equal,63
+Enri et al. 2017,CG-SRG,360,2660,176.7766953,360,2750,350,Cold,Eurasia,0.82,Cattle,Equal,64
+Gilley et al. 1996,UG-SRG,2,610,NA,2,980,NA,Cold,Nth America,2,Cattle,NA,9
+Gilley et al. 1996,CG-SRG,2,610,NA,2,678,NA,Cold,Nth America,2,Cattle,Greater,65
+Grings et al. 2002,CG-SRG,252,1442,517.5089564,252,1840,517.5089564,Arid/Semi arid,Nth America,0.575673415,Cattle,Equal,66
+Gutman et al. 1999,CG-SRG,3000,999,NA,3000,577,NA,Temperate,Middle East,0.171,Cattle,Equal,67
+Gutman et al. 1999,CG-SRG,3000,2990,NA,3000,2580,NA,Temperate,Middle East,0.171,Cattle,Equal,68
+Gutman et al. 1999,CG-SRG,3000,756,NA,3000,596,NA,Temperate,Middle East,0.171,Cattle,Equal,69
+Habtemicael et al. 2015,CG-SRG,18,2204,1243.093721,18,3696,861.2560595,Arid/Semi arid,Africa,1,Mixed,Lower,70
+Habtemicael et al. 2015,CG-SRG,18,1026,752.2201938,18,1586,570.2109083,Arid/Semi arid,Africa,1,Mixed,Lower,71
+Haggar et al. 1963,CG-SRG,12,2742.346333,678.3072064,12,2342.5765,712.7760025,Temperate,Europe,4,Sheep,Equal,72
+Haggar et al. 1963,CG-SRG,8,3844.5155,269.4706161,8,2914.21,760.8582103,Temperate,Europe,4,Sheep,Equal,73
+Haider et al. 2011,UG-SRG,160,428.75,57.5,160,615,176.7295486,Temperate,Middle East,3,Unknown,Equal,10
+Haider et al. 2011,UG-SRG,160,640,98.99494937,160,615,176.7295486,Temperate,Middle East,1,Unknown,Equal,11
+Haider et al. 2011,CG-SRG,160,428.75,57.5,160,310,131.9090596,Temperate,Middle East,3,Unknown,Equal,74
+Haider et al. 2011,CG-SRG,160,640,98.99494937,160,310,131.9090596,Temperate,Middle East,1,Unknown,Equal,75
+Hall et al. 2014,CG-SRG,18,2400,NA,21,2340,NA,Temperate,Australia/New Zealand,1.08,Cattle,Lower,76
+Hall et al. 2014,CG-SRG,24,2520,NA,21,2340,NA,Temperate,Australia/New Zealand,24.92,Cattle,Equal,77
+Hao et al. 2013,CG-SRG,48,640.75,219.7275689,48,630,254.281519,Arid/Semi arid,Eurasia,3.03,Sheep,Equal,78
+Harmoney et al. 2001,UG-SRG,90,1965.666667,422.0442315,90,2993.333333,549.3599306,Cold,Nth America,NA,Unknown,NA,12
+Harmoney et al. 2001,CG-SRG,90,1965.666667,422.0442315,90,1717.333333,528.1565425,Cold,Nth America,NA,Unknown,Equal,79
+Heitschmidt et al. 1987,CG-SRG,280,1100,469.7073557,280,1917.857143,484.9214468,Arid/Semi arid,Nth America,NA,Unknown,Equal,166
+Hidalgo and Cauhepe 1991,CG-SRG,720,3162.5,1371.847034,720,2706.25,810.8362086,Temperate,Sth America,0.502,Cattle,NA,81
+Hidalgo and Cauhepe 1991,CG-SRG,720,2743.75,918.6315521,720,2706.25,810.8362086,Temperate,Sth America,0.587,Cattle,NA,82
+Holst et al. 2006,CG-SRG,600,820,255.2606511,600,725.25,240.312817,Temperate,Australia/New Zealand,3,Sheep,Lower,83
+Holst et al. 2006,CG-SRG,600,911.5,143.6488775,600,1012,337.5588838,Temperate,Australia/New Zealand,3,Sheep,Lower,84
+Holst et al. 2006,CG-SRG,450,894.6666667,135.975488,450,747,251.8650432,Temperate,Australia/New Zealand,3,Sheep,Lower,85
+James et al. 2017,UG-SRG,127.5,1749,3387.476937,15,2465,573.2015352,Temperate,Nth America,NA,Cattle,NA,13
+James et al. 2017,UG-SRG,127.5,1074,2551.899293,15,2857,1010.848653,Temperate,Nth America,NA,Cattle,NA,14
+James et al. 2017,UG-SRG,68,2024,1517.30287,8,3893,1977.07056,Temperate,Nth America,NA,Sheep,NA,15
+James et al. 2017,UG-SRG,68,1873,1731.704363,8,4450,899.4398257,Temperate,Nth America,NA,Sheep,NA,16
+Kahn et al. 2010,UG-SRG,250,1800,3162.27766,250,2800,3162.27766,Arid/Semi arid,Australia/New Zealand,0.515,Sheep,NA,17
+Kahn et al. 2010,UG-SRG,250,1825,3162.27766,250,2801,3178.089048,Arid/Semi arid,Australia/New Zealand,3.56,Sheep,NA,18
+Kahn et al. 2010,UG-SRG,250,2200,3162.27766,250,2802,3193.900437,Arid/Semi arid,Australia/New Zealand,5.56,Sheep,NA,19
+Kahn et al. 2010,UG-SRG,250,2525,3162.27766,250,2803,3209.711825,Arid/Semi arid,Australia/New Zealand,23.3,Sheep,NA,20
+Kauffman et al. 1983,UG-SRG,90,1137,209.4015282,90,1336,236.5142702,Temperate,Nth America,NA,Cattle,NA,21
+Kauffman et al. 1983,UG-SRG,90,2940,387.6093394,90,3528.666667,929.6054719,Temperate,Nth America,NA,Cattle,NA,22
+Kauffman et al. 1983,UG-SRG,90,1686.333333,194.8187192,90,1940.333333,483.853628,Temperate,Nth America,NA,Cattle,NA,23
+Kauffman et al. 1983,UG-SRG,90,7484.333333,1136.017752,90,6555.666667,2866.287901,Temperate,Nth America,NA,Cattle,NA,24
+Kauffman et al. 1983,UG-SRG,90,2032.666667,694.6310771,90,1712.333333,834.9852294,Temperate,Nth America,NA,Cattle,NA,25
+Kauffman et al. 1983,UG-SRG,90,1638,577.2105335,90,1598.666667,462.7357057,Temperate,Nth America,NA,Cattle,NA,26
+Kauffman et al. 1983,UG-SRG,90,1500.666667,137.7909044,90,1715.666667,216.956985,Temperate,Nth America,NA,Cattle,NA,27
+Kauffman et al. 1983,UG-SRG,90,2167.5,7.778174593,90,2632.5,908.6322138,Temperate,Nth America,NA,Cattle,NA,28
+Kauffman et al. 1983,UG-SRG,90,1839.333333,400.5899816,90,2046.666667,918.5827852,Temperate,Nth America,NA,Cattle,NA,29
+Kauffman et al. 1983,UG-SRG,90,3975.5,16.26345597,90,3428,304.0559159,Temperate,Nth America,NA,Cattle,NA,30
+Kioko et al. 2012,UG-SRG,500,5639.94,NA,500,5350,NA,Arid/Semi arid,Africa,NA,Cattle,NA,31
+Kioko et al. 2012,UG-SRG,500,5639.94,NA,500,1082,NA,Arid/Semi arid,Africa,NA,Cattle,NA,31
+Kirby et al. 1986,CG-SRG,180,1705.5,703.5712473,180,2840.5,935.5022715,Cold,Nth America,7,Cattle,Lower,86
+Kitessa and Nicol 2001,CG-SRG,12,3005,1435.426766,12,1890,180.133284,Temperate,Australia/New Zealand,NA,Mixed,Equal,87
+Kitessa and Nicol 2001,CG-SRG,12,2352,1060.660172,12,1453,195.0289209,Temperate,Australia/New Zealand,NA,Mixed,Equal,88
+Kitessa and Nicol 2001,CG-SRG,12,2407,927.7240969,12,1635,453.7973116,Temperate,Australia/New Zealand,NA,Cattle,Equal,89
+Laycock and Conrad  1981,UG-SRG,300,876.5047,183.8740675,300,1012.687975,138.6981112,Arid/Semi arid,Nth America,2,Cattle,NA,32
+Laycock and Conrad  1981,UG-SRG,100,936.470175,184.6666281,100,829.989425,151.3790814,Arid/Semi arid,Nth America,1,Cattle,NA,33
+Laycock and Conrad  1981,UG-SRG,50,1197.628225,10.30328826,50,1549.575125,279.7739044,Arid/Semi arid,Nth America,1,Cattle,NA,34
+Laycock and Conrad  1981,UG-SRG,250,1645.968225,565.0957332,250,1798.403825,133.9427474,Arid/Semi arid,Nth America,1,Cattle,NA,35
+Laycock and Conrad  1981,UG-SRG,50,2001.277675,1739.670595,50,2483.243175,1268.889578,Arid/Semi arid,Nth America,1,Cattle,NA,36
+Laycock and Conrad  1981,UG-SRG,250,1316.99875,589.665113,250,1439.731825,501.6908824,Arid/Semi arid,Nth America,1,Cattle,NA,37
+Laycock and Conrad  1981,CG-SRG,300,876.5047,183.8740675,300,835.593675,15.05865208,Cold,Nth America,2,Cattle,NA,90
+Laycock and Conrad  1981,CG-SRG,100,936.470175,184.6666281,100,835.593675,15.05865208,Cold,Nth America,1,Cattle,NA,91
+Lodge and King 2006,CG-SRG,540,3490,NA,540,1168,NA,Temperate,Australia/New Zealand,1,Sheep,Equal,92
+Lodge and King 2006,CG-SRG,540,4305,NA,540,1168,NA,Temperate,Australia/New Zealand,3,Sheep,Equal,93
+Lodge and King 2006,CG-SRG,540,4354,NA,540,3244,NA,Temperate,Australia/New Zealand,1,Sheep,Equal,94
+Lodge and King 2006,CG-SRG,540,4191,NA,540,3244,NA,Temperate,Australia/New Zealand,3,Sheep,Equal,95
+Lodge and King 2006,CG-SRG,180,5940,NA,180,3195,NA,Temperate,Australia/New Zealand,0.106,Sheep,Equal,96
+Lodge and King 2006,CG-SRG,180,5940,NA,180,5140,NA,Temperate,Australia/New Zealand,0.106,Sheep,Equal,96
+Lodge et al. 2003,CG-SRG,300,3435,NA,300,1641,NA,Temperate,Australia/New Zealand,1,Sheep,Equal,97
+Lodge et al. 2003,CG-SRG,300,3839,NA,300,1269,NA,Temperate,Australia/New Zealand,4,Sheep,Equal,98
+Lomas et al. 2000,CG-SRG,54,1741.6,189.6639908,54,1825.6,189.6639908,Temperate,Nth America,7.14,Cattle,Equal,99
+Lomas et al. 2000,CG-SRG,54,4332.5,2029.279777,54,4106.7,2029.279777,Temperate,Nth America,7.14,Cattle,Equal,100
+Lucas et al. 2004,UG-SRG,56,1088,658.5317001,56,1241,1167.397105,Arid/Semi arid,Nth America,NA,Cattle,NA,38
+Lucas et al. 2004,UG-SRG,56,1183,621.1151262,56,1241,1167.397105,Arid/Semi arid,Nth America,NA,Cattle,NA,39
+Ma et al. 2014,CG-SRG,45,1001,167.7050983,45,337,167.7050983,Arid/Semi arid,Eurasia,0.431,Sheep,Lower,101
+Ma et al. 2014,CG-SRG,45,1001,167.7050983,45,373,167.7050983,Arid/Semi arid,Eurasia,0.431,Sheep,Lower,101
+Ma et al. 2014,CG-SRG,45,1001,167.7050983,45,569,167.7050983,Arid/Semi arid,Eurasia,0.431,Sheep,Lower,101
+Ma et al. 2014,CG-SRG,45,1004,167.7050983,45,337,167.7050983,Arid/Semi arid,Eurasia,0.431,Sheep,Lower,102
+Ma et al. 2014,CG-SRG,45,1004,167.7050983,45,373,167.7050983,Arid/Semi arid,Eurasia,0.431,Sheep,Lower,102
+Ma et al. 2014,CG-SRG,45,1004,167.7050983,45,569,167.7050983,Arid/Semi arid,Eurasia,0.431,Sheep,Lower,102
+Martin and Severson 1988,CG-SRG,300,403,314.1787789,600,439.1666667,342.0355984,Arid/Semi arid,Nth America,2,Cattle,Equal,103
+McCollum and Gillen 1998,CG-SRG,360,4266.25,776.0603345,360,3262.5,788.1624198,Temperate,Nth America,7,Cattle,Equal,104
+McDonald et al. 1986,CG-SRG,144,1850,838.8,144,1400,838.8,Temperate,Australia/New Zealand,NA,Sheep,Equal,105
+Morley et al. 1969,CG-SRG,18,2336.666667,1134.563058,24,2835,1439.224328,Temperate,Australia/New Zealand,2,Sheep,Equal,106
+Morley et al. 1969,CG-SRG,24,2282.5,1060.451948,24,2835,1439.224328,Temperate,Australia/New Zealand,8,Sheep,Equal,107
+Moyo et al.  2011,CG-SRG,2000,0.6,1.788854382,2000,0.55,1.788854382,Arid/Semi arid,Africa,4,Cattle,Equal,108
+Oates and Jackson 2014,CG-SRG,180,11700,989.9494937,180,8100,989.9494937,Cold,Nth America,14,Cattle,Equal,109
+Oates and Jackson 2014,CG-SRG,180,11700,989.9494937,90,2550,212.1320344,Cold,Nth America,14,Cattle,NA,109
+Ortega et al. 1997,CG-SRG,840,2311,NA,840,2245,NA,Temperate,Nth America,NA,Cattle,Equal,110
+Owensby et al. 1973,CG-SRG,90,4764.73335,NA,90,4391.4903,NA,Temperate,Nth America,1.14,Cattle,Equal,111
+Owensby et al. 1973,CG-SRG,90,3810.89,NA,90,2870.49685,NA,Temperate,Nth America,1.14,Cattle,Equal,112
+Owensby et al. 1973,CG-SRG,90,4447.5328,NA,90,3547.49025,NA,Temperate,Nth America,1.14,Cattle,Equal,113
+Paine et al. 1999,CG-SRG,215,1976.05855,61.81972958,160,952.7225,58.64948704,Cold,Nth America,NA,Cattle,Equal,114
+Phillip et al. 2001,CG-SRG,192,2225,391.9608824,192,2235,201.74241,Cold,Nth America,5,Cattle,Equal,115
+Phillip et al. 2001,CG-SRG,192,2175,416.37323,192,1960,372.9164339,Cold,Nth America,5,Cattle,Equal,116
+Phillip et al. 2001,CG-SRG,192,1915,490.8835571,192,1815,486.3811948,Cold,Nth America,5,Cattle,Equal,117
+Phillip et al. 2001,CG-SRG,192,2052.5,409.3388979,192,2235,201.74241,Cold,Nth America,15,Cattle,Equal,118
+Phillip et al. 2001,CG-SRG,192,1852.5,327.6558154,192,1960,372.9164339,Cold,Nth America,15,Cattle,Equal,119
+Phillip et al. 2001,CG-SRG,192,1325,486.7237409,192,1815,486.3811948,Cold,Nth America,15,Cattle,Equal,120
+Popp et al. 1997,CG-SRG,80,3513.875,819.518596,80,2985.125,487.7134362,Cold,Nth America,9,Cattle,Equal,121
+Popp et al. 1997,CG-SRG,80,2007.5,535.3321399,80,2330.75,502.2387381,Cold,Nth America,9,Cattle,Equal,122
+Reardon and Merrill 1976,UG-SRG,20,2460.26575,NA,20,2011.92575,NA,Arid/Semi arid,Nth America,3,Mixed,NA,40
+Reardon and Merrill 1976,UG-SRG,20,2460.26575,NA,20,1593.8487,NA,Arid/Semi arid,Nth America,3,Mixed,NA,40
+Reardon and Merrill 1976,CG-SRG,20,2460.26575,NA,20,1073.7743,NA,Arid/Semi arid,Nth America,3,Mixed,Lower,123
+Reardon and Merrill 1976,CG-SRG,20,2460.26575,NA,20,2228.2498,NA,Arid/Semi arid,Nth America,3,Mixed,Greater,123
+Sanford et al. 2003,CG-SRG,3038.4,7940,NA,3038.4,7520,NA,Temperate,Australia/New Zealand,3,Sheep,Greater,163
+Sanford et al. 2003,CG-SRG,3038.4,7750,NA,3038.4,7520,NA,Temperate,Australia/New Zealand,7,Sheep,Greater,164
+Sanford et al. 2003,CG-SRG,3038.4,6640,NA,3038.4,7120,NA,Temperate,Australia/New Zealand,3,Sheep,Greater,165
+Sanjari et al. 2016,CG-SRG,1540,2442.857143,568.9380249,1540,2107.142857,375.7532118,Temperate,Australia/New Zealand,7.2,Sheep,Equal,124
+Saunders and Fausch 2007,CG-SRG,40,4600,3794.733192,40,1600,3478.505426,Cold,Nth America,14.7,Cattle,Greater,125
+Saunders and Fausch 2012,UG-SRG,16,1150,1200,12,1450,1039.230485,Cold,Nth America,2,Cattle,NA,41
+Saunders and Fausch 2012,UG-SRG,20,2200,1118.033989,12,1450,1039.230485,Cold,Nth America,5.3,Cattle,NA,42
+Saunders and Fausch 2012,CG-SRG,16,1150,1200,16,700,1000,Cold,Nth America,2,Cattle,NA,126
+Saunders and Fausch 2012,CG-SRG,20,2200,1118.033989,16,700,1000,Cold,Nth America,5.3,Cattle,NA,127
+Savadogo et al. 2007,UG-SRG,24,2600,NA,24,2950,NA,Arid/Semi arid,Africa,8,Cattle,NA,43
+Savadogo et al. 2007,UG-SRG,24,1650,NA,24,2950,NA,Arid/Semi arid,Africa,8,Cattle,NA,44
+Savadogo et al. 2007,UG-SRG,24,1350,NA,24,2950,NA,Arid/Semi arid,Africa,8,Cattle,NA,45
+Savadogo et al. 2007,UG-SRG,24,1350,NA,24,3100,NA,Arid/Semi arid,Africa,8,Cattle,NA,45
+Savadogo et al. 2007,UG-SRG,24,1100,NA,24,2950,NA,Arid/Semi arid,Africa,8,Cattle,NA,46
+Savadogo et al. 2007,UG-SRG,24,2250,NA,24,3100,NA,Arid/Semi arid,Africa,8,Cattle,NA,47
+Savadogo et al. 2007,UG-SRG,24,2850,NA,24,3100,NA,Arid/Semi arid,Africa,8,Cattle,NA,48
+Savadogo et al. 2007,UG-SRG,24,1000,NA,24,3100,NA,Arid/Semi arid,Africa,8,Cattle,NA,49
+Sedivec et al. 1990,CG-SRG,5,3062,NA,5,3207,NA,Cold,Nth America,7.14,Cattle,Greater,128
+Sedivec et al. 1990,CG-SRG,5,2892,NA,5,3207,NA,Cold,Nth America,3,Cattle,Greater,129
+Sedivec et al. 1990,CG-SRG,5,3617,NA,5,3207,NA,Cold,Nth America,1,Cattle,Greater,130
+Selemani et al. 2013,CG-SRG,200,555,1131.37085,400,420,1000,Tropical,Africa,NA,Unknown,NA,131
+Selemani et al. 2013,CG-SRG,200,550,1131.37085,400,420,1000,Tropical,Africa,NA,Unknown,NA,132
+Selemani et al. 2013,CG-SRG,200,550,1131.37085,400,420,1000,Tropical,Africa,NA,Unknown,NA,132
+Selemani et al. 2013,CG-SRG,200,765,1131.37085,400,420,1000,Tropical,Africa,NA,Unknown,NA,133
+Smith et al. 1973,CG-SRG,64,4400,4000,64,3400,4000,Temperate,Australia/New Zealand,0.106,Sheep,Lower,134
+Smith et al. 1973,CG-SRG,64,2800,4000,64,2700,4000,Temperate,Australia/New Zealand,0.106,Sheep,Lower,135
+Sun et al. 2015,CG-SRG,405,2300,30,405,2200,50,Cold,Eurasia,1.45,Sheep,Equal,136
+Teague et al. 2010,CG-SRG,60,2550,721.1102551,60,1900,435.8898944,Temperate,Nth America,7,Cattle,Equal,137
+Teague et al. 2010,CG-SRG,80,1925,434.932945,80,1625,510.7184482,Temperate,Nth America,7,Cattle,Equal,138
+Teague et al. 2011,UG-SRG,120,4680,NA,120,5149,NA,Temperate,Nth America,30,Cattle,NA,50
+Teague et al. 2011,CG-SRG,120,4680,NA,120,3960,NA,Temperate,Nth America,30,Cattle,Greater,139
+Teague et al. 2011,CG-SRG,120,4680,NA,120,2696,NA,Temperate,Nth America,30,Cattle,Equal,139
+Tupper 1978,CG-SRG,1260,718.5714286,441.341611,1260,588.5714286,319.7560884,Arid/Semi arid,Australia/New Zealand,0.44,Sheep,Equal,144
+Tupper 1978,CG-SRG,1260,608.5714286,56.56854249,1260,565.7142857,219.2031022,Arid/Semi arid,Australia/New Zealand,0.44,Sheep,Equal,145
+Tupper 1978,CG-SRG,1260,439.2857143,42.42640687,1260,395,42.42640687,Arid/Semi arid,Australia/New Zealand,0.44,Sheep,Equal,146
+Vermeire et al. 2008,CG-SRG,120,1212,NA,120,1125,NA,Arid/Semi arid,Nth America,2.044,Cattle,Equal,147
+Vermeire et al. 2008,CG-SRG,120,1212,NA,120,1125,NA,Arid/Semi arid,Nth America,14,Cattle,Equal,147
+Vermeire et al. 2008,CG-SRG,120,1351,NA,120,1125,NA,Arid/Semi arid,Nth America,29,Cattle,Equal,148
+Waller et al. 2001a,CG-SRG,240,1503.333333,400.5413004,240,786.6666667,198.5782801,Temperate,Australia/New Zealand,7,Sheep,Greater,149
+Waller et al. 2001a,CG-SRG,240,1403.333333,418.8476254,240,1636.666667,270.6165799,Temperate,Australia/New Zealand,7,Sheep,Greater,150
+Wang et al. 2009,CG-SRG,288,541.3333333,165.6401723,288,430.1666667,179.5499002,Cold,Eurasia,3,Sheep,Equal,151
+Wang et al. 2014,UG-SRG,90,640,165.2271164,90,1016.666667,528.4253337,Cold,Eurasia,NA,Sheep,NA,51
+Wang et al. 2014,UG-SRG,90,893.3333333,337.0954365,90,1016.666667,528.4253337,Cold,Eurasia,NA,Sheep,NA,52
+Wang et al. 2014,UG-SRG,90,966.6666667,679.8774399,90,1016.666667,528.4253337,Cold,Eurasia,NA,Sheep,NA,53
+Wang et al. 2014,CG-SRG,90,640,165.2271164,90,710,455.7411546,Cold,Eurasia,NA,Sheep,Equal,152
+Wang et al. 2014,CG-SRG,90,893.3333333,337.0954365,90,710,455.7411546,Cold,Eurasia,NA,Sheep,Equal,153
+Wang et al. 2014,CG-SRG,90,966.6666667,679.8774399,90,710,455.7411546,Cold,Eurasia,NA,Sheep,Equal,154
+Wang et al. 2017,CG-SRG,25,422.7,114.5,25,292.8,296,Arid/Semi arid,Eurasia,NA,Sheep,Lower,155
+Wang et al. 2017,CG-SRG,25,804.2,357,25,292.8,296,Arid/Semi arid,Eurasia,1.38,Sheep,Lower,156
+Weltz and Wood 1986,UG-SRG,18,254,NA,18,380,NA,Arid/Semi arid,Nth America,NA,Unknown,NA,54
+Weltz and Wood 1986,UG-SRG,18,192,NA,18,380,NA,Arid/Semi arid,Nth America,NA,Unknown,NA,55
+Weltz and Wood 1986,UG-SRG,18,305,NA,18,628,NA,Arid/Semi arid,Nth America,NA,Unknown,NA,56
+Weltz and Wood 1986,UG-SRG,18,264,NA,18,628,NA,Arid/Semi arid,Nth America,NA,Unknown,NA,57
+Weltz and Wood 1986,CG-SRG,18,254,NA,18,288,NA,Arid/Semi arid,Nth America,NA,Unknown,Greater,157
+Weltz and Wood 1986,CG-SRG,18,254,NA,18,218,NA,Arid/Semi arid,Nth America,NA,Unknown,Equal,157
+Weltz and Wood 1986,CG-SRG,18,192,NA,18,288,NA,Arid/Semi arid,Nth America,NA,Unknown,Greater,158
+Weltz and Wood 1986,CG-SRG,18,192,NA,18,218,NA,Arid/Semi arid,Nth America,NA,Unknown,Equal,158
+Weltz and Wood 1986,CG-SRG,18,305,NA,18,341,NA,Arid/Semi arid,Nth America,NA,Unknown,Greater,159
+Weltz and Wood 1986,CG-SRG,18,264,NA,18,341,NA,Arid/Semi arid,Nth America,NA,Unknown,Greater,160
+White et al. 1991,CG-SRG,144,1214.166667,265.6549767,144,1199.166667,189.5419918,Arid/Semi arid,Nth America,8,Unknown,Greater,161
+Williamson et al. 2016,CG-SRG,500,3530,957.3101204,250,3784,395.9797975,Temperate,Nth America,22,Cattle,NA,162
+Zhou et al. 2010,UG-SRG,15,983,468.6309849,15,1271,499.6148517,Arid/Semi arid,Eurasia,2,Sheep,NA,59
+Zhou et al. 2010,UG-SRG,15,1021,511.2338017,15,1271,499.6148517,Arid/Semi arid,Eurasia,2,Sheep,NA,60
+Zhou et al. 2010,UG-SRG,15,567,487.9959016,15,1271,499.6148517,Arid/Semi arid,Eurasia,2,Sheep,NA,61
