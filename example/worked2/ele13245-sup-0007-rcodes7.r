@@ -1,14 +1,17 @@
 #run libraries
 pacman::p_load(ape, metafor, MCMCglmm, tidyverse, readxl)
+source("./R/func.R")
 
 #load data
-dat  <- read_excel("./example/worked2/ele13245-sup-0003-metas3.xlsx")
+dat  <- data.frame(read_excel("./example/worked2/ele13245-sup-0003-metas3.xlsx"))
 
 #remove rows with missing data
 dat <- na.omit(dat)
 
 #load phylogenetic tree
 tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
+
+tree_checks(data = dat, tree = tree, dataCol = "Focal_insect", type = "checks")
 
 #priors
 prior3<-list(R=list(V=1,nu=0.002),G=list(G1=list(V=1,nu=0.002),G2=list(V=1,nu=0.002),G3=list(V=1,nu=0.002)))
