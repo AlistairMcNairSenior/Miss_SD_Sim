@@ -38,7 +38,7 @@ phylogenymodel<-MCMCglmm(yi_g ~ Spatial_separation + temporal_separation + F_Gui
                          random=~Group+Year+Focal_insect, data=a1, mev=a1$vi, ginverse=list(Focal_insect=INtree$Ainv),
                          prior=prior3, nitt=1000000, thin=100, burnin=500000)
 
-
+saveRDS(phylogenymodel, "./example/worked2/phylogenymodel")
 
 #create subset to only model abundance data
 dat <- subset(dat, Measurement_type == "Abundance")
