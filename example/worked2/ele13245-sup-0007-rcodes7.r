@@ -5,8 +5,17 @@ source("./R/func.R")
 #load data
 dat  <- data.frame(read_excel("./example/worked2/ele13245-sup-0003-metas3.xlsx"))
 
+# Fix column classes
+dat$Experimental_standard_deviation <- as.numeric(dat$Experimental_standard_deviation)
+dat$Control_standard_deviation <- as.numeric(dat$Control_standard_deviation)
+
 #remove rows with missing data
 dat <- na.omit(dat)
+
+# Generate missing data in SD's at the effect size level. If you're missing one SD then your missing for control and experimental
+dat_missSD <- gen.miss(dat, missVar = "Experimental_standard_deviation",
+                           missCol2 = "Control_standard_deviation",
+                             n_miss = 0.2*nrow(dat))
 
 #load phylogenetic tree
 tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
@@ -29,7 +38,7 @@ check.species<-function(x) {any(x==tree1$tip.label)}
 a1 <- a1[sapply(a1[,"Focal_insect"],check.species),]
 
 # Quick check to make sure that pruning has been done correctly.
-tree_checks(data = a1, tree = tree1, dataCol = "Focal_insect", type = "checks")
+tree_checks(data = a1, tree = tree1, species_name_col = "Focal_insect", type = "checks")
 
 INtree <- inverseA(tree1,nodes="TIPS")
 
