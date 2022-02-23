@@ -27,35 +27,63 @@ gen.miss <- function(data, missVar, missCol2, n_miss){
 }
 
 
-cv_avg <- function(cv, n, group, data){
-  b_grp_cv_data <- data                                      %>%
-              group_by({{group}})                            %>%
-              mutate(   w_CV = weighted.mean({{cv}}, {{n}},
-                                             na.rm = TRUE),
-                     n_total = sum({{n}}, na.rm = TRUE))     %>%
-              ungroup(.)                                     %>%
-              mutate(b_CV = weighted.mean(w_CV, n_total))
+cv_avg <- function(cv, n, group, data, name){
+  # Calculate between study CV (or whatever). Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
+    b_grp_cv_data <- data                                      %>%
+                group_by({{group}})                            %>%
+                mutate(   w_CV = weighted.mean({{cv}}, {{n}},
+                                               na.rm = TRUE),
+                       n_total = sum({{n}}, na.rm = TRUE))     %>%
+                ungroup(.)                                     %>%
+                mutate(b_CV = weighted.mean(w_CV, n_total), .keep = "used")
 
-  return(data.frame(b_grp_cv_data))
+  # Make sure that label of the calculated columns is distinct from any other columns
+    names(b_grp_cv_data) <- paste0(names(b_grp_cv_data), "_", name)
 
+  # Append these calculated columns back to the original data and return the full dataset.
+    dat_new <- cbind(data, b_grp_cv_data)
+
+    return(data.frame(dat_new))
 }
 
 
-# test data for cv_avg function
-library(tidyverse)
-set.seed(76)
-x1 = rnorm(16, 6, 1)
-test_dat <- data.frame(stdy = rep(c(1,2,3,4), each = 4),
-                          x = x1,
-                         sd = exp(log(x1)*1.5 + rnorm(16, 0, sd = 0.10)),
-                          n = rpois(16, 15))
-test_dat <- test_dat %>% mutate(cv = x / sd)
-plot(sd ~ x, data = test_dat)
-plot(log(sd) ~ log(x), data = test_dat)
-
-t <- cv_avg(cv, n, stdy, data =  test_dat)
-
-# Now generate some missing data
-t2 <- gen.miss(test_dat, "sd", "cv", 6)
-
-t2_cv <- cv_avg(cv, n, stdy, data =  t2)
+# # test data for cv_avg function
+# library(tidyverse)
+# set.seed(76)
+# x1 = rnorm(16, 6, 1)
+# x2 = rnorm(16, 6, 1)
+# test_dat <- data.frame(stdy = rep(c(1,2,3,4), each = 4),
+#                           x1 = x1,
+#                          sd1 = exp(log(x1)*1.5 + rnorm(16, 0, sd = 0.10)),
+#                           n1 = rpois(16, 15),
+#                           x2 = x2,
+#                          sd2 = exp(log(x2)*1.5 + rnorm(16, 0, sd = 0.10)),
+#                           n2 = rpois(16, 15))
+# test_dat <- test_dat %>% mutate(cv1 = x1 / sd1,
+#                                 cv2 = x2 / sd2)
+# plot(sd ~ x, data = test_dat)
+# plot(log(sd) ~ log(x), data = test_dat)
+#
+# # Now generate some missing data
+# t2 <- gen.miss(test_dat, "sd1", "cv1", 6)
+# t2 <- gen.miss(test_dat, "sd2", "cv2", 6)
+#
+# t2_cv <- cv_avg(cv1, n1, stdy, name = "1", data =  t2)
+# t2_cv <- cv_avg(cv2, n2, stdy, name = "2", data =  t2_cv)
+#
+# # Check calculations are correct. All match what is expected
+# test <- t2_cv %>%  filter(stdy == "1")
+#
+# sum(test$n1) #59
+# sum(test$n2) #56
+# weighted.mean(test$cv1, test$n1, na.rm = T) #0.4183278
+# weighted.mean(test$cv2, test$n2, na.rm = T) #0.4579275
+#
+# # Between
+# wCV1 = unique(t2_cv$w_CV_1)
+# w_nt1 = c(59,58,58,50)
+# weighted.mean(wCV1, w_nt1) #0.4207684
+#
+# wCV2 = unique(t2_cv$w_CV_2)
+# w_nt2 = c(56, 56, 72, 63)
+# weighted.mean(wCV2, w_nt2) # 0.4000197
