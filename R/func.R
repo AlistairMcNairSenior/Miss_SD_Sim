@@ -74,6 +74,7 @@ cv_avg <- function(cv, n, group, data, name){
 # # Check calculations are correct. All match what is expected
 # test <- t2_cv %>%  filter(stdy == "1")
 #
+# # Within
 # sum(test$n1) #59
 # sum(test$n2) #56
 # weighted.mean(test$cv1, test$n1, na.rm = T) #0.4183278
