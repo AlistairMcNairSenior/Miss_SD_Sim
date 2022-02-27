@@ -103,8 +103,13 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
                            missCol2 = "Control_standard_deviation",
                            n_miss = 0.2*nrow(a2))
 
+   # Create missingness at the study level. It's more likely a study doesn't present SD than a subset of effects within a study.
+    stdies <- sample(unique(a2$Group), size = 0.2*(length(unique(a2$Group))))
+    a2missSD_stdy <- a2
+    a2missSD_stdy[which(a2missSD_stdy$Group %in% stdies), c("Experimental_standard_deviation", "Control_standard_deviation")] <- NA
+
     # Now, assume you needto exclude data with missing SD because you can't calculate effect size and sampling variance
-    complete_case_MV <- na.omit(a2_missSD)
+    complete_case_MV <- na.omit(a2missSD_stdy)
 
     # Prune tree.
     tree3_meta<-drop.tip(tree,
