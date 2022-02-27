@@ -33,7 +33,7 @@ cv_avg <- function(cv, n, group, data, name){
                 group_by({{group}})                            %>%
                 mutate(   w_CV = weighted.mean({{cv}}, {{n}},
                                                na.rm = TRUE),
-                       n_total = sum({{n}}, na.rm = TRUE))     %>% # Pooled N or mean N?
+                       n_mean = mean({{n}}, na.rm = TRUE))     %>%
                 ungroup(.)                                     %>%
                 mutate(b_CV = weighted.mean(w_CV, n_total, na.rm = TRUE), .keep = "used")
 
