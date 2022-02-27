@@ -35,7 +35,7 @@ cv_avg <- function(cv, n, group, data, name){
                                                na.rm = TRUE),
                        n_mean = mean({{n}}, na.rm = TRUE))     %>%
                 ungroup(.)                                     %>%
-                mutate(b_CV = weighted.mean(w_CV, n_total, na.rm = TRUE), .keep = "used")
+                mutate(b_CV = weighted.mean(w_CV, n_mean, na.rm = TRUE), .keep = "used")
 
   # Make sure that label of the calculated columns is distinct from any other columns
     names(b_grp_cv_data) <- paste0(names(b_grp_cv_data), "_", name)
