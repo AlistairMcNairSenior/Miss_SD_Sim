@@ -26,10 +26,6 @@ gen.miss <- function(data, missVar, missCol2, n_miss){
   return(data)
 }
 
-gen.miss2 <- function(data, missVar, n_miss){
-  data[sample(rownames(data), n_miss, replace = TRUE), missVar] <- NA
-  return(data)
-}
 
 cv_avg <- function(cv, n, group, data, name){
   # Calculate between study CV (or whatever). Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
@@ -39,7 +35,7 @@ cv_avg <- function(cv, n, group, data, name){
                                                na.rm = TRUE),
                        n_total = sum({{n}}, na.rm = TRUE))     %>% # Pooled N or mean N?
                 ungroup(.)                                     %>%
-                mutate(b_CV = weighted.mean(w_CV, n_total), .keep = "used")
+                mutate(b_CV = weighted.mean(w_CV, n_total, na.rm = TRUE), .keep = "used")
 
   # Make sure that label of the calculated columns is distinct from any other columns
     names(b_grp_cv_data) <- paste0(names(b_grp_cv_data), "_", name)
@@ -99,70 +95,4 @@ get_est <- function(model){
   ci.lb <- model$ci.lb
   ci.ub <- model$ci.ub
   return(data.frame(Est. = est, "95% LCI" = ci.lb, "95% UCI" = ci.ub, check.names = FALSE))
-}
-
-
-#' createMiss: Function for creating missingness in a data frames variables
-#' @param data the data frame to create missing values for variables. Note the last column should be an individual ID column
-#' @param p.miss the percentage of missing data for each variable.
-#' @param mcar if TRUE missingness is completely random for each variable.
-#` @param W if TRUE missingness is at the within individual level (i.e. individuals are missing a percentage of values).
-#` @param w.miss percentage of missingness at the within individual level (i.e. percentage of missing values within each individual). Used when mcar = 'TRUE', this will over-write p.miss.
-
-createMiss <- function(data, grp = "ID", missVar = c("x1", "x2", "x3"), col = 1:(ncol(data) - 1), p.miss = rep(0.2, ncol(data) - 1),  type = c("w", "all", "nrand")){
-
-  totCol <- 1:ncol(data)
-  cols <- totCol[-match(c(grp), colnames(data))]
-
-  #if(length(cols) != length(p.miss)){
-  #stop("The percentage of missingness is not defined for some columns OR you have entered too many missingness values")
-  #}
-
-  type = match.arg(type)
-
-  if(type  == "all"){
-    # Will ignore individuals, but create a set amount of missingness throughout the entire dataset. Can specify different missingness for each variable.
-    n_miss <- p.miss*nrow(data)
-    data <- gen.miss(data, grp, n_miss)
-    return(data)
-  }
-
-  if(type == "w"){
-    # Split data by ID
-    dtmp <- split(data, data[,grp])
-
-    #Generate number of rows to create missing data for each ind
-    n_miss <- p.miss*(nrow(data) / length(unique(data[,grp])))
-
-    # Create missing data within each individual. Restricted to all individuals having same amount of data at this point. But you can change the missingness per variable per individual.
-    dat <- lapply(dtmp, function(x) gen.miss2(x, missVar, n_miss))
-    return(plyr::ldply(dat, .id = NULL))
-  }
-
-
-  if(type == "nrand"){
-    #pattern1 <- c(rep(TRUE, 3), rep(FALSE,5), rep(TRUE, 2))
-    pattern1 <- c(rep(FALSE, 3), rep(TRUE,5), rep(FALSE, 2))
-    pattern2 <- c(rep(TRUE, 3), rep(FALSE,5), rep(TRUE, 2))
-
-
-    # Split data by ID
-    # Sample IDs within treatments
-    ids <- as.vector(unlist(as.vector(lapply(data %>% split(trt, drop = TRUE), function(x) sample(unique(x$ind), 5)))))
-
-    # Split by ID
-    dtmp <- split(data, data[,grp])
-
-    # create missing data patterns
-    for(i in names(dtmp)){
-      if(i %in% ids){
-        dtmp[[i]][pattern1, missVar] <- NA
-      } else{
-        dtmp[[i]][pattern2, missVar] <- NA
-      }
-    }
-
-    return(plyr::ldply(dtmp, .id = NULL))
-  }
-
 }
