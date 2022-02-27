@@ -31,11 +31,11 @@ cv_avg <- function(cv, n, group, data, name){
   # Calculate between study CV (or whatever). Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
     b_grp_cv_data <- data                                      %>%
                 group_by({{group}})                            %>%
-                mutate(   w_CV = weighted.mean({{cv}}, {{n}},
+                mutate(   w_CV = weighted.mean({{cv}}^2, {{n}},
                                                na.rm = TRUE),
                        n_mean = mean({{n}}, na.rm = TRUE))     %>%
                 ungroup(.)                                     %>%
-                mutate(b_CV = weighted.mean(w_CV, n_mean, na.rm = TRUE), .keep = "used")
+                mutate(b_CV = weighted.mean(w_CV^2, n_mean, na.rm = TRUE), .keep = "used")
 
   # Make sure that label of the calculated columns is distinct from any other columns
     names(b_grp_cv_data) <- paste0(names(b_grp_cv_data), "_", name)
