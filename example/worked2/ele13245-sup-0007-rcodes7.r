@@ -95,18 +95,16 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
                           random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                           R = list(Focal_insect = phylo), data = a2)
     complete_mv_res <- get_est(complete_mv)
+
 #####################
 # Generate missing data & complete case analysis
 #####################
-    # Generate missing data in SD's at the effect size level. If you're missing one SD then your missing for control and experimental
-    a2_missSD <- gen.miss(a2, missVar = "Experimental_standard_deviation",
-                           missCol2 = "Control_standard_deviation",
-                           n_miss = 0.2*nrow(a2))
 
    # Create missingness at the study level. It's more likely a study doesn't present SD than a subset of effects within a study.
-    stdies <- sample(unique(a2$Group), size = 0.2*(length(unique(a2$Group))))
+    set.seed(65)
+    stdies <- sample(unique(a2$Author), size = 0.2*(length(unique(a2$Author))))
     a2missSD_stdy <- a2
-    a2missSD_stdy[which(a2missSD_stdy$Group %in% stdies), c("Experimental_standard_deviation", "Control_standard_deviation")] <- NA
+    a2missSD_stdy[which(a2missSD_stdy$Author %in% stdies), c("Experimental_standard_deviation", "Control_standard_deviation")] <- NA
 
     # Now, assume you needto exclude data with missing SD because you can't calculate effect size and sampling variance
     complete_case_MV <- na.omit(a2missSD_stdy)
