@@ -94,11 +94,33 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
     complete_mv <- rma.mv(yi_g ~ 1, V = vi,
                           random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                           R = list(Focal_insect = phylo), data = a2)
-
+    complete_mv_res <- get_est(complete_mv)
 #####################
-# Generate missing data
+# Generate missing data & complete case analysis
 #####################
     # Generate missing data in SD's at the effect size level. If you're missing one SD then your missing for control and experimental
     a2_missSD <- gen.miss(a2, missVar = "Experimental_standard_deviation",
                            missCol2 = "Control_standard_deviation",
                            n_miss = 0.2*nrow(a2))
+
+    # Now, assume you needto exclude data with missing SD because you can't calculate effect size and sampling variance
+    complete_case_MV <- na.omit(a2_missSD)
+
+    # Prune tree.
+    tree3_meta<-drop.tip(tree,
+                         tree$tip.label[which(tree$tip.label%in%complete_case_MV$Focal_insect==FALSE)])
+    check.species<-function(x) {any(x==tree3_meta$tip.label)}
+    complete_case_MV <- complete_case_MV[sapply(complete_case_MV[,"Focal_insect"],check.species),]
+
+    #Check that it was done right
+    tree_checks(data = complete_case_MV, tree = tree3_meta, species_name_col = "Focal_insect", type = "checks")
+
+    # Make new VCV matrix
+    phylo2 <- vcv(tree3_meta, corr = TRUE)
+
+    # Fit complete case analysis. Note that data is currently missing at random.
+    complete_case_mv <- rma.mv(yi_g ~ 1, V = vi,
+                          random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
+                          R = list(Focal_insect = phylo2), data = complete_case_MV)
+
+    complete_case_mv_res <- get_est(complete_case_mv)
