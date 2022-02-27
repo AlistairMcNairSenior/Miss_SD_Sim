@@ -99,20 +99,10 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
 
     phylo <- vcv(tree2_meta, corr = TRUE)
 
-
 ################################################
-# Whole/full data model
+    # Generate missing data
 ################################################
-
-    whole_mv <- rma.mv(yi_lnrr ~ 1, V = vi_lnrr,
-                          random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
-                          R = list(Focal_insect = phylo), data = a2)
-    whole_mv_res <- get_est(whole_mv)
-
-################################################
-# Generate missing data
-################################################
-   # Create missingness at the study level. It's more likely a study doesn't present SD than a subset of effects within a study.
+    # Create missingness at the study level. It's more likely a study doesn't present SD than a subset of effects within a study.
     set.seed(675)  # Important to note that, how much of an impact missing data will have really depends on the sample of studies, whether it's random or not.
     stdies <- sample(unique(a2$Author), size = 0.2*(length(unique(a2$Author))))
     a2missSD_stdy <- a2
@@ -133,6 +123,17 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
 
     # Make new VCV matrix
     phylo2 <- vcv(tree3_meta, corr = TRUE)
+
+
+
+################################################
+# Whole/full data model
+################################################
+
+    whole_mv <- rma.mv(yi_lnrr ~ 1, V = vi_lnrr,
+                          random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
+                          R = list(Focal_insect = phylo), data = a2)
+    whole_mv_res <- get_est(whole_mv)
 
 
 ################################################
@@ -161,9 +162,21 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
     a2missSD_stdy <- cv_avg(cv_Experimental, Experimental_sample_size, group = Author,
                             name = "2", data = a2missSD_stdy)
 
+    # Now using wighted mean CV in replacement for where CV's are missing
+    a2missSD_stdy <- a2missSD_stdy %>%
+                      mutate(cv_cont_new = if_else(is.na(cv_Control),      b_CV_1, cv_Control),
+                             cv_expt_new = if_else(is.na(cv_Experimental), b_CV_2, cv_Experimental))
 
+    # Now calculate new vi, called vi_DS_lnrr
+    a2missSD_stdy <- a2missSD_stdy %>%
+                      mutate(vi_DS_lnrr = (cv_cont_new^2 / Control_sample_size) + (cv_expt_new^2 / Experimental_sample_size))
 
+    # Fit model with new sampling variance
+    method_1A_mv <- rma.mv(yi_lnrr ~ 1, V = vi_DS_lnrr,
+                               random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
+                               R = list(Focal_insect = phylo), data = a2missSD_stdy)
 
+    method_1A_mv_res <- get_est(method_1A_mv)
 ################################################
     # METHOD 1B
 ################################################
