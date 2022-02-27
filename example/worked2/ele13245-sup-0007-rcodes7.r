@@ -152,7 +152,7 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
     # Spake and Doncaster Method that takes CV across studies
     # FIrst calculate CV on missing dataset. Note missing data will be ignored
     a2missSD_stdy <- a2missSD_stdy %>%
-                      mutate(cv_Control = na_if(Control_mean / Control_standard_deviation, Inf),
+                 mutate(cv_Control = na_if(Control_mean / Control_standard_deviation, Inf),
                         cv_Experimental = na_if(Experimental_mean / Experimental_standard_deviation, Inf))
 
      # Now calculate the average between study CV, which will replace missing values.
@@ -180,6 +180,28 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
 ################################################
     # METHOD 1B
 ################################################
+    lnrr_laj <- function(m1, m2, cv1, cv2, n1, n2){
+            log(m1 / m2) + 0.5*(weighted.mean(cv1^2, n1) - weighted.mean(cv2^2, n2))
+    }
+
+    v_lnrr_laj <- function(cv1, cv2, n1, n2){
+          (weighted.mean(cv1^2, n_mean_1) / n1) + (weighted.mean(cv2^2, n_mean_2) / n2) +
+        (weighted.mean(cv1^2, n_mean_1)^2 / (2*(n1^2))) + (weighted.mean(cv2^2, n_mean_2)^2 / (2*(n2^2)))
+    }
+
+    # Now calculate new yi andvi, called lnrr_laj & v_lnrr_laj, respectively.
+    a2missSD_stdy <- a2missSD_stdy %>%
+      mutate(lnrr_laj = lnrr_laj(m1 = Control_mean, m2 = Experimental_mean, cv1 = cv_cont_new, cv2 = cv_expt_new,
+                                 n1= Control_sample_size, n2 = Experimental_sample_size),
+           v_lnrr_laj = v_lnrr_laj(cv1 = cv_cont_new, n1= Control_sample_size,
+                                   cv2 = cv_expt_new, n2 = Experimental_sample_size))
+
+    # Fit model with new sampling variance
+    method_1B_mv <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj,
+                           random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
+                           R = list(Focal_insect = phylo), data = a2missSD_stdy)
+
+    method_1B_mv_res <- get_est(method_1B_mv)
 ################################################
     # METHOD 2
 ################################################
