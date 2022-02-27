@@ -88,3 +88,11 @@ cv_avg <- function(cv, n, group, data, name){
 # wCV2 = unique(t2_cv$w_CV_2)
 # w_nt2 = c(56, 56, 72, 63)
 # weighted.mean(wCV2, w_nt2) # 0.4000197
+
+
+get_est <- function(model){
+  est <- coef(model)
+  ci.lb <- model$ci.lb
+  ci.ub <- model$ci.ub
+  return(data.frame(Est. = est, "95% LCI" = ci.lb, "95% UCI" = ci.ub, check.names = FALSE))
+}
