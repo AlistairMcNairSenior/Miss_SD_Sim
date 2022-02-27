@@ -1,7 +1,7 @@
 ############################
 # Load libraries
 ###########################
-rm(ls=list())
+rm(list=ls())
 pacman::p_load(ape, metafor, MCMCglmm, tidyverse, readxl)
 source("./R/func.R")
 
@@ -21,8 +21,6 @@ dat$obs <- 1:nrow(dat) # Needed for metafor to make model equivalent to MCMCglmm
 
 #load phylogenetic tree
 tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
-
-tree_checks(data = dat, tree = tree, species_name_col = "Focal_insect", type = "checks")
 
 ##################
 # Checks with authors code
@@ -162,14 +160,14 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
     a2missSD_stdy <- cv_avg(cv_Experimental, Experimental_sample_size, group = Author,
                             name = "2", data = a2missSD_stdy)
 
-    # Now using wighted mean CV in replacement for where CV's are missing
+    # Now using wighted mean CV in replacement for where CV's are missing. Note that function above already 2 CV so need to do that on original CV
     a2missSD_stdy <- a2missSD_stdy %>%
-                      mutate(cv_cont_new = if_else(is.na(cv_Control),      b_CV_1, cv_Control),
-                             cv_expt_new = if_else(is.na(cv_Experimental), b_CV_2, cv_Experimental))
+                      mutate(cv_cont_new = if_else(is.na(cv_Control),      b_CV_1, cv_Control^2),
+                             cv_expt_new = if_else(is.na(cv_Experimental), b_CV_2, cv_Experimental^2))
 
-    # Now calculate new vi, called vi_DS_lnrr
+    # Now calculate new vi, called vi_DS_lnrr. Note that CV is alreday ^2
     a2missSD_stdy <- a2missSD_stdy %>%
-                      mutate(vi_DS_lnrr = (cv_cont_new^2 / Control_sample_size) + (cv_expt_new^2 / Experimental_sample_size))
+                      mutate(vi_DS_lnrr = (cv_cont_new / Control_sample_size) + (cv_expt_new / Experimental_sample_size))
 
     # Fit model with new sampling variance
     method_1A_mv <- rma.mv(yi_lnrr ~ 1, V = vi_DS_lnrr,
@@ -180,13 +178,13 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
 ################################################
     # METHOD 1B
 ################################################
-    lnrr_laj <- function(m1, m2, cv1, cv2, n1, n2){
-            log(m1 / m2) + 0.5*(weighted.mean(cv1^2, n1) - weighted.mean(cv2^2, n2))
+    lnrr_laj <- function(m1, m2, cv1_2, cv2_2, n1, n2){
+            log(m1 / m2) + 0.5*((cv1_2 / n1) - (cv2_2 / n2))
     }
 
-    v_lnrr_laj <- function(cv1, cv2, n1, n2){
-          (weighted.mean(cv1^2, n_mean_1) / n1) + (weighted.mean(cv2^2, n_mean_2) / n2) +
-        (weighted.mean(cv1^2, n_mean_1)^2 / (2*(n1^2))) + (weighted.mean(cv2^2, n_mean_2)^2 / (2*(n2^2)))
+    v_lnrr_laj <- function(cv1_2, cv2_2, n1, n2){
+          ((cv1_2) / n1) + ((cv2_2) / n2) +
+        ((cv1_2)^2 / (2*n1)^2) + ((cv2_2)^2 / (2*n2)^2)
     }
 
     # Now calculate new yi andvi, called lnrr_laj & v_lnrr_laj, respectively.
