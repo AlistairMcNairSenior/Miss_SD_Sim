@@ -1,6 +1,7 @@
 ############################
 # Load libraries
 ###########################
+rm(ls=list())
 pacman::p_load(ape, metafor, MCMCglmm, tidyverse, readxl)
 source("./R/func.R")
 
@@ -75,6 +76,18 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
 # Intercept only model. for Abundance fitness ONLY. The authors state: "We first estimated the average impact of insect interaction on each fitness component by fitting linear models in which the intercept was the only fixed effect." Table 1 provides the fitness components. Abundance has the most data.
     a2 <- dat %>% filter(Fitness_component == "Abundance") # Doesn't quite match Table 1, but does match figure 1, and even exclusion N = 311, which matches.
 
+    # Here, we want to use lnRR so we need to calculate this
+    a2 <- escalc( m1i = Control_mean,
+                  m2i = Experimental_mean,
+                 sd1i = Control_standard_deviation,
+                 sd2i = Experimental_standard_deviation,
+                  n1i = Control_sample_size,
+                  n2i = Experimental_sample_size,
+                 measure = "ROM", var.names=c("yi_lnrr","vi_lnrr"),
+                 append = TRUE, data = a2)
+    # Some NA's because lnRR, not too many though 311 -> 306
+    a2 <- na.omit(a2)
+
     # Prune tree
     #align focal species with branches of phylogenetic tree
     tree2_meta<-drop.tip(tree,
@@ -88,10 +101,10 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
 
 
 ################################################
-# Complete data model
+# Whole/full data model
 ################################################
 
-    whole_mv <- rma.mv(yi_g ~ 1, V = vi,
+    whole_mv <- rma.mv(yi_lnrr ~ 1, V = vi_lnrr,
                           random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                           R = list(Focal_insect = phylo), data = a2)
     whole_mv_res <- get_est(whole_mv)
@@ -126,8 +139,37 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
 # Complete case analysis
 ################################################
     # Fit complete case analysis. Note that data is currently missing at random.
-    complete_case_mv <- rma.mv(yi_g ~ 1, V = vi,
+    complete_case_mv <- rma.mv(yi_lnrr ~ 1, V = vi_lnrr,
                           random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                           R = list(Focal_insect = phylo2), data = complete_case_MV)
 
     complete_case_mv_res <- get_est(complete_case_mv)
+
+################################################
+    # METHOD 1A
+################################################
+    # Spake and Doncaster Method that takes CV across studies
+    # FIrst calculate CV on missing dataset. Note missing data will be ignored
+    a2missSD_stdy <- a2missSD_stdy %>%
+                      mutate(cv_Control = na_if(Control_mean / Control_standard_deviation, Inf),
+                        cv_Experimental = na_if(Experimental_mean / Experimental_standard_deviation, Inf))
+
+     # Now calculate the average between study CV, which will replace missing values.
+     # Note that mean N used
+    a2missSD_stdy <- cv_avg(cv_Control, Control_sample_size, group = Author,
+                            name = "1", data = a2missSD_stdy)
+    a2missSD_stdy <- cv_avg(cv_Experimental, Experimental_sample_size, group = Author,
+                            name = "2", data = a2missSD_stdy)
+
+
+
+
+################################################
+    # METHOD 1B
+################################################
+################################################
+    # METHOD 2
+################################################
+################################################
+    # METHOD 3
+################################################
