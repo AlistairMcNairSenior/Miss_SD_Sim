@@ -87,21 +87,20 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
     phylo <- vcv(tree2_meta, corr = TRUE)
 
 
-#####################
+################################################
 # Complete data model
-#####################
+################################################
 
-    complete_mv <- rma.mv(yi_g ~ 1, V = vi,
+    whole_mv <- rma.mv(yi_g ~ 1, V = vi,
                           random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                           R = list(Focal_insect = phylo), data = a2)
-    complete_mv_res <- get_est(complete_mv)
+    whole_mv_res <- get_est(whole_mv)
 
-#####################
-# Generate missing data & complete case analysis
-#####################
-
+################################################
+# Generate missing data
+################################################
    # Create missingness at the study level. It's more likely a study doesn't present SD than a subset of effects within a study.
-    set.seed(65)
+    set.seed(675)  # Important to note that, how much of an impact missing data will have really depends on the sample of studies, whether it's random or not.
     stdies <- sample(unique(a2$Author), size = 0.2*(length(unique(a2$Author))))
     a2missSD_stdy <- a2
     a2missSD_stdy[which(a2missSD_stdy$Author %in% stdies), c("Experimental_standard_deviation", "Control_standard_deviation")] <- NA
@@ -116,11 +115,16 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
     complete_case_MV <- complete_case_MV[sapply(complete_case_MV[,"Focal_insect"],check.species),]
 
     #Check that it was done right
-    tree_checks(data = complete_case_MV, tree = tree3_meta, species_name_col = "Focal_insect", type = "checks")
+    tree_checks(data = complete_case_MV, tree = tree3_meta,
+                species_name_col = "Focal_insect", type = "checks")
 
     # Make new VCV matrix
     phylo2 <- vcv(tree3_meta, corr = TRUE)
 
+
+################################################
+# Complete case analysis
+################################################
     # Fit complete case analysis. Note that data is currently missing at random.
     complete_case_mv <- rma.mv(yi_g ~ 1, V = vi,
                           random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
