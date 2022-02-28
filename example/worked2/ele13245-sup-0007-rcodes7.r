@@ -106,6 +106,9 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
     a2missSD_stdy <- a2
     a2missSD_stdy[which(a2missSD_stdy$Author %in% stdies), c("Experimental_standard_deviation", "Control_standard_deviation")] <- NA
 
+    # Seems to be some issue data when calculating sampling variances with CV, which suggest some raw data maybe wrong.
+    a2missSD_stdy <- a2missSD_stdy[!a2missSD_stdy$ID%in%c("833", "1176"),]
+
     # Now, assume you needto exclude data with missing SD because you can't calculate effect size and sampling variance
     complete_case_MV <- na.omit(a2missSD_stdy)
 
@@ -150,7 +153,7 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
     # Spake and Doncaster Method that takes CV across studies
     # FIrst calculate CV on missing dataset. Note missing data will be ignored
     a2missSD_stdy <- a2missSD_stdy %>%
-                 mutate(cv_Control = na_if(Control_mean / Control_standard_deviation, Inf),
+                 mutate(     cv_Control = na_if(Control_mean / Control_standard_deviation, Inf),
                         cv_Experimental = na_if(Experimental_mean / Experimental_standard_deviation, Inf))
 
      # Now calculate the average between study CV, which will replace missing values.
