@@ -176,13 +176,13 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
       missing_dat <- which(is.na(a2missSD_stdy$Control_standard_deviation) & is.na(a2missSD_stdy$Experimental_standard_deviation))
 
     # Set the effect sizes not missing data to zero in the V_es matrix
-    V_es2 <- diag(a2missSD_stdy$v_lnrr_laj)
+                        V_es2 <- diag(a2missSD_stdy$v_lnrr_laj)
     diag(V_es2)[-missing_dat] <- 0
-    row.names(V_es2) <- a2missSD_stdy$obs
-    a2missSD_stdy$obs2 <- rownames(V_es2)
+             row.names(V_es2) <- a2missSD_stdy$obs
+           a2missSD_stdy$obs2 <- rownames(V_es2)
 
     # Set the v_lnrr_laj to 0
-    a2missSD_stdy$v_lnrr_laj_m3 <- a2missSD_stdy$v_lnrr_laj
+                 a2missSD_stdy$v_lnrr_laj_m3 <- a2missSD_stdy$v_lnrr_laj
     a2missSD_stdy$v_lnrr_laj_m3[missing_dat] <- 0
 
     method3_mv <-rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_m3, random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs, ~1|obs2),
