@@ -22,52 +22,6 @@ dat$obs <- 1:nrow(dat) # Needed for metafor to make model equivalent to MCMCglmm
 #load phylogenetic tree
 tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 
-##################
-# Checks with authors code
-##################
-#set up for phylogeny model
-
-#create copy of data file to use with tree
-a1 <- dat
-
-#align focal species with branches of phylogenetic tree
-tree1<-drop.tip(tree,tree$tip.label[which(tree$tip.label%in%a1$Focal_insect==FALSE)])
-check.species<-function(x) {any(x==tree1$tip.label)}
-a1 <- a1[sapply(a1[,"Focal_insect"],check.species),]
-
-# Quick check to make sure that pruning has been done correctly.
-tree_checks(data = a1, tree = tree1, species_name_col = "Focal_insect", type = "checks")
-
-INtree <- inverseA(tree1)  # Metafor takes a correlation matrix
-INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
-
-#phylogeny model with fixed effects
-    rerun=FALSE
-    if(rerun){
-      #priors
-      prior3<-list(R=list(V=1,nu=0.002),
-                   G=list(G1=list(V=1,nu=0.002),
-                          G2=list(V=1,nu=0.002),
-                          G3=list(V=1,nu=0.002)))
-      prior6<-list(R=list(V=1,nu=0.002),
-                   G=list(G1=list(V=1,nu=0.002),
-                          G2=list(V=1,nu=0.002),
-                          G3=list(V=1,nu=0.002),
-                          G4=list(V=1,nu=0.002),
-                          G5=list(V=1,nu=0.002),
-                          G6=list(V=1,nu=0.002)))
-
-      phylogenymodel<-MCMCglmm(yi_g ~ Spatial_separation + temporal_separation + F_Guild + C_Guild + F_Guild:C_Guild,
-                             random=~Group+Year+Focal_insect, data=a1, mev=a1$vi, ginverse=list(Focal_insect=INtree$Ainv),
-                             prior=prior3, nitt=1000000, thin=100, burnin=500000)
-
-    saveRDS(phylogenymodel, "./example/worked2/phylogenymodel")} else {phylogenymodel <- readRDS("./example/worked2/phylogenymodel")}
-
-
-    ## Metafor models. First, check it matches autors code.
-    phylogenymodel_mv <- rma.mv(yi_g ~ Spatial_separation + temporal_separation + F_Guild + C_Guild + F_Guild:C_Guild, V = vi, random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs), R = list(Focal_insect = INtree2), data = a1)
-
-
 #######################
     # Example 2
 #######################
@@ -240,4 +194,4 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
 ################################################
     results <- rbind(whole_mv_res, complete_case_mv_res, method_1A_mv_res, method_1B_mv_res, method2_mv_res, method3_mv_res)
     row.names(results) <- c("Whole Data", "Complete Case", "Method 1A", "Method 1B", "Method 2", "Method 3")
-    write.csv(results, "./example/worked2/results2.csv", row.names = FALSE)
+    write.csv(results, "./example/worked2/results2.csv", row.names = TRUE)
