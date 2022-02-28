@@ -163,7 +163,8 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
     a2missSD_stdy <- cv_avg(cv_Experimental, Experimental_sample_size, group = Author,
                             name = "2", data = a2missSD_stdy)
 
-    # Now using wighted mean CV in replacement for where CV's are missing. Note that function above already CV^2 so need to do that on original CV
+    # Now using wighted mean CV in replacement for where CV's are missing.
+    # Note that function above already CV^2 so need to do that on original CV
     a2missSD_stdy <- a2missSD_stdy %>%
                       mutate(cv_cont_new = if_else(is.na(cv_Control),      b_CV_1, cv_Control^2),
                              cv_expt_new = if_else(is.na(cv_Experimental), b_CV_2, cv_Experimental^2))
@@ -206,6 +207,14 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
 ################################################
     # METHOD 2
 ################################################
+                 V_es <- diag(a2missSD_stdy$v_lnrr_laj)
+      row.names(V_es) <- a2missSD_stdy$obs
+   a2missSD_stdy$obs2 <- rownames(V_es)
+
+    method2_mv <-rma.mv(lnrr_laj ~ 1, V = 0, random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs, ~1|obs2),
+                        data=a2missSD_stdy, R=list(obs2=V_es), Rscale=F)
+    method2_mv_res <- get_est(method2_mv)
+
 ################################################
     # METHOD 3
 ################################################
