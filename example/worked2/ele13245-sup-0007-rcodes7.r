@@ -124,7 +124,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
                       mutate(cv_cont_new = if_else(is.na(cv_Control),      b_CV_1, cv_Control^2),
                              cv_expt_new = if_else(is.na(cv_Experimental), b_CV_2, cv_Experimental^2))
 
-    # Now calculate new vi, called vi_DS_lnrr. Note that CV is alreday ^2
+    # Now calculate new vi, called vi_DS_lnrr. Note that CV is alreday ^2. ** NOTE THAT THIS IS NOT CORRECT. USE EQN 7 for vi_DS_lnrr.
     a2missSD_stdy <- a2missSD_stdy %>%
                       mutate(vi_DS_lnrr = (cv_cont_new / Control_sample_size) + (cv_expt_new / Experimental_sample_size))
 
@@ -150,8 +150,8 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     a2missSD_stdy <- a2missSD_stdy %>%
       mutate(lnrr_laj = lnrr_laj(m1 = Control_mean, m2 = Experimental_mean, cv1 = cv_cont_new, cv2 = cv_expt_new,
                                  n1= Control_sample_size, n2 = Experimental_sample_size),
-           v_lnrr_laj = v_lnrr_laj(cv1 = cv_cont_new, n1= Control_sample_size,
-                                   cv2 = cv_expt_new, n2 = Experimental_sample_size))
+           v_lnrr_laj = v_lnrr_laj(cv1 = b_CV_1, n1= Control_sample_size,
+                                   cv2 = b_CV_2, n2 = Experimental_sample_size))
 
     # Fit model with new sampling variance
     method_1B_mv <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj,
