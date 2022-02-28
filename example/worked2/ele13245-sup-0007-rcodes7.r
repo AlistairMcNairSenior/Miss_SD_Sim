@@ -101,7 +101,9 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
     # Generate missing data
 ################################################
     # Create missingness at the study level. It's more likely a study doesn't present SD than a subset of effects within a study.
-    set.seed(675)  # Important to note that, how much of an impact missing data will have really depends on the sample of studies, whether it's random or not.
+    # Important to note that, how much of an impact missing data will have really depends on the sample of studies,
+    # whether it's random or not.
+    set.seed(675)
     stdies <- sample(unique(a2$Author), size = 0.2*(length(unique(a2$Author))))
     a2missSD_stdy <- a2
     a2missSD_stdy[which(a2missSD_stdy$Author %in% stdies), c("Experimental_standard_deviation", "Control_standard_deviation")] <- NA
@@ -124,8 +126,6 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
 
     # Make new VCV matrix
     phylo2 <- vcv(tree3_meta, corr = TRUE)
-
-
 
 ################################################
 # Whole/full data model
@@ -218,3 +218,26 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
 ################################################
     # METHOD 3
 ################################################
+    # Find where missing SD's are in the data
+      missing_dat <- which(is.na(a2missSD_stdy$Control_standard_deviation) & is.na(a2missSD_stdy$Experimental_standard_deviation))
+
+    # Set the effect sizes not missing data to zero in the V_es matrix
+    V_es2 <- diag(a2missSD_stdy$v_lnrr_laj)
+    diag(V_es2)[-missing_dat] <- 0
+    row.names(V_es2) <- a2missSD_stdy$obs
+    a2missSD_stdy$obs2 <- rownames(V_es2)
+
+    # Set the v_lnrr_laj to 0
+    a2missSD_stdy$v_lnrr_laj_m3 <- a2missSD_stdy$v_lnrr_laj
+    a2missSD_stdy$v_lnrr_laj_m3[missing_dat] <- 0
+
+    method3_mv <-rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_m3, random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs, ~1|obs2),
+                        data=a2missSD_stdy, R=list(obs2=V_es2), Rscale=F)
+    method3_mv_res <- get_est(method3_mv)
+
+################################################
+    # Results Table
+################################################
+    results <- rbind(whole_mv_res, complete_case_mv_res, method_1A_mv_res, method_1B_mv_res, method2_mv_res, method3_mv_res)
+    row.names(results) <- c("Whole Data", "Complete Case", "Method 1A", "Method 1B", "Method 2", "Method 3")
+    write.csv(results, "./example/worked2/results2.csv", row.names = FALSE)
