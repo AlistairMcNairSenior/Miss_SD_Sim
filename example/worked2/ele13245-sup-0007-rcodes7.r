@@ -160,7 +160,7 @@ INtree2 <- vcv(tree1, corr = TRUE)  # Metafor takes a correlation matrix
     a2missSD_stdy <- cv_avg(cv_Experimental, Experimental_sample_size, group = Author,
                             name = "2", data = a2missSD_stdy)
 
-    # Now using wighted mean CV in replacement for where CV's are missing. Note that function above already 2 CV so need to do that on original CV
+    # Now using wighted mean CV in replacement for where CV's are missing. Note that function above already CV^2 so need to do that on original CV
     a2missSD_stdy <- a2missSD_stdy %>%
                       mutate(cv_cont_new = if_else(is.na(cv_Control),      b_CV_1, cv_Control^2),
                              cv_expt_new = if_else(is.na(cv_Experimental), b_CV_2, cv_Experimental^2))
