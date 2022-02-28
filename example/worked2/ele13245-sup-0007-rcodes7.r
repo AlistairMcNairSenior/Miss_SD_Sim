@@ -1,13 +1,13 @@
-############################
-# Load libraries
-###########################
+################################################
+    # Load libraries
+################################################
 rm(list=ls())
 pacman::p_load(ape, metafor, MCMCglmm, tidyverse, readxl)
 source("./R/func.R")
 
-############################
-# Loading and sorting data out
-###########################
+################################################
+    # Loading and sorting data out
+################################################
 #load data
 dat  <- data.frame(read_excel("./example/worked2/ele13245-sup-0003-metas3.xlsx"))
 
@@ -22,9 +22,10 @@ dat$obs <- 1:nrow(dat) # Needed for metafor to make model equivalent to MCMCglmm
 #load phylogenetic tree
 tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 
-#######################
-    # Example 2
-#######################
+################################################
+    # Calculate effect sizes
+    # and load and prune tree
+################################################
 # Intercept only model. for Abundance fitness ONLY. The authors state: "We first estimated the average impact of insect interaction on each fitness component by fitting linear models in which the intercept was the only fixed effect." Table 1 provides the fitness components. Abundance has the most data.
     a2 <- dat %>% filter(Fitness_component == "Abundance") # Doesn't quite match Table 1, but does match figure 1, and even exclusion N = 311, which matches.
 
@@ -82,7 +83,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     phylo2 <- vcv(tree3_meta, corr = TRUE)
 
 ################################################
-# Whole/full data model
+    # Whole/full data model
 ################################################
 
     whole_mv <- rma.mv(yi_lnrr ~ 1, V = vi_lnrr,
@@ -92,7 +93,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 
 
 ################################################
-# Complete case analysis
+    # Complete case analysis
 ################################################
     # Fit complete case analysis. Note that data is currently missing at random.
     complete_case_mv <- rma.mv(yi_lnrr ~ 1, V = vi_lnrr,
