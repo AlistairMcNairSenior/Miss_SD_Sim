@@ -94,5 +94,6 @@ get_est <- function(model){
   est <- coef(model)
   ci.lb <- model$ci.lb
   ci.ub <- model$ci.ub
-  return(data.frame(Est. = est, "95% LCI" = ci.lb, "95% UCI" = ci.ub, check.names = FALSE))
+  se <- model$se
+  return(data.frame(Est. = est, SE=se, "95% LCI" = ci.lb, "95% UCI" = ci.ub, check.names = FALSE))
 }
