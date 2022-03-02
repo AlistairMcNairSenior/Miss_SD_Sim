@@ -153,7 +153,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     # METHOD 1A
 ################################################
 
-    # Now calculate new vi, called vi_DS_lnrr. Note that CV is alreday ^2. ** NOTE THAT THIS IS NOT CORRECT. USE EQN 7 for vi_DS_lnrr.
+    # Now calculate new vi DS
     a2missSD_stdy <- a2missSD_stdy %>%
                       mutate(vi_DS_lnrr = (cv_cont_new / Control_sample_size) + (cv_expt_new / Experimental_sample_size))
 
