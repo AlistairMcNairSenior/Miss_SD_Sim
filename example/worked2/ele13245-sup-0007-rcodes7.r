@@ -19,6 +19,9 @@ dat$Control_standard_deviation <- as.numeric(dat$Control_standard_deviation)
     dat <- na.omit(dat)
 dat$obs <- 1:nrow(dat) # Needed for metafor to make model equivalent to MCMCglmm
 
+# Clean up the data to drop unecessary columns
+dat <- dat[,-which(colnames(dat)%in%c("vi", "yi_g", "Focal_insect_resolved_name", "Competing_insect_resolved_name", "Focal_insect_diet_breadth", "Competing_insect_diet_breadth", "Phylogenetic_distance_between_focal_insect_and_competing_insect", "Spatial_separation", "temporal_separation"))]
+
 #load phylogenetic tree
 tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 
@@ -27,7 +30,12 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     # and load and prune tree
 ################################################
 # Intercept only model. for Abundance fitness ONLY. The authors state: "We first estimated the average impact of insect interaction on each fitness component by fitting linear models in which the intercept was the only fixed effect." Table 1 provides the fitness components. Abundance has the most data.
-    a2 <- dat %>% filter(Fitness_component == "Abundance") # Doesn't quite match Table 1, but does match figure 1, and even exclusion N = 311, which matches.
+    a2 <- dat %>% filter(Fitness_component == "Abundance")
+
+  # First calculate CV on missing dataset. Note missing data will be ignored
+           a2 <- a2 %>%
+                  mutate(cv_Control = na_if(Control_mean / Control_standard_deviation, Inf),
+                    cv_Experimental = na_if(Experimental_mean / Experimental_standard_deviation, Inf))
 
     # Here, we want to use lnRR so we need to calculate this
     a2 <- escalc( m1i = Control_mean,
@@ -39,6 +47,22 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
                  measure = "ROM", var.names=c("yi_lnrr","vi_lnrr"),
                  append = TRUE, data = a2)
     # Some NA's because lnRR, not too many though 311 -> 306
+
+
+    # Add in Laj lnRR correction. Note we need to ^2 cv's here because of
+    a2 <-  a2 %>%
+      mutate(lnrr_laj_orig = na_if(lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
+                                           cv1 = cv_Control^2, cv2 = cv_Experimental^2,
+                                 n1= Control_sample_size, n2 = Experimental_sample_size), Inf),
+             v_lnrr_laj_orig = na_if(v_lnrr_laj(cv1 = cv_Control^2, n1= Control_sample_size,
+                                     cv2 = cv_Experimental^2, n2 = Experimental_sample_size), Inf))
+
+
+    ## There seem to be some big problems with the original data as it's saying large ratios of V. Exclude these large V calculations as clearly there is something wrong with these original data
+    a2 <-  a2 %>% filter(!v_lnrr_laj_orig > 100)
+
+    #hist(a2$v_lnrr_laj)
+
     a2 <- na.omit(a2)
 
     # Prune tree
@@ -61,10 +85,8 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     set.seed(675)
     stdies <- sample(unique(a2$Author), size = 0.2*(length(unique(a2$Author))))
     a2missSD_stdy <- a2
-    a2missSD_stdy[which(a2missSD_stdy$Author %in% stdies), c("Experimental_standard_deviation", "Control_standard_deviation")] <- NA
-
-    # Seems to be some issue data when calculating sampling variances with CV, which suggest some raw data maybe wrong.
-    a2missSD_stdy <- a2missSD_stdy[!a2missSD_stdy$ID%in%c("833", "1176"),]
+    a2missSD_stdy[which(a2missSD_stdy$Author %in% stdies),
+                  c("Experimental_standard_deviation", "Control_standard_deviation")] <- NA
 
     # Now, assume you needto exclude data with missing SD because you can't calculate effect size and sampling variance
     complete_case_MV <- na.omit(a2missSD_stdy)
@@ -82,11 +104,36 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     # Make new VCV matrix
     phylo2 <- vcv(tree3_meta, corr = TRUE)
 
+
+    # Now calculate the average between study CV, which will replace missing values.
+    # Note that mean N used
+    a2missSD_stdy <- cv_avg(cv_Control, Control_sample_size, group = Author,
+                            name = "1", data = a2missSD_stdy)
+    a2missSD_stdy <- cv_avg(cv_Experimental, Experimental_sample_size, group = Author,
+                            name = "2", data = a2missSD_stdy)
+
+    # Now using wighted mean CV in replacement for where CV's are missing.
+    # Note that function above already CV^2 so need to do that on original CV
+    a2missSD_stdy <- a2missSD_stdy %>%
+      mutate(cv_cont_new = if_else(is.na(cv_Control),      b_CV2_1, cv_Control^2),
+             cv_expt_new = if_else(is.na(cv_Experimental), b_CV2_2, cv_Experimental^2))
+
+
+    # Caluclate the new unbiased lnRR
+
+    # Now calculate new yi andvi, called lnrr_laj & v_lnrr_laj, respectively.
+    a2missSD_stdy <- a2missSD_stdy %>%
+      mutate(lnrr_laj = lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
+                                 cv1 = cv_cont_new, cv2 = cv_expt_new,
+                                 n1= Control_sample_size, n2 = Experimental_sample_size),
+             v_lnrr_laj = v_lnrr_laj(cv1 = b_CV2_1, n1= Control_sample_size,
+                                     cv2 = b_CV2_2, n2 = Experimental_sample_size))
+
 ################################################
     # Whole/full data model
 ################################################
 
-    whole_mv <- rma.mv(yi_lnrr ~ 1, V = vi_lnrr,
+    whole_mv <- rma.mv(lnrr_laj_orig ~ 1, V = v_lnrr_laj_orig,
                           random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                           R = list(Focal_insect = phylo), data = a2)
     whole_mv_res <- get_est(whole_mv)
@@ -96,7 +143,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     # Complete case analysis
 ################################################
     # Fit complete case analysis. Note that data is currently missing at random.
-    complete_case_mv <- rma.mv(yi_lnrr ~ 1, V = vi_lnrr,
+    complete_case_mv <- rma.mv(lnrr_laj_orig ~ 1, V = v_lnrr_laj_orig,
                           random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                           R = list(Focal_insect = phylo2), data = complete_case_MV)
 
@@ -105,31 +152,13 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 ################################################
     # METHOD 1A
 ################################################
-    # Spake and Doncaster Method that takes CV across studies
-    # FIrst calculate CV on missing dataset. Note missing data will be ignored
-    a2missSD_stdy <- a2missSD_stdy %>%
-                 mutate(     cv_Control = na_if(Control_mean / Control_standard_deviation, Inf),
-                        cv_Experimental = na_if(Experimental_mean / Experimental_standard_deviation, Inf))
-
-     # Now calculate the average between study CV, which will replace missing values.
-     # Note that mean N used
-    a2missSD_stdy <- cv_avg(cv_Control, Control_sample_size, group = Author,
-                            name = "1", data = a2missSD_stdy)
-    a2missSD_stdy <- cv_avg(cv_Experimental, Experimental_sample_size, group = Author,
-                            name = "2", data = a2missSD_stdy)
-
-    # Now using wighted mean CV in replacement for where CV's are missing.
-    # Note that function above already CV^2 so need to do that on original CV
-    a2missSD_stdy <- a2missSD_stdy %>%
-                      mutate(cv_cont_new = if_else(is.na(cv_Control),      b_CV_1, cv_Control^2),
-                             cv_expt_new = if_else(is.na(cv_Experimental), b_CV_2, cv_Experimental^2))
 
     # Now calculate new vi, called vi_DS_lnrr. Note that CV is alreday ^2. ** NOTE THAT THIS IS NOT CORRECT. USE EQN 7 for vi_DS_lnrr.
     a2missSD_stdy <- a2missSD_stdy %>%
                       mutate(vi_DS_lnrr = (cv_cont_new / Control_sample_size) + (cv_expt_new / Experimental_sample_size))
 
     # Fit model with new sampling variance
-    method_1A_mv <- rma.mv(yi_lnrr ~ 1, V = vi_DS_lnrr,
+    method_1A_mv <- rma.mv(lnrr_laj_orig ~ 1, V = vi_DS_lnrr,
                                random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                                R = list(Focal_insect = phylo), data = a2missSD_stdy)
 
@@ -137,23 +166,8 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 ################################################
     # METHOD 1B
 ################################################
-    lnrr_laj <- function(m1, m2, cv1_2, cv2_2, n1, n2){
-            log(m1 / m2) + 0.5*((cv1_2 / n1) - (cv2_2 / n2))
-    }
 
-    v_lnrr_laj <- function(cv1_2, cv2_2, n1, n2){
-          ((cv1_2) / n1) + ((cv2_2) / n2) +
-        ((cv1_2)^2 / (2*n1)^2) + ((cv2_2)^2 / (2*n2)^2)
-    }
-
-    # Now calculate new yi andvi, called lnrr_laj & v_lnrr_laj, respectively.
-    a2missSD_stdy <- a2missSD_stdy %>%
-      mutate(lnrr_laj = lnrr_laj(m1 = Control_mean, m2 = Experimental_mean, cv1 = cv_cont_new, cv2 = cv_expt_new,
-                                 n1= Control_sample_size, n2 = Experimental_sample_size),
-           v_lnrr_laj = v_lnrr_laj(cv1 = b_CV_1, n1= Control_sample_size,
-                                   cv2 = b_CV_2, n2 = Experimental_sample_size))
-
-    # Fit model with new sampling variance
+    # Fit model with new sampling variance and point estimate
     method_1B_mv <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj,
                            random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                            R = list(Focal_insect = phylo), data = a2missSD_stdy)
