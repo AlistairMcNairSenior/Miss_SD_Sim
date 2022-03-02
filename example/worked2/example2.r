@@ -51,15 +51,15 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 
     # Add in Laj lnRR correction. Note we need to ^2 cv's here because of
     a2 <-  a2 %>%
-      mutate(lnrr_laj_orig = na_if(lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
+  mutate(lnrr_laj_orig = na_if(lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
                                            cv1 = cv_Control^2, cv2 = cv_Experimental^2,
-                                 n1= Control_sample_size, n2 = Experimental_sample_size), Inf),
-             v_lnrr_laj_orig = na_if(v_lnrr_laj(cv1 = cv_Control^2, n1= Control_sample_size,
-                                     cv2 = cv_Experimental^2, n2 = Experimental_sample_size), Inf))
+                              n1= Control_sample_size, n2 = Experimental_sample_size), Inf),
+        v_lnrr_laj_orig = na_if(v_lnrr_laj(cv1 = cv_Control^2, n1= Control_sample_size,
+                              cv2 = cv_Experimental^2, n2 = Experimental_sample_size), Inf))
 
 
     ## There seem to be some big problems with the original data as it's saying large ratios of V. Exclude these large V calculations as clearly there is something wrong with these original data
-    a2 <-  a2 %>% filter(!v_lnrr_laj_orig > 100)
+    a2 <-  a2 %>% filter(!v_lnrr_laj_orig > 80)
 
     #hist(a2$v_lnrr_laj)
 
@@ -209,4 +209,4 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 ################################################
     results <- rbind(whole_mv_res, complete_case_mv_res, method_1A_mv_res, method_1B_mv_res, method2_mv_res, method3_mv_res)
     row.names(results) <- c("Whole Data", "Complete Case", "Method 1A", "Method 1B", "Method 2", "Method 3")
-    write.csv(results, "./example/worked2/results2.csv", row.names = TRUE)
+    write.csv(round(results, 3), "./example/worked2/results2.csv", row.names = TRUE)
