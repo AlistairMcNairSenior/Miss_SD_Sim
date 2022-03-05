@@ -1,0 +1,31 @@
+---
+title: "Supplemental Materials for: A robust and readily implementable method for the meta-analysis of response ratios with and without missing standard deviations"
+author: Shinichi Nakagawa, Daniel W. A. Noble, Malgorzata Lagisz, Rebecca Spake, Wolfgang Viechtbauer and Alistair M. Senior 
+date: "`r Sys.Date()`"
+output: 
+  bookdown::html_document2:
+    code_folding: hide
+    number_sections: no
+    toc: yes
+    toc_depth: 6
+    toc_float: yes
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE, tidy = TRUE)
+options(digits=2)
+```
+
+```{r klippy, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE}
+#install.packages("devtools")
+remotes::install_github("rlesur/klippy")
+klippy::klippy(tooltip_message = 'Click to Copy Code', tooltip_success = 'Done', position = 'right', color = "red")
+```
+# Citation
+To cite this supplement please use the following paper: 
+
+Shinichi Nakagawa, Daniel W. A. Noble, Malgorzata Lagisz, Rebecca Spake, Wolfgang Viechtbauer and Alistair M. Senior. 2022. A robust and readily implementable method for the meta-analysis of response ratios with and without missing standard deviations. 
+
+
+# Introduction
+
+In this supplement we show readers how they can implement some of the missing data approaches covered within our paper to deal with missing standard deviations when using log response ratio (*lnRR*) effect size estimates. We provide code snippets that can be copied and make use of a worked example throughout. 

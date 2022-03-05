@@ -26,16 +26,16 @@ gen.miss <- function(data, missVar, missCol2, n_miss){
   return(data)
 }
 
-
+# TO DO: add in mean and sd directly instead of CV
 cv_avg <- function(cv, n, group, data, name){
   # Calculate between study CV (or whatever). Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
     b_grp_cv_data <- data                                      %>%
                 group_by({{group}})                            %>%
-                mutate(   w_CV = weighted.mean({{cv}}, {{n}},
+                mutate(   w_CV2 = weighted.mean({{cv}}^2, {{n}},
                                                na.rm = TRUE),
-                       n_total = sum({{n}}, na.rm = TRUE))     %>% # Pooled N or mean N?
+                       n_mean = mean({{n}}, na.rm = TRUE))     %>%
                 ungroup(.)                                     %>%
-                mutate(b_CV = weighted.mean(w_CV, n_total), .keep = "used")
+                mutate(b_CV2 = weighted.mean(w_CV2, n_mean, na.rm = TRUE), .keep = "used")
 
   # Make sure that label of the calculated columns is distinct from any other columns
     names(b_grp_cv_data) <- paste0(names(b_grp_cv_data), "_", name)
@@ -88,3 +88,22 @@ cv_avg <- function(cv, n, group, data, name){
 # wCV2 = unique(t2_cv$w_CV_2)
 # w_nt2 = c(56, 56, 72, 63)
 # weighted.mean(wCV2, w_nt2) # 0.4000197
+
+
+get_est <- function(model){
+  est <- coef(model)
+  ci.lb <- model$ci.lb
+  ci.ub <- model$ci.ub
+  se <- model$se
+  return(data.frame(Est. = est, SE=se, "95% LCI" = ci.lb, "95% UCI" = ci.ub, check.names = FALSE))
+}
+
+
+lnrr_laj <- function(m1, m2, cv1_2, cv2_2, n1, n2){
+  log(m1 / m2) + 0.5*((cv1_2 / n1) - (cv2_2 / n2))
+}
+
+v_lnrr_laj <- function(cv1_2, cv2_2, n1, n2){
+  ((cv1_2) / n1) + ((cv2_2) / n2) +
+    ((cv1_2)^2 / (2*n1)^2) + ((cv2_2)^2 / (2*n2)^2)
+}
