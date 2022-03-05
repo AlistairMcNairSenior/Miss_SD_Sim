@@ -20,3 +20,12 @@ options(digits=2)
 remotes::install_github("rlesur/klippy")
 klippy::klippy(tooltip_message = 'Click to Copy Code', tooltip_success = 'Done', position = 'right', color = "red")
 ```
+# Citation
+To cite this supplement please use the following paper: 
+
+Shinichi Nakagawa, Daniel W. A. Noble, Malgorzata Lagisz, Rebecca Spake, Wolfgang Viechtbauer and Alistair M. Senior. 2022. A robust and readily implementable method for the meta-analysis of response ratios with and without missing standard deviations. 
+
+
+# Introduction
+
+In this supplement we show readers how they can implement some of the missing data approaches covered within our paper to deal with missing standard deviations when using log response ratio (*lnRR*) effect size estimates. We provide code snippets that can be copied and make use of a worked example throughout. 
