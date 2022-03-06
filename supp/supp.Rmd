@@ -21,11 +21,39 @@ remotes::install_github("rlesur/klippy")
 klippy::klippy(tooltip_message = 'Click to Copy Code', tooltip_success = 'Done', position = 'right', color = "red")
 ```
 # Citation
-To cite this supplement please use the following paper: 
+Please cite the following paper: 
 
 Shinichi Nakagawa, Daniel W. A. Noble, Malgorzata Lagisz, Rebecca Spake, Wolfgang Viechtbauer and Alistair M. Senior. 2022. A robust and readily implementable method for the meta-analysis of response ratios with and without missing standard deviations. 
 
 
 # Introduction
 
-In this supplement we show readers how they can implement some of the missing data approaches covered within our paper to deal with missing standard deviations when using log response ratio (*lnRR*) effect size estimates. We provide code snippets that can be copied and make use of a worked example throughout. 
+In this supplement we show readers how they can implement some of the missing data approaches covered within our paper to deal with missing standard deviations when using log response ratio (*lnRR*). We provide code snippets that can be copied and make use of a worked example throughout presented within the main text throughout. 
+
+This tutorial is self-contained. The code will download all the necessary files needed to run the examples. This includes a subset of data from [@bird] along with their pruned phylogenetic tree. For simplicity, we have not provided the code here to show readers how to prune the tree and process the data. That code can all be found on our [GitHub](https://github.com/AlistairMcNairSenior/Miss_SD_Sim) repository. 
+
+# Setting up
+
+To understand how to implement the different methods for dealing with missing standard deviations we provide the code example data here. First, load the libraries and data:
+
+```{r echo = TRUE, eval = TRUE, class.source='klippy'}
+#install.packages("pacman")
+pacman::p_load(tidyverse, metafor, here, osfr, ape, phytools)
+```
+
+Then, download the data file and phylogenetic tree file that we will use to demonstrate the examples
+
+```{r echo = TRUE, eval = TRUE, results='hide', class.source='klippy'}
+# Download the data file from OSF
+osfr::osf_retrieve_file("https://osf.io/evysw/") %>% osfr::osf_download(conflicts = "overwrite") 
+
+# Download the phylogeny from OSF
+osfr::osf_retrieve_file("https://osf.io/t5kh4/") %>% osfr::osf_download(conflicts = "overwrite") 
+
+# Load the data file and tree file
+data <- read.csv(here::here("eg_data.csv"))
+tree <- read.tree(here::here("phylo_tree"))
+```
+
+# Methods for Dealing with Missing Standard Deviations
+
