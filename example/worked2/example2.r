@@ -180,8 +180,10 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
       row.names(V_es) <- a2missSD_stdy$obs
    a2missSD_stdy$obs2 <- rownames(V_es)
 
-    method2_mv <-rma.mv(lnrr_laj ~ 1, V = 0, random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs, ~1|obs2),
-                        data=a2missSD_stdy, R=list(obs2=V_es), Rscale=F)
+    method2_mv <-rma.mv(lnrr_laj ~ 1, V = 0, random=list(~1|Group, ~1|Year,
+                                                         ~1|Focal_insect, ~1|obs, ~1|obs2),
+                        data=a2missSD_stdy, R=list(obs2=V_es, Focal_insect = phylo),
+                        Rscale=F)
     method2_mv_res <- get_est(method2_mv)
 
 ################################################
@@ -201,7 +203,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     a2missSD_stdy$v_lnrr_laj_m3[missing_dat] <- 0
 
     method3_mv <-rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_m3, random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs, ~1|obs2),
-                        data=a2missSD_stdy, R=list(obs2=V_es2), Rscale=F)
+                        data=a2missSD_stdy, R=list(obs2=V_es2, Focal_insect = phylo), Rscale=F)
     method3_mv_res <- get_est(method3_mv)
 
 ################################################
