@@ -2,6 +2,7 @@
 title: "Supplemental Materials for: A robust and readily implementable method for the meta-analysis of response ratios with and without missing standard deviations"
 author: Shinichi Nakagawa, Daniel W. A. Noble, Malgorzata Lagisz, Rebecca Spake, Wolfgang Viechtbauer and Alistair M. Senior 
 date: "`r Sys.Date()`"
+bibliography: ./bib.bib
 output: 
   bookdown::html_document2:
     code_folding: hide
@@ -30,7 +31,7 @@ Shinichi Nakagawa, Daniel W. A. Noble, Malgorzata Lagisz, Rebecca Spake, Wolfgan
 
 In this supplement we show readers how they can implement some of the missing data approaches covered within our paper to deal with missing standard deviations when using log response ratio (*lnRR*). We provide code snippets that can be copied and make use of a worked example throughout presented within the main text throughout. 
 
-This tutorial is self-contained. The code will download all the necessary files needed to run the examples. This includes a subset of data from [@bird] along with their pruned phylogenetic tree. For simplicity, we have not provided the code here to show readers how to prune the tree and process the data. That code can all be found on our [GitHub](https://github.com/AlistairMcNairSenior/Miss_SD_Sim) repository. 
+This tutorial is self-contained. The code will download all the necessary files needed to run the examples. This includes a subset of data from [@bird2019] along with their pruned phylogenetic tree. For simplicity, we have not provided the code here to show readers how to prune the tree and process the data. That code can all be found on our [GitHub](https://github.com/AlistairMcNairSenior/Miss_SD_Sim) repository. 
 
 # Setting up
 
@@ -57,3 +58,9 @@ tree <- read.tree(here::here("phylo_tree"))
 
 # Methods for Dealing with Missing Standard Deviations
 
+# Session Information
+```{r echo = FALSE, eval = TRUE}
+sessionInfo() %>% pander::pander()
+```
+
+# References
