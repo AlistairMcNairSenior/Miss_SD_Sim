@@ -1,13 +1,15 @@
 
 # Simulation to Support Nakagawa et al. A practical and readily implementable method for handling missing standard deviation in the meta-analysis of response ratios. 
 
-# This script includes is for plotting the results of the aggregated simulation
+# This script includes a random effect for study ID (i.e. multilevel meta-analysis)
+
+# First written by AM Senior @ The University of Sydney, 25/06/2021.
 
 # Clean up the R Environment 
 rm(list=ls())
 
 # Set the working directory
-wd<-"/Users/alistairsenior/Dropbox (Sydney Uni)/Nakagawa_Ecology_Missing_SD/Miss_SD_Sim" # MacMini Home
+wd<-"/Users/alistairsenior/OneDrive - The University of Sydney (Staff)/Nakagawa_Ecology_Missing_SD/Full_Simulation" # MacMini Home
 setwd(wd)
 
 # Load the relevant libraries, and header
@@ -36,6 +38,10 @@ setwd("Plots_MLMA")
 head(agg_results)
 agg_results$range_bias<-agg_results$max_bias - agg_results$min_bias
 
+# Rename 1.1 and 1.2 to 1.A and 1.B
+agg_results$Method[which(agg_results$Method == "Method 1.1")]<-"Method 1A"
+agg_results$Method[which(agg_results$Method == "Method 1.2")]<-"Method 1B"
+
 A<-ggplot(data=agg_results, aes(x=mean_bias, y=Method, col=Method, fill=Method)) +
 	geom_violin() + 
 	geom_beeswarm(groupOnX=F, size=0.05, cex=0.25, col="black") + 
@@ -56,15 +62,15 @@ A<-ggplot(data=agg_results, aes(x=mean_bias, y=Method, col=Method, fill=Method))
 long<-agg_results[,c("Method", "mean_bias", "code")]
 wide<-reshape(long, direction="wide", idvar="code", timevar="Method")
 cor.mat<-cor(wide[,-1])
-rownames(cor.mat)<-c("Complete", "Method 1.1", "Method 1.2", "Method 2", "Method 3")
-colnames(cor.mat)<-c("Complete", "Method 1.1", "Method 1.2", "Method 2", "Method 3")
+rownames(cor.mat)<-c("Complete", "Method 1A", "Method 1B", "Method 2", "Method 3")
+colnames(cor.mat)<-c("Complete", "Method 1A", "Method 1B", "Method 2", "Method 3")
 
 B<-ggcorrplot(cor.mat, lab=T, show.legend=FALSE, type="lower") + theme(plot.title=element_text(size=15))
 
 # Difference in the bias
-df<-data.frame(delta=abs(wide[,"mean_bias.Method 1.1"]) - abs(wide[,"mean_bias.Method 1.2"]))
+df<-data.frame(delta=abs(wide[,"mean_bias.Method 1A"]) - abs(wide[,"mean_bias.Method 1B"]))
 C<-ggplot(df, aes(x=delta)) + geom_histogram(bins=20) + theme_bw() + geom_vline(xintercept=0, col="red") +
-	xlab("Diff. |Bias| Meths 1.1 & 1.2") + ylab("Frequency")
+	xlab("Diff. |Bias| Meths 1A & 1B") + ylab("Frequency")
 
 D<-ggplot(data=agg_results, aes(x=log(range_bias, base=10), y=Method, col=Method, fill=Method)) +
 	geom_violin() + 
@@ -72,9 +78,9 @@ D<-ggplot(data=agg_results, aes(x=log(range_bias, base=10), y=Method, col=Method
 	xlab("log10 Range of Bias lnRR") + ylab("") + theme_bw() + 
 	theme(legend.position="none", axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title=element_text(size=15))
 
-# Get the data for Methods 1.1 & 1.2
-dat1.1<-agg_results[which(agg_results$Method=="Method 1.1"),]
-dat1.2<-agg_results[which(agg_results$Method=="Method 1.2"),]
+# Get the data for Methods 1.A & 1.B
+dat1.1<-agg_results[which(agg_results$Method=="Method 1A"),]
+dat1.2<-agg_results[which(agg_results$Method=="Method 1B"),]
 
 E<-ggplot(dat1.2, aes(x=log(range_bias, base=10), y=as.factor(sd_study_sd), fill=as.factor(n_study_mu))) +
 	geom_violin() +
@@ -110,7 +116,7 @@ B<-ggplot(data=dat1.1, aes(x=as.factor(tau2), y=coverage, fill=as.factor(icc_stu
 	xlab(expression(italic(T)^2)) + ylab("Coverage (95% CI)") +
 	theme(legend.position=c(0.85, 0.875), axis.text.x=element_text(size=12), axis.title.x=element_text(size=15), axis.text.y=element_text(size=12), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=15), plot.subtitle=element_text(size=15), legend.text=element_text(size=15)) +
 	geom_hline(yintercept=0.95, col="dark grey") + guides(fill=guide_legend(title="Simulated ICC")) +
-	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1))) + labs(subtitle="Method 1.1")
+	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1))) + labs(subtitle="Method 1A")
 
 C<-ggplot(data=dat1.2, aes(x=as.factor(tau2), y=coverage, fill=as.factor(icc_study))) +
 	geom_violin() + 
@@ -119,7 +125,7 @@ C<-ggplot(data=dat1.2, aes(x=as.factor(tau2), y=coverage, fill=as.factor(icc_stu
 	ylim(0.9, 1) +
 	theme(legend.position=c(0.85, 0.875), axis.text.x=element_text(size=12), axis.title.x=element_text(size=15), axis.text.y=element_text(size=12), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=15), plot.subtitle=element_text(size=15), legend.text=element_text(size=15)) +
 	geom_hline(yintercept=0.95, col="dark grey") + guides(fill=guide_legend(title="Simulated ICC")) +
-	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1))) + labs(subtitle="Method 1.2")
+	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1))) + labs(subtitle="Method 1B")
 
 pdf("Coverage.pdf", height=7, width=18)
 
