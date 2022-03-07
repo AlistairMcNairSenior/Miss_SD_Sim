@@ -36,10 +36,9 @@ gen.miss <- function(data, missVar, missCol2, n_miss){
 #' @param name The name one wishes to attach to columns to identify the treatment. Otherwise, if not specified it will default to the variable name for x
 #' @param sub_b A logical indicating whether the between study CV^2 (b_CV2) should be appended to the data only ('TRUE') or whether both within study CV^2 (w_CV2), mean sample size (n_mean) and between study CV^2 (b_CV2) should all be appended to the data only ('FALSE')
 
-
 cv_avg <- function(x, sd, n, group, data, name = NULL, sub_b = TRUE){
 
-  # Check if the name is specified or not. If not, then assign it the name of the mean, x, variable input in the function.
+  # Check if the name is specified or not. If not, then assign it the name of the mean, x, variable input in the function. https://stackoverflow.com/questions/60644445/converting-tidyeval-arguments-to-string
   if(is.null(name)){
    name <- purrr::map_chr(enquos(x), rlang::as_label)
   }
