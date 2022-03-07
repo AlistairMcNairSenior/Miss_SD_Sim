@@ -22,13 +22,6 @@ library(ggcorrplot)
 # Load the results
 load("Rdata/agg_results.Rdata")
 
-# Create a folder for the plots
-if(file.exists("Plots_MLMA")){
-	unlink("Plots_MLMA", recursive=T)
-}
-dir.create("Plots_MLMA")
-setwd("Plots_MLMA")
-
 ########################################################################
 ############## Averaging each parameter set ############################
 ########################################################################
