@@ -27,15 +27,15 @@ gen.miss <- function(data, missVar, missCol2, n_miss){
 }
 
 
-cv_avg <- function(mean, sd, n, group, data, name){
+cv_avg <- function(x, sd, n, group, data, name){
   # Calculate between study CV. Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
-    b_grp_cv_data <- data                                      %>%
-                group_by({{group}})                            %>%
-                mutate(   w_CV2 = weighted.mean(na_if(({{mean}} / {{sd}})^2, Inf), {{n}},
+    b_grp_cv_data <- data                                             %>%
+                dplyr::group_by({{group}})                            %>%
+                dplyr::mutate(   w_CV2 = weighted.mean(na_if(({{x}} / {{sd}})^2, Inf), {{n}},
                                                na.rm = TRUE),
-                         n_mean = mean({{n}}, na.rm = TRUE))   %>%
-                ungroup(.)                                     %>%
-                mutate(b_CV2 = weighted.mean(w_CV2, n_mean, na.rm = TRUE), .keep = "used")
+                                n_mean = mean({{n}}, na.rm = TRUE))   %>%
+                dplyr::ungroup(.)                                     %>%
+                dplyr::mutate(b_CV2 = weighted.mean(w_CV2, n_mean, na.rm = TRUE), .keep = "used")
 
   # Make sure that label of the calculated columns is distinct from any other columns
     names(b_grp_cv_data) <- paste0(names(b_grp_cv_data), "_", name)
@@ -52,18 +52,19 @@ cv_avg <- function(mean, sd, n, group, data, name){
 # set.seed(76)
 # x1 = rnorm(16, 6, 1)
 # x2 = rnorm(16, 6, 1)
-test_dat <- data.frame(stdy = rep(c(1,2,3,4), each = 4),
-                          x1 = x1,
-                         sd1 = exp(log(x1)*1.5 + rnorm(16, 0, sd = 0.10)),
-                          n1 = rpois(16, 15),
-                          x2 = x2,
-                         sd2 = exp(log(x2)*1.5 + rnorm(16, 0, sd = 0.10)),
-                          n2 = rpois(16, 15))
+# rm(list = c("x1", "x2"))
+# test_dat <- data.frame(stdy = rep(c(1,2,3,4), each = 4),
+#                           x1 = x1,
+#                          sd1 = exp(log(x1)*1.5 + rnorm(16, 0, sd = 0.10)),
+#                           n1 = rpois(16, 15),
+#                           x2 = x2,
+#                          sd2 = exp(log(x2)*1.5 + rnorm(16, 0, sd = 0.10)),
+#                           n2 = rpois(16, 15))
 #
 # # # Now generate some missing data
 #   t2 <- gen.miss(test_dat, "sd1", "sd2", 6)
 #
-#   t2_cv <- cv_avg(mean = x1, sd = sd1, n =   n1, stdy, name = "1", data =  t2)
+#   t2_cv <- cv_avg(x = x1, sd = sd1, n = n1, stdy, name = "1", data =  t2)
 #   t2_cv <- cv_avg(x2, sd2, n2, stdy, name = "2", data =  t2_cv)
 #
 # # Check calculations are correct. All match what is expected
