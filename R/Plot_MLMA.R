@@ -9,7 +9,7 @@
 rm(list=ls())
 
 # Set the working directory
-wd<-"/Users/alistairsenior/OneDrive - The University of Sydney (Staff)/Nakagawa_Ecology_Missing_SD/Full_Simulation" # MacMini Home
+wd<-"/Users/alistairsenior/OneDrive - The University of Sydney (Staff)/Nakagawa_Ecology_Missing_SD/Miss_SD_Sim" # MacMini Home
 setwd(wd)
 
 # Load the relevant libraries, and header
@@ -20,7 +20,7 @@ library(ggbeeswarm)
 library(ggcorrplot)
 
 # Load the results
-load("agg_results.Rdata")
+load("Rdata/agg_results.Rdata")
 
 # Create a folder for the plots
 if(file.exists("Plots_MLMA")){
@@ -92,7 +92,7 @@ E<-ggplot(dat1.2, aes(x=log(range_bias, base=10), y=as.factor(sd_study_sd), fill
 
 
 
-pdf("Bias_lnRR.pdf", height=10, width=12)
+pdf("MS/fig/Bias_lnRR.pdf", height=10, width=12)
 
 grid.arrange(A+labs(title="A."), B+labs(title="B."), C+labs(title="C."), D+labs(title="D."), E+labs(title="E."), layout_matrix=rbind(c(1,1,3,4),
 													c(5,5,6,6)))	
@@ -127,7 +127,7 @@ C<-ggplot(data=dat1.2, aes(x=as.factor(tau2), y=coverage, fill=as.factor(icc_stu
 	geom_hline(yintercept=0.95, col="dark grey") + guides(fill=guide_legend(title="Simulated ICC")) +
 	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1))) + labs(subtitle="Method 1B")
 
-pdf("Coverage.pdf", height=7, width=18)
+pdf("MS/fig/Coverage.pdf", height=7, width=18)
 
 grid.arrange(A+labs(title="A."), B+labs(title="B."), C+labs(title="C."), layout_matrix=array(c(1,2,3), c(1,3)))
 													
@@ -167,7 +167,7 @@ D<-ggplot(data=dat1.2, aes(x=as.factor(tau2), y= mean_bias_ICC, fill=as.factor(i
 	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1)))	
 	
 
-pdf("Bias_Het.pdf", height=10, width=12)
+pdf("MS/fig/Bias_Het.pdf", height=10, width=12)
 
 grid.arrange(A+labs(title="A."), B+labs(title="B."), C+labs(title="C."), D+labs(title="D."), layout_matrix=rbind(c(1,2),
 					c(3,4)))	
