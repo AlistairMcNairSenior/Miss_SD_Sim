@@ -20,7 +20,7 @@ library(ggbeeswarm)
 library(ggcorrplot)
 
 # Load the results
-load("Rdata/agg_results.Rdata")
+load("Rdata/agg_results_REMA.Rdata")
 
 ########################################################################
 ############## Averaging each parameter set ############################
@@ -85,7 +85,7 @@ E<-ggplot(dat1.2, aes(x=log(range_bias, base=10), y=as.factor(sd_study_sd), fill
 
 
 
-pdf("MS/fig/Bias_lnRR.pdf", height=10, width=12)
+pdf("MS/fig/Bias_lnRR_REMA.pdf", height=10, width=12)
 
 grid.arrange(A+labs(title="A."), B+labs(title="B."), C+labs(title="C."), D+labs(title="D."), E+labs(title="E."), layout_matrix=rbind(c(1,1,3,4),
 													c(5,5,6,6)))	
@@ -120,7 +120,7 @@ C<-ggplot(data=dat1.2, aes(x=as.factor(tau2), y=coverage, fill=as.factor(icc_stu
 	geom_hline(yintercept=0.95, col="dark grey") + guides(fill=guide_legend(title="Simulated ICC")) +
 	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1))) + labs(subtitle="Method 1B")
 
-pdf("MS/fig/Coverage.pdf", height=7, width=18)
+pdf("MS/fig/Coverage_REMA.pdf", height=7, width=18)
 
 grid.arrange(A+labs(title="A."), B+labs(title="B."), C+labs(title="C."), layout_matrix=array(c(1,2,3), c(1,3)))
 													
@@ -142,28 +142,11 @@ B<-ggplot(data=agg_results, aes(x=as.factor(tau2), y= mean_bias_tau2_lnR, fill=M
 	theme(legend.position="none", axis.text.x=element_text(size=12), axis.title.x=element_text(size=15), axis.text.y=element_text(size=12), axis.title.y=element_text(size=15), plot.title=element_text(size=15)) +
 	geom_hline(yintercept=0, col="dark grey") +
 	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1)))
-
-C<-ggplot(data=agg_results, aes(x=mean_bias_ICC, y=Method, col=Method, fill=Method)) +
-	geom_violin() + 
-	geom_beeswarm(groupOnX=F, size=0.05, cex=0.25, col="black") + 
-	xlim(-0.5, 0.75) +
-	xlab("Bias in ICC") + ylab("") + theme_bw() + 
-	theme(legend.position="none", axis.title.x=element_text(size=15), axis.text.x=element_text(size=12), axis.text.y=element_text(size=15), plot.title=element_text(size=15)) +
-	geom_vline(xintercept=0, col="dark grey", size=0.5)
-		
-D<-ggplot(data=dat1.2, aes(x=as.factor(tau2), y= mean_bias_ICC, fill=as.factor(icc_study))) +
-	geom_violin() + 
-	theme_bw() + 
-	xlab(expression(italic(T)^2)) + ylab("Bias in ICC") +
-	theme(legend.position=c(0.85, 0.85), axis.text.x=element_text(size=12), axis.title.x=element_text(size=15), axis.text.y=element_text(size=12), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=15), legend.text=element_text(size=15)) +
-	geom_hline(yintercept=0, col="dark grey") + guides(fill=guide_legend(title="Simulated ICC")) +
-	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1)))	
 	
 
-pdf("MS/fig/Bias_Het.pdf", height=10, width=12)
+pdf("MS/fig/Bias_Het.pdf", height=5, width=12)
 
-grid.arrange(A+labs(title="A."), B+labs(title="B."), C+labs(title="C."), D+labs(title="D."), layout_matrix=rbind(c(1,2),
-					c(3,4)))	
+grid.arrange(A+labs(title="A."), B+labs(title="B."), layout_matrix=rbind(c(1,2)))	
 													
 dev.off()	
 	
