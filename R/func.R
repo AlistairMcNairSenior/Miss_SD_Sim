@@ -27,11 +27,11 @@ gen.miss <- function(data, missVar, missCol2, n_miss){
 }
 
 # TO DO: add in mean and sd directly instead of CV
-cv_avg <- function(cv, n, group, data, name){
+cv_avg <- function(mean, sd, n, group, data, name){
   # Calculate between study CV (or whatever). Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
     b_grp_cv_data <- data                                      %>%
                 group_by({{group}})                            %>%
-                mutate(   w_CV2 = weighted.mean({{cv}}^2, {{n}},
+                mutate(   w_CV2 = weighted.mean(({{mean}} / {{sd}})^2, {{n}},
                                                na.rm = TRUE),
                        n_mean = mean({{n}}, na.rm = TRUE))     %>%
                 ungroup(.)                                     %>%
