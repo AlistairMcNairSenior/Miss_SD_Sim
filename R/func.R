@@ -33,14 +33,14 @@ gen.miss <- function(data, missVar, missCol2, n_miss){
 #' @param n The sample size of an experimental group
 #' @param group Study, grouping or cluster variable one wishes to calculate the within and between weighted CV^2. In meta-analysis this will most likely be 'study'.
 #' @param data The dataframe containing the mean, sd, n and grouping variables
-#' @param name The name one wishes to attach to columns to identify the treatment. Otherwise, if not specified it will default to the variable name for x
+#' @param label A character string specifying the label one wishes to attach to columns to identify the treatment. Otherwise, if not specified it will default to the variable name for x
 #' @param sub_b A logical indicating whether the between study CV^2 (b_CV2) should be appended to the data only ('TRUE') or whether both within study CV^2 (w_CV2), mean sample size (n_mean) and between study CV^2 (b_CV2) should all be appended to the data only ('FALSE')
 
-cv_avg <- function(x, sd, n, group, data, name = NULL, sub_b = TRUE){
+cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
 
   # Check if the name is specified or not. If not, then assign it the name of the mean, x, variable input in the function. https://stackoverflow.com/questions/60644445/converting-tidyeval-arguments-to-string
-  if(is.null(name)){
-   name <- purrr::map_chr(enquos(x), rlang::as_label)
+  if(is.null(label)){
+    label <- purrr::map_chr(enquos(x), rlang::as_label)
   }
 
   # Calculate between study CV. Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
@@ -53,7 +53,7 @@ cv_avg <- function(x, sd, n, group, data, name = NULL, sub_b = TRUE){
                 dplyr::mutate(b_CV2 = weighted.mean(w_CV2, n_mean, na.rm = TRUE), .keep = "used")
 
   # Make sure that label of the calculated columns is distinct from any other columns
-    names(b_grp_cv_data) <- paste0(names(b_grp_cv_data), "_", name)
+    names(b_grp_cv_data) <- paste0(names(b_grp_cv_data), "_", label)
 
   # Append these calculated columns back to the original data and return the full dataset.
     if(sub_b){
@@ -78,8 +78,8 @@ cv_avg <- function(x, sd, n, group, data, name = NULL, sub_b = TRUE){
 # # # Now generate some missing data
 #   t2 <- gen.miss(test_dat, "sd1", "sd2", 6)
 #
-#   t2_cv <- cv_avg(x = x1, sd = sd1, n = n1, stdy, data =  t2, sub_b = FALSE)
-#   t2_cv <- cv_avg(x2, sd2, n2, stdy, name = "2", data =  t2_cv)
+#   t2_cv <- cv_avg(x = x1, sd = sd1, n = n1, stdy, data =  t2, sub_b = TRUE)
+#   t2_cv <- cv_avg(x2, sd2, n2, stdy, label = "2", data =  t2_cv)
 #
 # # Check calculations are correct. All match what is expected
 # test <- t2_cv %>%  filter(stdy == "1")
