@@ -31,8 +31,8 @@ index<-args[6]
 lnRR<-0.3
 
 # Specify the number of effect sizes per study 1 with SD 0 for REMA
-k_effect_mu<-3
-k_effect_sd<-2.4
+k_effect_mu<-1
+k_effect_sd<-0
 
 # Specify total tau2 of lnRR^2. This sets 0 at 1 SD below the mean effect meaning there will be a set proportion of negative effects. A large degree of heteorgeneity
 tau2<-c(0.003^2, lnRR^2)

@@ -6,9 +6,8 @@
 # Clean up the R Environment 
 rm(list=ls())
 
-# Set the working directory
-wd<-"/Users/alistairsenior/Dropbox (Sydney Uni)/Nakagawa_Ecology_Missing_SD/Full_Simulation/Miss_Sim" # Note this directory is not in the git repo. Contains a massive amount of raw data. Hence this file will not run from the repo.
-setwd(wd)
+# Note the raw data is not in the github repro as there is too much so this script will not work for git hub
+
 
 # Load the relevant libraries, and header
 library(metafor)
@@ -16,12 +15,12 @@ library(plyr)
 library(doSNOW)
 
 # Check the files
-files<-dir()[-c(1:7)]
+files<-dir("Miss_Sim_REMA")[-c(1:5)]
 
-load(files[1])
+load(paste0("Miss_Sim_REMA/", files[1]))
 res_unlist<-results
-for(i in 1:length(files)){
-	load(files[i])
+for(i in 2:length(files)){
+	load(paste0("Miss_Sim_REMA/", files[i]))
 	for(j in 1:length(res_unlist)){
 		res_unlist[[j]]<-rbind(res_unlist[[j]], results[[j]])
 	}
@@ -29,7 +28,7 @@ for(i in 1:length(files)){
 results<-res_unlist
 
 # Load the parameters 
-load("Parameters_MLMA.Rdata")
+load("Miss_Sim_REMA/Parameters_REMA.Rdata")
 
 # Long format all the results
 for(i in 1:length(results)){
@@ -43,7 +42,7 @@ for(i in 1:length(results)){
 long_mat<-as.matrix(long)
 
 # Reformat from long to wide for the methods
-long_full<-as.data.frame(rbind(long_mat[,-c(5:20)], long_mat[,-c(1:4,9:20)], long_mat[,-c(1:8,13:20)], long_mat[,-c(1:12,17:20)], long_mat[,-c(1:16)]))
+long_full<-as.data.frame(rbind(long_mat[,c(1:3, 16:27)], long_mat[,c(4:6, 16:27)], long_mat[,c(7:9, 16:27)], long_mat[,c(10:12, 16:27)], long_mat[,c(13:15, 16:27)]))
 long_full$Method<-c(rep("Complete Data", dim(long_mat)[1]), rep("Method 1.1", dim(long_mat)[1]), rep("Method 1.2", dim(long_mat)[1]), rep("Method 2", dim(long_mat)[1]), rep("Method 3", dim(long_mat)[1]))
 
 # Calculate the bias and coverage
@@ -55,21 +54,20 @@ ts<-qt(0.975, df=dfs)
 long_full$coverage<-(abs(long_full$bias) - ts*long_full$whole_SE) <= 0
 long_full$bias_tau2<-long_full$whole_Tau2 - long_full$tau2
 long_full$bias_tau2_lnR<-log(long_full$whole_Tau2 / long_full$tau2)
-long_full$bias_ICC<-long_full$whole_ICC - long_full$icc_study
 
 # Add a unique code for each parameter set
-long_full$code<-paste0(long_full[,5], "_", long_full[,6])
-for(i in 7:16){
+long_full$code<-paste0(long_full[,4], "_", long_full[,5])
+for(i in 6:15){
 	long_full$code<-paste0(long_full$code, "_", long_full[,i])
 	print(i)
 }
 
 # Save that
-save(long_full, file="long_MLMA.Rdata")
+save(long_full, file="long_REMA.Rdata")
 
 # Now get the aggregate stats
 long_full$code2<-paste0(long_full$code, long_full$Method)
-agg_stats<-ddply(long_full, .(code2), summarise, code=code[1], Method=Method[1], mean_bias=mean(bias), median_bias=median(bias), min_bias=min(bias), max_bias=max(bias), q10_bias=quantile(bias, 0.1), q90_bias=quantile(bias, 0.9), mean_bias_tau2=mean(bias_tau2), median_bias_tau2=median(bias_tau2), min_bias_tau2=min(bias_tau2), max_bias_tau2=max(bias_tau2), q10_bias_tau2=quantile(bias_tau2, 0.1), q90_bias_tau2=quantile(bias_tau2, 0.9), mean_bias_tau2_lnR=mean(bias_tau2_lnR), median_bias_tau2_lnR=median(bias_tau2_lnR), min_bias_tau2_lnR=min(bias_tau2_lnR), max_bias_tau2_lnR=max(bias_tau2_lnR), q10_bias_tau2_lnR=quantile(bias_tau2_lnR, 0.1), q90_bias_tau2_lnR=quantile(bias_tau2_lnR, 0.9),  mean_bias_ICC=mean(bias_ICC), median_ICC=median(bias_ICC), min_bias_ICC=min(bias_ICC), max_ICC=max(bias_ICC), q10_bias_ICC=quantile(bias_ICC, 0.1), q90_bias_ICC=quantile(bias_ICC, 0.9), coverage=mean(coverage))
+agg_stats<-ddply(long_full, .(code2), summarise, code=code[1], Method=Method[1], mean_bias=mean(bias), median_bias=median(bias), min_bias=min(bias), max_bias=max(bias), q10_bias=quantile(bias, 0.1), q90_bias=quantile(bias, 0.9), mean_bias_tau2=mean(bias_tau2), median_bias_tau2=median(bias_tau2), min_bias_tau2=min(bias_tau2), max_bias_tau2=max(bias_tau2), q10_bias_tau2=quantile(bias_tau2, 0.1), q90_bias_tau2=quantile(bias_tau2, 0.9), mean_bias_tau2_lnR=mean(bias_tau2_lnR), median_bias_tau2_lnR=median(bias_tau2_lnR), min_bias_tau2_lnR=min(bias_tau2_lnR), max_bias_tau2_lnR=max(bias_tau2_lnR), q10_bias_tau2_lnR=quantile(bias_tau2_lnR, 0.1), q90_bias_tau2_lnR=quantile(bias_tau2_lnR, 0.9), coverage=mean(coverage))
 
 # Combine with the parameter set by code
 parameters$code<-paste0(parameters[,1], "_", parameters[,2])
@@ -81,5 +79,5 @@ agg_stats<-cbind(agg_stats, parameters[match(agg_stats$code, parameters$code),])
 agg_results<-agg_stats[,-c(1:2)]
 
 # Save that
-save(agg_results, file="agg_results.Rdata")
+save(agg_results, file="agg_results_REMA.Rdata")
 
