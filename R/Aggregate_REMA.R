@@ -11,9 +11,7 @@ wd<-"/Users/alistairsenior/OneDrive - The University of Sydney (Staff)/Nakagawa_
 setwd(wd)
 
 # Load the relevant libraries, and header
-library(metafor)
 library(plyr)
-library(doSNOW)
 
 # Check the files
 files<-dir("HPC_data/Miss_Sim_REMA")[-c(1:5)]
@@ -80,5 +78,5 @@ agg_stats<-cbind(agg_stats, parameters[match(agg_stats$code, parameters$code),])
 agg_results<-agg_stats[,-c(1:2)]
 
 # Save that
-save(agg_results, file="Miss_SD_Sim/agg_results_rema.Rdata")
+save(agg_results, file="Miss_SD_Sim/Rdata/agg_results_rema.Rdata")
 
