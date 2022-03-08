@@ -81,5 +81,5 @@ agg_stats<-cbind(agg_stats, parameters[match(agg_stats$code, parameters$code),])
 agg_results<-agg_stats[,-c(1:2)]
 
 # Save that to the githib repo
-save(agg_results, file="Miss_SD_Sim/Rdata/agg_results.Rdata")
+save(agg_results, file="Miss_SD_Sim/Rdata/agg_results_mlma.Rdata")
 
