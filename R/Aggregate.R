@@ -7,7 +7,7 @@
 rm(list=ls())
 
 # Set the working directory
-wd<-"/Users/alistairsenior/Dropbox (Sydney Uni)/Nakagawa_Ecology_Missing_SD/Full_Simulation/Miss_Sim" # Note this directory is not in the git repo. Contains a massive amount of raw data. Hence this file will not run from the repo.
+wd<-"/Users/alistairsenior/OneDrive - The University of Sydney (Staff)/Nakagawa_Ecology_Missing_SD" # Note this directory is not in the git repo. Contains a massive amount of raw data. Hence this file will not run from the repo.
 setwd(wd)
 
 # Load the relevant libraries, and header
@@ -16,12 +16,12 @@ library(plyr)
 library(doSNOW)
 
 # Check the files
-files<-dir()[-c(1:7)]
+files<-dir("HPC_data/Miss_Sim")[-c(1:5)]
 
-load(files[1])
+load(paste0("HPC_data/Miss_Sim/", files[1]))
 res_unlist<-results
-for(i in 1:length(files)){
-	load(files[i])
+for(i in 2:length(files)){
+	load(paste0("HPC_data/Miss_Sim/", files[i]))
 	for(j in 1:length(res_unlist)){
 		res_unlist[[j]]<-rbind(res_unlist[[j]], results[[j]])
 	}
@@ -29,7 +29,7 @@ for(i in 1:length(files)){
 results<-res_unlist
 
 # Load the parameters 
-load("Parameters_MLMA.Rdata")
+load("HPC_data/Miss_Sim/Parameters_MLMA.Rdata")
 
 # Long format all the results
 for(i in 1:length(results)){
@@ -65,7 +65,7 @@ for(i in 7:16){
 }
 
 # Save that
-save(long_full, file="long_MLMA.Rdata")
+save(long_full, file="HPC_data/long_MLMA.Rdata")
 
 # Now get the aggregate stats
 long_full$code2<-paste0(long_full$code, long_full$Method)
@@ -80,6 +80,6 @@ for(i in 3:12){
 agg_stats<-cbind(agg_stats, parameters[match(agg_stats$code, parameters$code),])
 agg_results<-agg_stats[,-c(1:2)]
 
-# Save that
-save(agg_results, file="agg_results.Rdata")
+# Save that to the githib repo
+save(agg_results, file="Miss_SD_Sim/Rdata/agg_results.Rdata")
 
