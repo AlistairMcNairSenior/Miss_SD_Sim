@@ -20,7 +20,7 @@ library(ggbeeswarm)
 library(ggcorrplot)
 
 # Load the results
-load("Rdata/agg_results_REMA.Rdata")
+load("Rdata/agg_results_rema.Rdata")
 
 ########################################################################
 ############## Averaging each parameter set ############################
