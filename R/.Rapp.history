@@ -1,0 +1,17 @@
+getwd()
+# Simulation to Support Nakagawa et al. A practical and readily implementable method for handling missing standard deviation in the meta-analysis of response ratios. #
+#
+# This script was used to aggregate multiple instances from the array job on the HPC. It also then calculates the bias, coverage and aggregate statsitics used in the plotting#
+#
+# Clean up the R Environment #
+rm(list=ls())#
+#
+# Set the working directory#
+wd<-"Miss_Sim" # Note this directory is not in the git repo. Contains a massive amount of raw data. Hence this file will not run from the repo.#
+setwd(wd)#
+#
+# Load the relevant libraries, and header#
+library(metafor)#
+library(plyr)#
+library(doSNOW)
+getwd()
