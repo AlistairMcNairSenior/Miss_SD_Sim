@@ -3,6 +3,7 @@ title: "Supplemental Materials for: A robust and readily implementable method fo
 author: Shinichi Nakagawa, Daniel W. A. Noble, Malgorzata Lagisz, Rebecca Spake, Wolfgang Viechtbauer and Alistair M. Senior 
 date: "`r Sys.Date()`"
 bibliography: ./bib.bib
+csl: ./ecology-letters.csl
 output: 
   bookdown::html_document2:
     code_folding: hide
@@ -22,18 +23,21 @@ remotes::install_github("rlesur/klippy")
 klippy::klippy(tooltip_message = 'Click to Copy Code', tooltip_success = 'Done', position = 'right', color = "red")
 ```
 # Citation
-Please cite the following paper: 
+Please cite the following paper for the methods proposed for dealing with missing standard deviations: 
 
 Shinichi Nakagawa, Daniel W. A. Noble, Malgorzata Lagisz, Rebecca Spake, Wolfgang Viechtbauer and Alistair M. Senior. 2022. A robust and readily implementable method for the meta-analysis of response ratios with and without missing standard deviations. 
 
 
 # Introduction
 
-In this supplement we show readers how they can implement some of the missing data approaches covered within our paper to deal with missing standard deviations when using log response ratio (*lnRR*). We provide code snippets that can be copied and make use of a worked example throughout presented within the main text throughout. 
+In this supplement we show readers how they can implement some of the missing data approaches covered within our paper to deal with missing standard deviations when using log response ratios (*lnRR*). We provide code snippets that can be copied and added to the users consol. We make use of our worked example from the main manuscript to demonstrate how to apply the methods. We then turn to a second worked example where the authors applied similar methods to deal with missing standard deviations.
 
-This tutorial is self-contained. The code will download all the necessary files needed to run the examples. This includes a subset of data from [@bird2019] along with their pruned phylogenetic tree. For simplicity, we have not provided the code here to show readers how to prune the tree and process the data. That code can all be found on our [GitHub](https://github.com/AlistairMcNairSenior/Miss_SD_Sim) repository. 
+Importantly, this tutorial is self-contained. The code will download all the necessary files needed to run the examples directly to your working directory. This includes a subset of data from @bird2019, along with their pruned phylogenetic tree, and data from @mcdonald2019. For simplicity, we have not provided the code here to show readers how to prune the tree and process the data. That code can all be found on our [GitHub](https://github.com/AlistairMcNairSenior/Miss_SD_Sim) repository. 
 
-# Setting up
+# Worked Example 1: Dealing with missing SD data to explore the fitness impacts of competition between herbivorous insects
+### Introduction
+
+### Setting up
 
 To understand how to implement the different methods for dealing with missing standard deviations we provide the code example data here. First, load the libraries and data:
 
@@ -52,11 +56,37 @@ osfr::osf_retrieve_file("https://osf.io/evysw/") %>% osfr::osf_download(conflict
 osfr::osf_retrieve_file("https://osf.io/t5kh4/") %>% osfr::osf_download(conflicts = "overwrite") 
 
 # Load the data file and tree file
-data <- read.csv(here::here("eg_data.csv"))
+data1 <- read.csv(here::here("example1.csv"))
 tree <- read.tree(here::here("phylo_tree"))
 ```
 
-# Methods for Dealing with Missing Standard Deviations
+# Worked Example 2: Dealing with missing SD data when assessing strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems
+
+### Introduction
+Our second example is from @mcdonald2019. @mcdonald2019 studied the effects of strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems. They looked at a number of different ecological outcomes. Here, we focus on their data on the effects of SRG vs CG on biomass; this dataset contains 173 effect sizes from 67 studies. In their original analysis @mcdonald2019 find that the biomass of CG systems is significantly reduced relative to that SRG, but do not report the total heterogeneity. The dataset contains two dimensions of non-independence that are common to eco-evolutionary meta-analyses; 1) multiple effect sizes per study and 2) several effect sizes within the same study are computed as relative to the same control group [sometimes termed ‘stochastic dependency’; @Noble2017; @GleserOlkin2009].
+
+### Setting up
+
+
+```{r echo = TRUE, eval = TRUE, results='hide', class.source='klippy'}
+# Download the data file from OSF
+osfr::osf_retrieve_file("https://osf.io/at6pn/") %>% osfr::osf_download(conflicts = "overwrite") 
+
+# Load the data file and tree file
+data2 <- read.csv(here::here("example2.csv"))
+```
+
+Of the 173 effect sizes in the biomass dataset, 35.8% have missing SD data. Where missing, SDs were missing for both the CG and SRG treatment groups in the effect size. In their original analyses @mcdonald2019 handle these missing data by calculating the average CV from all studies without missing data. They then use the reported mean value for studies with missing SDs coupled with the average CV to impute the missing SD value. This method is similar to single imputation of missing SDs, by predicting their value from a mean-SD linear regression. Non-independence was handled by @mcdonald2019 using MLMA, which included a variance-covariance matrix to account for stochastic dependency.
+
+In table 1 we present the results of re-analysis of the biomass data from @mcdonald2019, again using MLMA, but with the four different methods to handles missing SDs. For reference we also include the results of a complete cases analysis where studies with missing SDs have been excluded. The effect sizes for the different methods are all very similar, although the CI for the complete cases analysis is wider than for those that include studies with missing SDs. Method 1B estimated slightly lower heterogeneity than the other methods.
+
+Table 1.
+        Method	lnRR	CI Lower	CI Upper
+Complete Cases	-0.20	-0.31	-0.09	0.41
+     Method 1A	-0.21	-0.30	-0.13	0.40
+     Method 1B	-0.21	-0.29	-0.13	0.38
+      Method 2	-0.21	-0.30	-0.13	0.42
+      Method 3	-0.21	-0.29	-0.12	0.41
 
 # Session Information
 ```{r echo = FALSE, eval = TRUE}

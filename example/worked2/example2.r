@@ -52,10 +52,10 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     # Add in Laj lnRR correction. Note we need to ^2 cv's here because of
     a2 <-  a2 %>%
   mutate(lnrr_laj_orig = na_if(lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
-                                           cv1 = cv_Control^2, cv2 = cv_Experimental^2,
+                                        cv1_2 = cv_Control^2, cv2_2  = cv_Experimental^2,
                               n1= Control_sample_size, n2 = Experimental_sample_size), Inf),
-        v_lnrr_laj_orig = na_if(v_lnrr_laj(cv1 = cv_Control^2, n1= Control_sample_size,
-                              cv2 = cv_Experimental^2, n2 = Experimental_sample_size), Inf))
+        v_lnrr_laj_orig = na_if(v_lnrr_laj(cv1_2 = cv_Control^2, n1= Control_sample_size,
+                              cv2_2 = cv_Experimental^2, n2 = Experimental_sample_size), Inf))
 
 
     ## There seem to be some big problems with the original data as it's saying large ratios of V. Exclude these large V calculations as clearly there is something wrong with these original data
@@ -107,10 +107,12 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 
     # Now calculate the average between study CV, which will replace missing values.
     # Note that mean N used
-    a2missSD_stdy <- cv_avg(cv_Control, Control_sample_size, group = Author,
-                            name = "1", data = a2missSD_stdy)
-    a2missSD_stdy <- cv_avg(cv_Experimental, Experimental_sample_size, group = Author,
-                            name = "2", data = a2missSD_stdy)
+    a2missSD_stdy <- cv_avg(x = Control_mean, sd = Control_standard_deviation,
+                            n = Control_sample_size, group = Author, label = "1",
+                             data = a2missSD_stdy)
+    a2missSD_stdy <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation,
+                            n = Experimental_sample_size, group = Author,
+                            label = "2", data = a2missSD_stdy)
 
     # Now using wighted mean CV in replacement for where CV's are missing.
     # Note that function above already CV^2 so need to do that on original CV
