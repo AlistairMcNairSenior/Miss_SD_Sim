@@ -34,6 +34,7 @@ agg_results$range_bias<-agg_results$max_bias - agg_results$min_bias
 # Rename 1.1 and 1.2 to 1.A and 1.B
 agg_results$Method[which(agg_results$Method == "Method 1.1")]<-"Method 1A"
 agg_results$Method[which(agg_results$Method == "Method 1.2")]<-"Method 1B"
+agg_results$Method[which(agg_results$Method == "Complete Data")]<-"Full Data"
 
 A<-ggplot(data=agg_results, aes(x=mean_bias, y=Method, col=Method, fill=Method)) +
 	geom_violin() + 
@@ -55,8 +56,8 @@ A<-ggplot(data=agg_results, aes(x=mean_bias, y=Method, col=Method, fill=Method))
 long<-agg_results[,c("Method", "mean_bias", "code")]
 wide<-reshape(long, direction="wide", idvar="code", timevar="Method")
 cor.mat<-cor(wide[,-1])
-rownames(cor.mat)<-c("Complete", "Method 1A", "Method 1B", "Method 2", "Method 3")
-colnames(cor.mat)<-c("Complete", "Method 1A", "Method 1B", "Method 2", "Method 3")
+rownames(cor.mat)<-c("Full", "Method 1A", "Method 1B", "Method 2", "Method 3")
+colnames(cor.mat)<-c("Full", "Method 1A", "Method 1B", "Method 2", "Method 3")
 
 B<-ggcorrplot(cor.mat, lab=T, show.legend=FALSE, type="lower") + theme(plot.title=element_text(size=15))
 
