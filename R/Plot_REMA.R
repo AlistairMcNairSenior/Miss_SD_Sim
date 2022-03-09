@@ -144,7 +144,7 @@ B<-ggplot(data=agg_results, aes(x=as.factor(tau2), y= median_bias_tau2_lnR, fill
 	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1)))
 	
 
-pdf("MS/fig/Bias_Het.pdf", height=5, width=12)
+pdf("MS/fig/Bias_Het_REMA.pdf", height=5, width=12)
 
 grid.arrange(A+labs(title="A."), B+labs(title="B."), layout_matrix=rbind(c(1,2)))	
 													
