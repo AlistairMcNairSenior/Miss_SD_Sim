@@ -71,6 +71,16 @@ data1 <- read.csv(here::here("example1.csv"))
 To facilitate application of the methods we have written a general function for calculating the weighted $CV^2$ across studies. That function is in the `func.R` script, but we provide some detail here. 
 
 ```{r echo = TRUE, eval = TRUE, results='hide', class.source='klippy'}
+#' @title cv_avg
+#' @description Calculates the weighted average CV^2 within a study and the weighted average CV^2 across a study
+#' @param x Mean of an experimental group
+#' @param sd Standard deviation of an experimental group
+#' @param n The sample size of an experimental group
+#' @param group Study, grouping or cluster variable one wishes to calculate the within and between weighted CV^2. In meta-analysis this will most likely be 'study'.
+#' @param data The dataframe containing the mean, sd, n and grouping variables
+#' @param label A character string specifying the label one wishes to attach to columns to identify the treatment. Otherwise, if not specified it will default to the variable name for x
+#' @param sub_b A logical indicating whether the between study CV^2 (b_CV2) should be appended to the data only ('TRUE') or whether both within study CV^2 (w_CV2), mean sample size (n_mean) and between study CV^2 (b_CV2) should all be appended to the data only ('FALSE')
+
 cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
 
   # Check if the name is specified or not. If not, then assign it the name of the mean, x, variable input in the function. https://stackoverflow.com/questions/60644445/converting-tidyeval-arguments-to-string
@@ -102,6 +112,9 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
 }
 
 ```
+
+The function will take the mean (`x`), standard deviation (`sd`) and sample size (`n`) along with the desired dataframe and calculate the between study $CV^2$ that is needed for manyt of the methods implemented. The `group` argument is needed to identify the study variable which is important so that the function first takes the weighted mean $CV^2$ within the study first before calculating the $CV^2$ across studies. The new $CV^2$ is then added directly to the dataframe. You can label these new columns using the `label` argument, otherwise, it will append the name of the column for the treatment group with `b_CV2`. We'll show how this function is used as we overview the methods in detail below.
+
 
 # Worked Example 2: Dealing with missing SD data when assessing strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems
 
