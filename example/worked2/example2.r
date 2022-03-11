@@ -140,7 +140,6 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
                           R = list(Focal_insect = phylo), data = a2)
     whole_mv_res <- get_est(whole_mv)
 
-
 ################################################
     # Complete case analysis
 ################################################
@@ -165,6 +164,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
                                R = list(Focal_insect = phylo), data = a2missSD_stdy)
 
     method_1A_mv_res <- get_est(method_1A_mv)
+
 ################################################
     # METHOD 1B
 ################################################
@@ -175,6 +175,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
                            R = list(Focal_insect = phylo), data = a2missSD_stdy)
 
     method_1B_mv_res <- get_est(method_1B_mv)
+
 ################################################
     # METHOD 2
 ################################################
