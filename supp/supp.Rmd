@@ -34,6 +34,54 @@ In this supplement we show readers how they can implement some of the missing da
 
 Importantly, this tutorial is self-contained. The code will download all the necessary files needed to run the examples directly to your working directory. This includes a subset of data from @bird2019, along with their pruned phylogenetic tree, and data from @mcdonald2019. For simplicity, we have not provided the code here to show readers how to prune the tree and process the data. That code can all be found on our [GitHub](https://github.com/AlistairMcNairSenior/Miss_SD_Sim) repository. Similarly, if users experience any issues with downloading the files needed to run any code they are hosted on [OSF](https://osf.io/h9x6w/). 
 
+# `cv_avg` Function: Calculating between study $CV^2$
+To facilitate application of the methods we have written a general function for calculating the weighted $CV^2$ across studies. That function is in the `func.R` script, but we provide some detail here. 
+
+```{r echo = TRUE, eval = TRUE, results='hide', tidy=TRUE, class.source='klippy'}
+#' @title cv_avg
+#' @description Calculates the weighted average CV^2 within a study and the weighted average CV^2 across a study
+#' @param x Mean of an experimental group
+#' @param sd Standard deviation of an experimental group
+#' @param n The sample size of an experimental group
+#' @param group Study, grouping or cluster variable one wishes to calculate the within and between weighted CV^2. In meta-analysis this will most likely be 'study'.
+#' @param data The dataframe containing the mean, sd, n and grouping variables
+#' @param label A character string specifying the label one wishes to attach to columns to identify the treatment. Otherwise, if not specified it will default to the variable name for x
+#' @param sub_b A logical indicating whether the between study CV^2 (b_CV2) should be appended to the data only ('TRUE') or whether both within study CV^2 (w_CV2), mean sample size (n_mean) and between study CV^2 (b_CV2) should all be appended to the data only ('FALSE')
+
+cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
+
+  # Check if the name is specified or not. If not, then assign it the name of the mean, x, variable input in the function. https://stackoverflow.com/questions/60644445/converting-tidyeval-arguments-to-string
+  if(is.null(label)){
+    label <- purrr::map_chr(enquos(x), rlang::as_label)
+  }
+
+  # Calculate between study CV. Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
+  b_grp_cv_data <- data                                             %>%
+    dplyr::group_by({{group}})                            %>%
+    dplyr::mutate(w_CV2 = weighted.mean(na_if(({{x}} / {{sd}})^2, Inf), 
+                                        {{n}},na.rm = TRUE),
+                     n_mean = mean({{n}}, na.rm = TRUE))   %>%
+    dplyr::ungroup(.)                                     %>%
+    dplyr::mutate(b_CV2 = weighted.mean(w_CV2, n_mean, na.rm = TRUE), .keep = "used")
+
+  # Make sure that label of the calculated columns is distinct from any other columns
+  names(b_grp_cv_data) <- paste0(names(b_grp_cv_data), "_", label)
+
+  # Append these calculated columns back to the original data and return the full dataset.
+  if(sub_b){
+    b_grp_cv_data <- b_grp_cv_data %>% dplyr::select(grep("b_", names(b_grp_cv_data)))
+    dat_new <- cbind(data, b_grp_cv_data)
+  } else {
+    dat_new <- cbind(data, b_grp_cv_data)
+  }
+
+  return(data.frame(dat_new))
+}
+
+```
+
+The function will take the mean (`x`), standard deviation (`sd`) and sample size (`n`) along with the desired dataframe and calculate the between study $CV^2$ that is needed for many of the methods implemented. The `group` argument is needed to identify the "study" / cluster variable which is important so that the function first takes the weighted mean $CV^2$ within the study first before calculating the $CV^2$ across studies. The new $CV^2$ is then added directly to the dataframe. You can label these new columns using the `label` argument, otherwise, it will append the name of the column for the treatment group with `b_CV2`. We'll show how this function is used as we overview the methods in detail below.
+
 # Worked Example 1: Dealing with missing SD data to explore the fitness impacts of competition between herbivorous insects
 
 ### Introduction
@@ -68,53 +116,6 @@ data1 <- read.csv(here::here("example1.csv"))
  tree <- read.tree(here::here("phylo_tree"))
 ```
 
-### `cv_avg` Function: Calculating between study $CV^2$
-To facilitate application of the methods we have written a general function for calculating the weighted $CV^2$ across studies. That function is in the `func.R` script, but we provide some detail here. 
-
-```{r echo = TRUE, eval = TRUE, results='hide', class.source='klippy'}
-#' @title cv_avg
-#' @description Calculates the weighted average CV^2 within a study and the weighted average CV^2 across a study
-#' @param x Mean of an experimental group
-#' @param sd Standard deviation of an experimental group
-#' @param n The sample size of an experimental group
-#' @param group Study, grouping or cluster variable one wishes to calculate the within and between weighted CV^2. In meta-analysis this will most likely be 'study'.
-#' @param data The dataframe containing the mean, sd, n and grouping variables
-#' @param label A character string specifying the label one wishes to attach to columns to identify the treatment. Otherwise, if not specified it will default to the variable name for x
-#' @param sub_b A logical indicating whether the between study CV^2 (b_CV2) should be appended to the data only ('TRUE') or whether both within study CV^2 (w_CV2), mean sample size (n_mean) and between study CV^2 (b_CV2) should all be appended to the data only ('FALSE')
-
-cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
-
-  # Check if the name is specified or not. If not, then assign it the name of the mean, x, variable input in the function. https://stackoverflow.com/questions/60644445/converting-tidyeval-arguments-to-string
-  if(is.null(label)){
-    label <- purrr::map_chr(enquos(x), rlang::as_label)
-  }
-
-  # Calculate between study CV. Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
-  b_grp_cv_data <- data                                             %>%
-    dplyr::group_by({{group}})                            %>%
-    dplyr::mutate(   w_CV2 = weighted.mean(na_if(({{x}} / {{sd}})^2, Inf), {{n}},
-                                           na.rm = TRUE),
-                     n_mean = mean({{n}}, na.rm = TRUE))   %>%
-    dplyr::ungroup(.)                                     %>%
-    dplyr::mutate(b_CV2 = weighted.mean(w_CV2, n_mean, na.rm = TRUE), .keep = "used")
-
-  # Make sure that label of the calculated columns is distinct from any other columns
-  names(b_grp_cv_data) <- paste0(names(b_grp_cv_data), "_", label)
-
-  # Append these calculated columns back to the original data and return the full dataset.
-  if(sub_b){
-    b_grp_cv_data <- b_grp_cv_data %>% dplyr::select(grep("b_", names(b_grp_cv_data)))
-    dat_new <- cbind(data, b_grp_cv_data)
-  } else {
-    dat_new <- cbind(data, b_grp_cv_data)
-  }
-
-  return(data.frame(dat_new))
-}
-
-```
-
-The function will take the mean (`x`), standard deviation (`sd`) and sample size (`n`) along with the desired dataframe and calculate the between study $CV^2$ that is needed for many of the methods implemented. The `group` argument is needed to identify the "study" / cluster variable which is important so that the function first takes the weighted mean $CV^2$ within the study first before calculating the $CV^2$ across studies. The new $CV^2$ is then added directly to the dataframe. You can label these new columns using the `label` argument, otherwise, it will append the name of the column for the treatment group with `b_CV2`. We'll show how this function is used as we overview the methods in detail below.
 
 ### Method 1A: 
 
