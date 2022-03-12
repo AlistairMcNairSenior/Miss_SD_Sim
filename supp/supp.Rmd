@@ -68,6 +68,7 @@ data1 <- read.csv(here::here("example1.csv"))
  tree <- read.tree(here::here("phylo_tree"))
 ```
 
+### `cv_avg` Function: Calculating between study $CV^2$
 To facilitate application of the methods we have written a general function for calculating the weighted $CV^2$ across studies. That function is in the `func.R` script, but we provide some detail here. 
 
 ```{r echo = TRUE, eval = TRUE, results='hide', class.source='klippy'}
@@ -113,8 +114,11 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
 
 ```
 
-The function will take the mean (`x`), standard deviation (`sd`) and sample size (`n`) along with the desired dataframe and calculate the between study $CV^2$ that is needed for manyt of the methods implemented. The `group` argument is needed to identify the study variable which is important so that the function first takes the weighted mean $CV^2$ within the study first before calculating the $CV^2$ across studies. The new $CV^2$ is then added directly to the dataframe. You can label these new columns using the `label` argument, otherwise, it will append the name of the column for the treatment group with `b_CV2`. We'll show how this function is used as we overview the methods in detail below.
+The function will take the mean (`x`), standard deviation (`sd`) and sample size (`n`) along with the desired dataframe and calculate the between study $CV^2$ that is needed for many of the methods implemented. The `group` argument is needed to identify the "study" / cluster variable which is important so that the function first takes the weighted mean $CV^2$ within the study first before calculating the $CV^2$ across studies. The new $CV^2$ is then added directly to the dataframe. You can label these new columns using the `label` argument, otherwise, it will append the name of the column for the treatment group with `b_CV2`. We'll show how this function is used as we overview the methods in detail below.
 
+### Method 1A: 
+
+In our manuscript we provide the whole data and complete case analysis. Here, we jump straight into showing readers how to implement the different 'solutions' to the missing standard deviation problem that is typical when conducting meta-analysis.
 
 # Worked Example 2: Dealing with missing SD data when assessing strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems
 
