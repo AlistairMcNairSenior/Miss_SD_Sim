@@ -114,6 +114,7 @@ osfr::osf_retrieve_file("https://osf.io/t5kh4/") %>% osfr::osf_download(conflict
 # Load the data file and tree file
 data1 <- read.csv(here::here("example1.csv"))
  tree <- read.tree(here::here("phylo_tree"))
+ phylo <- vcv(tree, corr = TRUE)
 ```
 
 The data from @bird2019 is incomplete. It is missing many SD values in the control and treatment group, which would normally mean we would have to exclude these data prior to analysis (Figure \@ref(fig:fig1))
@@ -141,7 +142,7 @@ In our manuscript we provide the full data and complete case analysis (excluding
 
 To implement Method 1 described in the manuscript, we need to first calculate the between study $CV^2$. We will do this with the `cvg_avg` function we describe above. Here, we need to do this for the control and experimental groups as follows:
 
-```{r cvavg, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+```{r cvavg, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 # Calculate the average between study CV, which will replace missing values.
     data1 <- cv_avg(x = Control_mean, sd = Control_standard_deviation,
                             n = Control_sample_size, group = Author, label = "1",
@@ -153,7 +154,7 @@ To implement Method 1 described in the manuscript, we need to first calculate th
 
 To implement Method 1A, we need to calculate log response ratios and their associated sampling variances differently depending on whether we have an observation with a missing standard deviation (SD) or not. Accoring to Table 1 (in the main MS), we can use equation 4 or 6 for the point estimate calculation and equation 5 for the sampling variance when we have a known SD and equation 7 when we have an unknown SD. We can do that as follows:
 
-```{r lnRR_1A, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+```{r lnRR_1A, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
     # Use weighted mean CV in replacement for where CV's are missing. Otherwise, calculate CV^2 of data that is known.
     data1 <- data1 %>%
               mutate(cv2_cont_new = if_else(is.na(cv_Control),      b_CV2_1, cv_Control^2),
@@ -170,7 +171,7 @@ To implement Method 1A, we need to calculate log response ratios and their assoc
 
 Now we are ready to fit our multilevel meta-analytic model as per @bird2019.
 
-```{r bird_1A, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+```{r bird_1A, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 ################################################
     # METHOD 1A
 ################################################
@@ -187,7 +188,7 @@ Now we are ready to fit our multilevel meta-analytic model as per @bird2019.
 ### Method 1B
 While Method 1A could be used our simulations show that it is better to apply Method 1B. The only real difference is that we apply eqation 7 to calculate sampling variance regardless of whether we are missing the standard deviation or not for a row. In otherwords, we simply using the between study $CV^2$ for all CV's in the control and experimental group. 
 
-```{r lnRR_1B, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+```{r lnRR_1B, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 
     # Now calculate new v_lnrr_laj_1B using between study CV^2 for all observations.
     data1 <- data1 %>%
@@ -196,7 +197,8 @@ While Method 1A could be used our simulations show that it is better to apply Me
 ```
 
 Now we can fit the same model as described above using this new sampling variance:
-```{r bird_1B, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+
+```{r bird_1B, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 ################################################
     # METHOD 1B
 ################################################
@@ -208,6 +210,62 @@ Now we can fit the same model as described above using this new sampling varianc
     method_1B_bird_res <- get_est(method_1B_bird)
 ```
 
+### Method 2
+Method 2 involves a weighted regression approach. This can be implemented as follows:
+
+```{r bird_2, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+################################################
+    # METHOD 2
+################################################
+                 V_es <- diag(data1$v_lnrr_laj_1B)
+      row.names(V_es) <- data1$obs
+           data1$obs2 <- rownames(V_es)
+
+    method2_bird <-rma.mv(lnrr_laj ~ 1, V = 0, 
+                          random=list(~1|Group, ~1|Year,
+                                      ~1|Focal_insect, ~1|obs, ~1|obs2),
+                        data=data1, R=list(obs2=V_es, Focal_insect = phylo),
+                        Rscale=F)
+    
+    method2_bird_res <- get_est(method2_bird)
+```
+
+### Method 3
+Method 3 is a combined approach using Equation 5 as the sampling variance when we have the full data; otherwise using a weighted regression approach.
+
+```{r bird_3, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+  ################################################
+    # METHOD 3
+################################################
+    # Find where missing SD's are in the data
+      missing_dat <- which(is.na(data1$Control_standard_deviation) &                is.na(data1$Experimental_standard_deviation))
+
+    # Set the effect sizes not missing data to zero in the V_es matrix
+                        V_es2 <- diag(data1$v_lnrr_laj_1B)
+    diag(V_es2)[-missing_dat] <- 0
+             row.names(V_es2) <- data1$obs
+                   data1$obs2 <- rownames(V_es2)
+
+    # Set the v_lnrr_laj to 0
+                 data1$v_lnrr_laj_m3 <- data1$v_lnrr_laj
+    data1$v_lnrr_laj_m3[missing_dat] <- 0
+
+    method3_bird <-rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_m3, 
+                          random = list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs, ~1|obs2),
+                            data = data1, R = list(obs2=V_es2, Focal_insect = phylo), Rscale=F)
+    method3_bird_res <- get_est(method3_bird)
+```
+
+### Comparing results
+We can compare the results of all the methods together:
+
+```{r birdResults, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+ results <- rbind(method_1A_bird_res, method_1B_bird_res, method2_bird_res, method3_bird_res)
+    results$Method <- c("Method 1A", "Method 1B", "Method 2", "Method 3")
+    
+    results <- results %>% select(Method, Est., SE, "95% LCI", "95% UCI")
+    flextable::flextable(results) %>% flextable::width(j = 1, 0.9)
+```
 # **Worked Example 2**: Dealing with missing SD data when assessing strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems
 
 ### Introduction
