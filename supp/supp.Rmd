@@ -135,9 +135,11 @@ na.plot <- data1 %>%
 na.plot
 ```
 
-### Method 1A:  
+### Method 1A  
 
-In our manuscript we provide the whole data and complete case analysis. Here, we jump straight into showing readers how to implement the different 'solutions' to the missing standard deviation problem that is typical when conducting meta-analysis.
+In our manuscript we provide the full data and complete case analysis (excluding rows with missing data). As such, here we jump straight into showing readers how to implement the different solutions to the missing standard deviation problem that is typical when conducting meta-analysis.
+
+To implement Method 1 described in the manuscript, we need to first calculate the between study $CV^2$. We will do this with the `cvg_avg` function we describe above. Here, we need to do this for the control and experimental groups as follows:
 
 ```{r cvavg, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 # Calculate the average between study CV, which will replace missing values.
@@ -147,6 +149,63 @@ In our manuscript we provide the whole data and complete case analysis. Here, we
     data1 <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation,
                             n = Experimental_sample_size, group = Author,
                             label = "2", data = data1)
+```
+
+To implement Method 1A, we need to calculate log response ratios and their associated sampling variances differently depending on whether we have an observation with a missing standard deviation (SD) or not. Accoring to Table 1 (in the main MS), we can use equation 4 or 6 for the point estimate calculation and equation 5 for the sampling variance when we have a known SD and equation 7 when we have an unknown SD. We can do that as follows:
+
+```{r lnRR_1A, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+    # Use weighted mean CV in replacement for where CV's are missing. Otherwise, calculate CV^2 of data that is known.
+    data1 <- data1 %>%
+              mutate(cv2_cont_new = if_else(is.na(cv_Control),      b_CV2_1, cv_Control^2),
+                     cv2_expt_new = if_else(is.na(cv_Experimental), b_CV2_2, cv_Experimental^2))
+
+    # Now calculate new yi and vi, called lnrr_laj & v_lnrr_laj, respectively. This uses either the between individual CV^2 when missing or normal CV^2 when not missing.
+    data1 <- data1 %>%
+              mutate(lnrr_laj = lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
+                                         cv1 = cv2_cont_new, cv2 = cv2_expt_new,
+                                         n1= Control_sample_size, n2 = Experimental_sample_size),
+                   v_lnrr_laj = v_lnrr_laj(cv1 = cv2_cont_new, n1= Control_sample_size,
+                                           cv2 = cv2_expt_new, n2 = Experimental_sample_size))
+```
+
+Now we are ready to fit our multilevel meta-analytic model as per @bird2019.
+
+```{r bird_1A, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+################################################
+    # METHOD 1A
+################################################
+
+    # Fit model with new sampling variance
+    method_1A_bird <- rma.mv(lnrr_laj_orig ~ 1, V = v_lnrr_laj,
+                               random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
+                               R = list(Focal_insect = phylo), data = data1)
+
+    method_1A_bird_res <- get_est(method_1A_bird)
+```    
+    
+
+### Method 1B
+While Method 1A could be used our simulations show that it is better to apply Method 1B. The only real difference is that we apply eqation 7 to calculate sampling variance regardless of whether we are missing the standard deviation or not for a row. In otherwords, we simply using the between study $CV^2$ for all CV's in the control and experimental group. 
+
+```{r lnRR_1B, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+
+    # Now calculate new v_lnrr_laj_1B using between study CV^2 for all observations.
+    data1 <- data1 %>%
+              mutate(v_lnrr_laj_1B = v_lnrr_laj(cv1 = b_CV2_1, n1= Control_sample_size,
+                                                cv2 = b_CV2_2, n2 = Experimental_sample_size))
+```
+
+Now we can fit the same model as described above using this new sampling variance:
+```{r bird_1B, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+################################################
+    # METHOD 1B
+################################################
+    # Fit model with new sampling variance and point estimate
+    method_1B_bird <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_1B,
+                           random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
+                           R = list(Focal_insect = phylo), data = data1)
+
+    method_1B_bird_res <- get_est(method_1B_bird)
 ```
 
 # **Worked Example 2**: Dealing with missing SD data when assessing strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems
