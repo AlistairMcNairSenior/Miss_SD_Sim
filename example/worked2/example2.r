@@ -123,13 +123,13 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 
     # Caluclate the new unbiased lnRR
 
-    # Now calculate new yi andvi, called lnrr_laj & v_lnrr_laj, respectively.
+    # Now calculate new yi andvi, called lnrr_laj & v_lnrr_laj, respectively.Note that the functions take CV^2
     a2missSD_stdy <- a2missSD_stdy %>%
       mutate(lnrr_laj = lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
                                  cv1 = cv_cont_new, cv2 = cv_expt_new,
                                  n1= Control_sample_size, n2 = Experimental_sample_size),
-             v_lnrr_laj = v_lnrr_laj(cv1 = b_CV2_1, n1= Control_sample_size,
-                                     cv2 = b_CV2_2, n2 = Experimental_sample_size))
+             v_lnrr_laj = v_lnrr_laj(cv1 = cv_cont_new, n1= Control_sample_size,
+                                     cv2 = cv_expt_new, n2 = Experimental_sample_size))
 
 ################################################
     # Whole/full data model
