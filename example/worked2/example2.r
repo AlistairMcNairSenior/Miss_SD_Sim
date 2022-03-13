@@ -117,8 +117,8 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     # Now using wighted mean CV in replacement for where CV's are missing.
     # Note that function above already CV^2 so need to do that on original CV
     a2missSD_stdy <- a2missSD_stdy %>%
-      mutate(cv_cont_new = if_else(is.na(cv_Control),      b_CV2_1, cv_Control^2),
-             cv_expt_new = if_else(is.na(cv_Experimental), b_CV2_2, cv_Experimental^2))
+      mutate(cv2_cont_new = if_else(is.na(cv_Control),      b_CV2_1, cv_Control^2),
+             cv2_expt_new = if_else(is.na(cv_Experimental), b_CV2_2, cv_Experimental^2))
 
 
     # Caluclate the new unbiased lnRR
@@ -126,10 +126,10 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     # Now calculate new yi andvi, called lnrr_laj & v_lnrr_laj, respectively.Note that the functions take CV^2
     a2missSD_stdy <- a2missSD_stdy %>%
       mutate(lnrr_laj = lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
-                                 cv1 = cv_cont_new, cv2 = cv_expt_new,
+                                 cv1 = cv2_cont_new, cv2 = cv2_expt_new,
                                  n1= Control_sample_size, n2 = Experimental_sample_size),
-             v_lnrr_laj = v_lnrr_laj(cv1 = cv_cont_new, n1= Control_sample_size,
-                                     cv2 = cv_expt_new, n2 = Experimental_sample_size))
+             v_lnrr_laj = v_lnrr_laj(cv1 = cv2_cont_new, n1= Control_sample_size,
+                                     cv2 = cv2_expt_new, n2 = Experimental_sample_size))
 
 ################################################
     # Whole/full data model
@@ -154,12 +154,8 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     # METHOD 1A
 ################################################
 
-    # Now calculate new vi DS
-    a2missSD_stdy <- a2missSD_stdy %>%
-                      mutate(vi_DS_lnrr = (cv_cont_new / Control_sample_size) + (cv_expt_new / Experimental_sample_size))
-
     # Fit model with new sampling variance
-    method_1A_mv <- rma.mv(lnrr_laj_orig ~ 1, V = vi_DS_lnrr,
+    method_1A_mv <- rma.mv(lnrr_laj_orig ~ 1, V = v_lnrr_laj,
                                random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                                R = list(Focal_insect = phylo), data = a2missSD_stdy)
 
@@ -168,9 +164,11 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 ################################################
     # METHOD 1B
 ################################################
-
+    data1 <- data1 %>%
+      mutate(v_lnrr_laj_1B = v_lnrr_laj(cv1 = b_CV2_1, n1= Control_sample_size,
+                                        cv2 = b_CV2_2, n2 = Experimental_sample_size))
     # Fit model with new sampling variance and point estimate
-    method_1B_mv <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj,
+    method_1B_mv <- rma.mv(lnrr_laj_orig ~ 1, V = v_lnrr_laj_1B,
                            random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                            R = list(Focal_insect = phylo), data = a2missSD_stdy)
 
@@ -179,7 +177,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 ################################################
     # METHOD 2
 ################################################
-                 V_es <- diag(a2missSD_stdy$v_lnrr_laj)
+                 V_es <- diag(a2missSD_stdy$v_lnrr_laj_1B)
       row.names(V_es) <- a2missSD_stdy$obs
    a2missSD_stdy$obs2 <- rownames(V_es)
 
@@ -196,7 +194,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
       missing_dat <- which(is.na(a2missSD_stdy$Control_standard_deviation) & is.na(a2missSD_stdy$Experimental_standard_deviation))
 
     # Set the effect sizes not missing data to zero in the V_es matrix
-                        V_es2 <- diag(a2missSD_stdy$v_lnrr_laj)
+                        V_es2 <- diag(a2missSD_stdy$v_lnrr_laj_1B)
     diag(V_es2)[-missing_dat] <- 0
              row.names(V_es2) <- a2missSD_stdy$obs
            a2missSD_stdy$obs2 <- rownames(V_es2)
