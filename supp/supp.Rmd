@@ -177,7 +177,7 @@ Now we are ready to fit our multilevel meta-analytic model as per @bird2019.
 ################################################
 
     # Fit model with new sampling variance
-    method_1A_bird <- rma.mv(lnrr_laj_orig ~ 1, V = v_lnrr_laj,
+    method_1A_bird <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj,
                                random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                                R = list(Focal_insect = phylo), data = data1)
 
