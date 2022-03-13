@@ -116,10 +116,38 @@ data1 <- read.csv(here::here("example1.csv"))
  tree <- read.tree(here::here("phylo_tree"))
 ```
 
+The data from @bird2019 is incomplete. It is missing many SD values in the control and treatment group, which would normally mean we would have to exclude these data prior to analysis (Figure \@ref(fig:fig1))
 
-### Method 1A: 
+```{r fig1, fig.cap = "Missing data in the Bird et al. (2019) dataset", echo=FALSE, eval = TRUE, include=TRUE, message=FALSE, warning=FALSE}
+na.plot <- data1 %>%
+  mutate(id = row_number()) %>%
+  gather(-id, key = "key", value = "val") %>%
+  mutate(isna = is.na(val)) %>%
+  ggplot(aes(key, id, fill = isna)) +
+    geom_raster(alpha=0.8) +
+    scale_fill_manual(name = "",
+        values = c('steelblue', 'tomato3'),
+        labels = c("Present", "Missing")) +
+    labs(x = "Variable",
+           y = "Row Number") +
+    coord_flip()
+
+na.plot
+```
+
+### Method 1A:  
 
 In our manuscript we provide the whole data and complete case analysis. Here, we jump straight into showing readers how to implement the different 'solutions' to the missing standard deviation problem that is typical when conducting meta-analysis.
+
+```{r cvavg, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+# Calculate the average between study CV, which will replace missing values.
+    data1 <- cv_avg(x = Control_mean, sd = Control_standard_deviation,
+                            n = Control_sample_size, group = Author, label = "1",
+                             data = data1)
+    data1 <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation,
+                            n = Experimental_sample_size, group = Author,
+                            label = "2", data = data1)
+```
 
 # Worked Example 2: Dealing with missing SD data when assessing strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems
 
