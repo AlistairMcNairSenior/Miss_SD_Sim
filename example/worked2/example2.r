@@ -155,7 +155,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 ################################################
 
     # Fit model with new sampling variance
-    method_1A_mv <- rma.mv(lnrr_laj_orig ~ 1, V = v_lnrr_laj,
+    method_1A_mv <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj,
                                random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                                R = list(Focal_insect = phylo), data = a2missSD_stdy)
 
@@ -164,11 +164,12 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 ################################################
     # METHOD 1B
 ################################################
-    data1 <- data1 %>%
+    a2missSD_stdy <- a2missSD_stdy %>%
       mutate(v_lnrr_laj_1B = v_lnrr_laj(cv1 = b_CV2_1, n1= Control_sample_size,
                                         cv2 = b_CV2_2, n2 = Experimental_sample_size))
+
     # Fit model with new sampling variance and point estimate
-    method_1B_mv <- rma.mv(lnrr_laj_orig ~ 1, V = v_lnrr_laj_1B,
+    method_1B_mv <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_1B,
                            random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                            R = list(Focal_insect = phylo), data = a2missSD_stdy)
 
