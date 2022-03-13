@@ -37,7 +37,7 @@ Importantly, this tutorial is self-contained. The code will download all the nec
 # **`cv_avg` Function**: Calculating between study $CV^2$
 To facilitate application of the methods we have written a general function for calculating the weighted $CV^2$ across studies. That function is in the `func.R` script, but we provide some detail here. 
 
-```{r echo = TRUE, results='hide', tidy=TRUE, tidy.opts=list(width.cutoff=80), class.source='klippy'}
+```{r echo = TRUE, results='hide', tidy=FALSE, tidy.opts=list(width.cutoff=80), class.source='klippy'}
 #' @title cv_avg
 #' @description Calculates the weighted average CV^2 within a study and the weighted average CV^2 across a study
 #' @param x Mean of an experimental group
@@ -58,7 +58,9 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
   # Calculate between study CV. Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
   b_grp_cv_data <- data                                             %>%
     dplyr::group_by({{group}})                            %>%
-    dplyr::mutate(w_CV2 = weighted.mean(na_if(({{x}} / {{sd}})^2, Inf), {{n}},na.rm = TRUE),n_mean = mean({{n}}, na.rm = TRUE))   %>%
+    dplyr::mutate(w_CV2 = weighted.mean(na_if(({{x}} / {{sd}})^2, Inf), 
+                                        {{n}},na.rm = TRUE),
+                  n_mean = mean({{n}}, na.rm = TRUE))   %>%
     dplyr::ungroup(.)                                     %>%
     dplyr::mutate(b_CV2 = weighted.mean(w_CV2, n_mean, na.rm = TRUE), .keep = "used")
 
@@ -150,7 +152,7 @@ In our manuscript we provide the whole data and complete case analysis. Here, we
 # **Worked Example 2**: Dealing with missing SD data when assessing strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems
 
 ### Introduction
-Our second example is from @mcdonald2019. @mcdonald2019 studied the effects of strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems. They looked at a number of different ecological outcomes. Here, we focus on their data on the effects of SRG vs CG on biomass; this dataset contains 173 effect sizes from 67 studies. In their original analysis @mcdonald2019 find that the biomass of CG systems is significantly reduced relative to that SRG, but do not report the total heterogeneity. The dataset contains two dimensions of non-independence that are common to eco-evolutionary meta-analyses; 1) multiple effect sizes per study and 2) several effect sizes within the same study are computed as relative to the same control group [sometimes termed ‘stochastic dependency’; @Noble2017; @GleserOlkin2009].
+Our second example is from @mcdonald2019 which demonstrates nicely a real dataset with  missing standard deviation data as a result of it not being reported within papers. @mcdonald2019 studied the effects of strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems. They looked at a number of different ecological outcomes. Here, we focus on their data on the effects of SRG vs CG on biomass; this dataset contains 173 effect sizes from 67 studies. In their original analysis @mcdonald2019 find that the biomass of CG systems is significantly reduced relative to that SRG, but do not report the total heterogeneity. The dataset contains two dimensions of non-independence that are common to eco-evolutionary meta-analyses; 1) multiple effect sizes per study and 2) several effect sizes within the same study are computed as relative to the same control group [sometimes termed ‘stochastic dependency’; @Noble2017; @GleserOlkin2009].
 
 ### Setting up
 
