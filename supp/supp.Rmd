@@ -338,11 +338,11 @@ Accoring to Table 1 (in the main MS), we can use equation 4 or 6 for the point e
    
     # Now calculate new yi and vi, called lnrr_laj & v_lnrr_laj, respectively. This uses either the between individual CV^2 when missing or normal CV^2 when not missing.
     data2 <- data2 %>%
-              mutate(lnrr_laj = lnrr_laj(m1 = CM, m2 = TM,
-                                         cv1_2 = cv2_cont_new, cv2_2 = cv2_expt_new,
-                                         n1= CN, n2 = TN),
-                   v_lnrr_1A = v_lnrr_laj( cv1_2 = cv2_cont_new, n1= CN,
-                                           cv2_2 = cv2_expt_new, n2 = TN))
+              mutate(lnrr_laj = lnrr_laj(m1 = TM, m2 = CM,
+                                         cv1_2 = cv2_expt_new, cv2_2 = cv2_cont_new,
+                                         n1= TN, n2 = CN),
+                   v_lnrr_1A = v_lnrr_laj( cv1_2 = cv2_expt_new, n1= TN,
+                                           cv2_2 = cv2_cont_new, n2 = CN))
 ```
 
 ```{r mcdon_1A, echo = TRUE, eval = TRUE, class.source='klippy'}
@@ -359,8 +359,8 @@ We will now calculate a new sampling varinace using Equation 7, that makes use o
 
  # Now calculate new v_lnrr_laj_1B using between study CV^2 for all observations.
     data2 <- data2 %>%
-              mutate(v_lnrr_laj_1B = v_lnrr_laj(cv1_2 = b_CV2_1, n1 = CN,
-                                                cv2_2 = b_CV2_2, n2 = TN))
+              mutate(v_lnrr_laj_1B = v_lnrr_laj(cv1_2 = b_CV2_2, n1 = TN,
+                                                cv2_2 = b_CV2_1, n2 = CN))
 
 # Model 1B: MLMA of all effect sizes using pooled CV2
 MLMA1B<-rma.mv(yi = lnrr_laj, V = v_lnrr_laj_1B, random=list(~1|Study, ~1|ES_ID), data=data2)
