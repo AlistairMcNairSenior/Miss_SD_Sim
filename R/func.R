@@ -25,15 +25,15 @@
 #' # Within
 #' sum(test$n1) #59
 #' sum(test$n2) #56
-#' weighted.mean((test$x1 / test$sd1)^2, test$n1, na.rm = T) #0.1724873
-#' weighted.mean((test$x2 / test$sd2)^2, test$n2, na.rm = T) #0.1822526
+#' weighted.mean((test$sd1 / test$x1)^2, test$n1, na.rm = T)
+#' weighted.mean((test$sd2 / test$x2)^2, test$n2, na.rm = T)
 #' # Between
 #' wCV1 = unique(t2_cv$w_CV2_1)
 #' w_nt1 = c(59,58,58,50)
-#' weighted.mean(wCV1, w_nt1) #0.1663909
+#' weighted.mean(wCV1, w_nt1)
 #' wCV2 = unique(t2_cv$w_CV2_2)
 #' w_nt2 = c(56, 56, 72, 63)
-#' weighted.mean(wCV2, w_nt2) # 0.1600759
+#' weighted.mean(wCV2, w_nt2)
 #' }
 
 cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
@@ -46,7 +46,7 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
   # Calculate between study CV. Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
   b_grp_cv_data <- data                                             %>%
     dplyr::group_by({{group}})                            %>%
-    dplyr::mutate(   w_CV2 = weighted.mean(na_if(({{x}} / {{sd}})^2, Inf), {{n}},
+    dplyr::mutate(   w_CV2 = weighted.mean(na_if(({{sd}} / {{x}})^2, Inf), {{n}},
                                            na.rm = TRUE),
                      n_mean = mean({{n}}, na.rm = TRUE))   %>%
     dplyr::ungroup(.)                                     %>%
