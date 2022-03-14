@@ -20,6 +20,38 @@ v_lnrr_laj2 <- function(m1, m2, sd1, sd2, n1, n2){
   v_lnrr_laj2
 }
 
+cv_avg2 <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
+
+  # Check if the name is specified or not. If not, then assign it the name of the mean, x, variable input in the function. https://stackoverflow.com/questions/60644445/converting-tidyeval-arguments-to-string
+  if(is.null(label)){
+    label <- purrr::map_chr(enquos(x), rlang::as_label)
+  }
+
+  # Calculate between study CV. Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
+  b_grp_cv_data <- data                                             %>%
+    dplyr::group_by({{group}})                            %>%
+    dplyr::mutate(sdc = {{sd}}*exp(1/(2*({{n}}-1))),
+      w_CV2 = weighted.mean(na_if((sdc/{{x}})^2, Inf), {{n}},
+                                           na.rm = TRUE),
+                     n_mean = mean({{n}}, na.rm = TRUE))   %>%
+    dplyr::ungroup(.)                                     %>%
+    dplyr::mutate(b_CV2 = weighted.mean(w_CV2, n_mean, na.rm = TRUE), .keep = "used")
+
+  # Make sure that label of the calculated columns is distinct from any other columns
+  names(b_grp_cv_data) <- paste0(names(b_grp_cv_data), "_", label)
+
+  # Append these calculated columns back to the original data and return the full dataset.
+  if(sub_b){
+    b_grp_cv_data <- b_grp_cv_data %>% dplyr::select(grep("b_", names(b_grp_cv_data)))
+    dat_new <- cbind(data, b_grp_cv_data)
+  } else {
+    dat_new <- cbind(data, b_grp_cv_data)
+  }
+
+  return(data.frame(dat_new))
+}
+
+
 
 # Useful functions for calculating CV^2 within and between studies
 osfr::osf_retrieve_file("https://osf.io/sqr4w/") %>% osfr::osf_download(conflicts = "overwrite")
@@ -47,8 +79,20 @@ data1 <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation,
                 label = "2", data = data1)
 
 
+data1a <- cv_avg2(x = Control_mean, sd = Control_standard_deviation,
+                n = Control_sample_size, group = Author, label = "1",
+                data = data1)
+data1a <- cv_avg2(x = Experimental_mean, sd = Experimental_standard_deviation,
+                n = Experimental_sample_size, group = Author,
+                label = "2", data = data1)
+
+
 # Use weighted mean CV in replacement for where CV's are missing. Otherwise, calculate CV^2 of data that is known.
 data1 <- data1 %>%
+  mutate(cv2_cont_new = if_else(is.na(Control_standard_deviation),      b_CV2_1, cv_Control^2),
+         cv2_expt_new = if_else(is.na(Experimental_standard_deviation), b_CV2_2, cv_Experimental^2))
+
+data1a <- data1a %>%
   mutate(cv2_cont_new = if_else(is.na(Control_standard_deviation),      b_CV2_1, cv_Control^2),
          cv2_expt_new = if_else(is.na(Experimental_standard_deviation), b_CV2_2, cv_Experimental^2))
 
