@@ -70,6 +70,8 @@ phylo <- vcv(tree, corr = TRUE)
 
 #
 
+data1a <- data1
+
 # Calculate the average between study CV, which will replace missing values.
 data1 <- cv_avg(x = Control_mean, sd = Control_standard_deviation,
                 n = Control_sample_size, group = Author, label = "1",
@@ -81,10 +83,10 @@ data1 <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation,
 
 data1a <- cv_avg2(x = Control_mean, sd = Control_standard_deviation,
                 n = Control_sample_size, group = Author, label = "1",
-                data = data1)
+                data = data1a)
 data1a <- cv_avg2(x = Experimental_mean, sd = Experimental_standard_deviation,
                 n = Experimental_sample_size, group = Author,
-                label = "2", data = data1)
+                label = "2", data = data1a)
 
 
 # Use weighted mean CV in replacement for where CV's are missing. Otherwise, calculate CV^2 of data that is known.
@@ -126,6 +128,7 @@ plot(log(data1$v_lnrr_laj), log(data1a$v_lnrr_laj2))
 cor(log(data1$v_lnrr_laj), log(data1a$v_lnrr_laj2))
 plot(data1$lnrr_laj, data1a$lnrr_laj2)
 cor.test(data1$lnrr_laj, data1a$lnrr_laj2, method = "spearman")
+cor.test(data1$lnrr_laj, data1a$lnrr_laj2, method = "pearson")
 hist(log(data1$v_lnrr_laj))
 hist(log(data1a$v_lnrr_laj2))
 
