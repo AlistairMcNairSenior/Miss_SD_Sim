@@ -257,14 +257,14 @@ Method 3 is a combined approach using Equation 5 as the sampling variance when w
 ```
 
 ### Comparing results
-We can compare the results of all the methods together:
+We can compare the results of all the methods together (Table \@ref(tab:birdResults):
 
-```{r birdResults, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+```{r birdResults, tab.cap = "Results from re-analysis of Bird et al. 2019", echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
  results <- rbind(method_1A_bird_res, method_1B_bird_res, method2_bird_res, method3_bird_res)
     results$Method <- c("Method 1A", "Method 1B", "Method 2", "Method 3")
     
     results <- results %>% select(Method, Est., SE, "95% LCI", "95% UCI")
-    flextable::flextable(results) %>% flextable::width(j = 1, 0.9)
+    flextable::flextable(results) %>% flextable::width(j = c(1, 5), c(0.9, 0.8))
 ```
 # **Worked Example 2**: Dealing with missing SD data when assessing strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems
 
@@ -309,7 +309,7 @@ na.plot2
 
 ### Method 1A
 
-Again, we need to calculate log response ratios and their associated sampling variances differently depending on whether we have an observation with a missing standard deviation (SD) or not. Accoring to Table 1 (in the main MS), we can use equation 4 or 6 for the point estimate calculation and equation 5 for the sampling variance when we have a known SD and equation 7 when we have an unknown SD. We can do that as follows:
+Again, we need to calculate log response ratios and their associated sampling variances differently depending on whether we have an observation with a missing standard deviation (SD) or not. First, we need to calculate $CV^2$, which will make it easy to set up the data.
 
 ```{r cvavg2, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 # Calcuclate CV  
@@ -332,9 +332,9 @@ Again, we need to calculate log response ratios and their associated sampling va
 
 ```
 
+Accoring to Table 1 (in the main MS), we can use equation 4 or 6 for the point estimate calculation and equation 5 for the sampling variance when we have a known SD and equation 7 when we have an unknown SD. We can do that as follows:
 
-
-```{r lnRR_McDon1A, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+```{r lnRR_McDon1A, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, results='hide', class.source='klippy'}
    
     # Now calculate new yi and vi, called lnrr_laj & v_lnrr_laj, respectively. This uses either the between individual CV^2 when missing or normal CV^2 when not missing.
     data2 <- data2 %>%
@@ -352,6 +352,8 @@ MLMA1A_res <- get_est(MLMA1A)
 ```
 ### Method 1B
 
+We will now calculate a new sampling varinace using Equation 7, that makes use of the weighted between study $CV^2$ for all observed effect sizes.
+
 ```{r mcdon_1B, echo = TRUE, eval = TRUE, class.source='klippy'}
 
  # Now calculate new v_lnrr_laj_1B using between study CV^2 for all observations.
@@ -365,6 +367,8 @@ MLMA1B_res <- get_est(MLMA1B)
 ```
 
 ### Method 2
+
+Now use the weighted regression approach with Equation 7 as $v_{i}$.
 ```{r mcdon_2, echo = TRUE, eval = TRUE, class.source='klippy'}
 # Model 2: weighted regression of all effect sizes using pooled CV2 
             Vf <- diag(data2$v_lnrr_laj_1B)
@@ -380,13 +384,19 @@ MLMA2_res <- get_est(MLMA2)
 
 ### Method 3
 
+Now use the weighted regression approach with Equation 7 as $v_{i}$, but equation 5 for the sampling variance when SD is known.
 ```{r mcdon_3, echo = TRUE, eval = TRUE, class.source='klippy'}
 # Model 2: weighted regression of all effect sizes using pooled CV2 
 
 missing<-which(is.na(data2$CSD) == T)
 diag(Vf)[-missing]<-0
 
-data2$vi_3<-data2$v_lnrr_laj_1B
+ Vf <- diag(data2$v_lnrr_laj_1B)
+ row.names(Vf) <- seq(1, length(data2$v_lnrr_laj_1B), 1)
+	colnames(Vf) <- seq(1, length(data2$v_lnrr_laj_1B), 1)
+  data2$ES_ID2 <- rownames(Vf)
+
+data2$vi_3<-data2$v_lnrr_1A
 data2$vi_3[missing]<-0
 
 MLMA3<-rma.mv(yi = lnrr_laj, V = vi_3, random=list(~1|Study, ~1|ES_ID, ~1|ES_ID2), 
@@ -395,14 +405,14 @@ MLMA3_res <- get_est(MLMA3)
 ```
 
 ### Comparing results
-In table 1 we present the results of re-analysis of the biomass data from @mcdonald2019, again using MLMA, but with the four different methods to handles missing SDs. For reference we also include the results of a complete cases analysis where studies with missing SDs have been excluded. The effect sizes for the different methods are all very similar, although the CI for the complete cases analysis is wider than for those that include studies with missing SDs. Method 1B estimated slightly lower heterogeneity than the other methods.
+In Table \@ref(tab:mcDonResults) we present the results of re-analysis of the biomass data from @mcdonald2019, again using MLMA, but with the four different methods to handles missing SDs. For reference we also include the results of a complete cases analysis where studies with missing SDs have been excluded. The effect sizes for the different methods are all very similar, although the CI for the complete cases analysis is wider than for those that include studies with missing SDs. Method 1B estimated slightly lower heterogeneity than the other methods.
 
-```{r mcDonResults, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+```{r mcDonResults, tab.cap = "Results from re-analysis of McDonald et al. 2019", echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
  results2 <- rbind(MLMA1A_res, MLMA1B_res, MLMA2_res, MLMA3_res)
     results2$Method <- c("Method 1A", "Method 1B", "Method 2", "Method 3")
     
     results2 <- results2 %>% select(Method, Est., SE, "95% LCI", "95% UCI")
-    flextable::flextable(results2) %>% flextable::width(j = 1, 0.9)
+    flextable::flextable(results2) %>% flextable::width(j = c(1, 5), c(0.9, 0.8))
 ```
 
 # **Session Information**

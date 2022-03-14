@@ -88,6 +88,11 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     a2missSD_stdy[which(a2missSD_stdy$Author %in% stdies),
                   c("Experimental_standard_deviation", "Control_standard_deviation")] <- NA
 
+    # First calculate CV on missing dataset. Note missing data will be ignored
+    a2missSD_stdy <- a2missSD_stdy %>%
+      mutate(cv_Control = na_if(Control_mean / Control_standard_deviation, Inf),
+             cv_Experimental = na_if(Experimental_mean / Experimental_standard_deviation, Inf))
+
     # Now, assume you needto exclude data with missing SD because you can't calculate effect size and sampling variance
     complete_case_MV <- na.omit(a2missSD_stdy)
 
