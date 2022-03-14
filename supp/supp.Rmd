@@ -13,7 +13,7 @@ output:
     toc_float: yes
 ---
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = TRUE, tidy = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
 options(digits=2)
 ```
 
@@ -257,7 +257,7 @@ Method 3 is a combined approach using Equation 5 as the sampling variance when w
 ```
 
 ### Comparing results
-We can compare the results of all the methods together (Table \@ref(tab:birdResults):
+We can compare the results of all the methods together (Table \@ref(tab:birdResults)):
 
 ```{r birdResults, tab.cap = "Results from re-analysis of Bird et al. 2019", echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
  results <- rbind(method_1A_bird_res, method_1B_bird_res, method2_bird_res, method3_bird_res)
