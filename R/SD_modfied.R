@@ -104,7 +104,7 @@ data1 <- data1 %>%
          v_lnrr_laj = v_lnrr_laj(cv1_2 = cv2_cont_new, n1= Control_sample_size,
                                  cv2_2 = cv2_expt_new, n2 = Experimental_sample_size))
 
-data1 <- data1 %>%
+data1a <- data1a %>%
   mutate(lnrr_laj2 = if_else(is.na(Control_standard_deviation),
                             lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
                              cv1_2 = cv2_cont_new, cv2_2 = cv2_expt_new,
@@ -122,12 +122,12 @@ data1 <- data1 %>%
          )
 
 
-plot(log(data1$v_lnrr_laj), log(data1$v_lnrr_laj2))
-cor(log(data1$v_lnrr_laj), log(data1$v_lnrr_laj2))
-plot(data1$lnrr_laj, data1$lnrr_laj2)
-cor.test(data1$lnrr_laj, data1$lnrr_laj2, method = "spearman")
+plot(log(data1$v_lnrr_laj), log(data1a$v_lnrr_laj2))
+cor(log(data1$v_lnrr_laj), log(data1a$v_lnrr_laj2))
+plot(data1$lnrr_laj, data1a$lnrr_laj2)
+cor.test(data1$lnrr_laj, data1a$lnrr_laj2, method = "spearman")
 hist(log(data1$v_lnrr_laj))
-hist(log(data1$v_lnrr_laj2))
+hist(log(data1a$v_lnrr_laj2))
 
 # 1A
 method_1A_bird <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj,
