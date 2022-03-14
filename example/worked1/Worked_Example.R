@@ -8,25 +8,25 @@ library(plyr)
 
 # Function to calculate the effect sizes both ways
 my_calc_es<-function(c_mean, c_sd, c_n, t_mean, t_sd, t_n, study_id){
-	
+
 	# Load package locally
 	require(plyr)
-	
+
 	# bind all together
 	data<-data.frame(c_mean=c_mean, c_sd=c_sd, c_n=c_n, t_mean=t_mean, t_sd=t_sd, t_n=t_n, study_id=study_id)
-	
+
 	# Calculate the CVs
 	data$c_cv<-data$c_sd/data$c_mean
 	data$t_cv<-data$t_sd/data$t_mean
-	
+
 	# Get the weighted CV^2
 	# First pool at the level of the study, weighted
 	pooled<-ddply(data, .(study_id), summarise, c_cv2=weighted.mean(c_cv^2, c_n, na.rm=T), t_cv2=weighted.mean(t_cv^2, t_n, na.rm=T), c_n=mean(c_n, na.rm=T), t_n=mean(t_n, na.rm=T))
-	
+
 	# Now get the weighted cv2s
 	mean_c_cv2<-weighted.mean(pooled$c_cv2, pooled$c_n, na.rm=T)
 	mean_t_cv2<-weighted.mean(pooled$t_cv2, pooled$t_n, na.rm=T)
-	
+
 	# Calculate the effect sizes and variances different ways
 	yi_miss<-log(data$t_mean / data$c_mean) + 0.5 * (data$t_cv^2 / data$t_n - data$c_cv^2 / data$c_n)
 	vi_miss<-data$t_cv^2 / data$t_n + data$c_cv^2 / data$c_n + data$t_cv^4 / (2 * data$t_n^2) + data$c_cv^4 / (2 * data$c_n^2)
@@ -36,18 +36,18 @@ my_calc_es<-function(c_mean, c_sd, c_n, t_mean, t_sd, t_n, study_id){
 
 	yi_1A<-yi_miss
 	vi_1A<-vi_miss
-	
+
 	missing<-which(is.na(data$c_sd) == T)
 	yi_1A[missing]<-yi_1B[missing]
 	vi_1A[missing]<-vi_1B[missing]
-	
-	
+
+
 	# Caluclate the matrix for method 2 - note this is just method 1B in the diagonal
 	Vf<-diag(vi_1B)
 	row.names(Vf)<-seq(1, length(yi_1A), 1)
 	colnames(Vf)<-seq(1, length(yi_1A), 1)
 
-	
+
 	# Package up and return as list - first object is effect sizes, second is matrix for method 2
 	output<-list()
 	output[[1]]<-data.frame(ES_ID = seq(1, length(yi_1A), 1), yi_miss = yi_miss, vi_miss = vi_miss, yi_1A = yi_1A, vi_1A = vi_1A, yi_1B = yi_1B, vi_1B = vi_1B)
@@ -57,7 +57,7 @@ my_calc_es<-function(c_mean, c_sd, c_n, t_mean, t_sd, t_n, study_id){
 
 
 # Load the data
-data<-read.csv("data_test.csv")
+data<-read.csv("./example/worked1/data_test.csv")
 head(data)
 
 # Lets follow their lead and split by grazing type as per the paper. Here I will only re-analyse the CG group
@@ -123,7 +123,7 @@ summary(MLMA1A)
 MLMA1B<-rma.mv(yi = yi_1B, V = vi_1B, random=list(~1|Study, ~1|ES_ID), data=data)
 summary(MLMA1B)
 
-# Model 2: weighted regression of all effect sizes using pooled CV2 
+# Model 2: weighted regression of all effect sizes using pooled CV2
 # Note here and below I analyse here with effect sizes estimated as the mix of known CV and mean CV - doesn't have to be though
 Vf<-my_calc_es(c_mean=data$CM, c_sd=data$CSD, c_n=data$CN, t_mean=data$TM, t_sd=data$TSD, t_n=data$TN, study_id=data$Study)[[2]]
 data$ES_ID2<-rownames(Vf)
