@@ -359,7 +359,7 @@ We will now calculate a new sampling varinace using Equation 7, that makes use o
 
  # Now calculate new v_lnrr_laj_1B using between study CV^2 for all observations.
     data2 <- data2 %>%
-              mutate(v_lnrr_laj_1B = v_lnrr_laj(cv1_2 = b_CV2_1, n1= CN,
+              mutate(v_lnrr_laj_1B = v_lnrr_laj(cv1_2 = b_CV2_1, n1 = CN,
                                                 cv2_2 = b_CV2_2, n2 = TN))
 
 # Model 1B: MLMA of all effect sizes using pooled CV2
