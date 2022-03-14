@@ -99,7 +99,7 @@ pacman::p_load(tidyverse, metafor, here, osfr, ape, phytools)
 
 # Useful functions for calculating CV^2 within and between studies
 osfr::osf_retrieve_file("https://osf.io/sqr4w/") %>% osfr::osf_download(conflicts = "overwrite")
-source("./func.R")
+source(here::here("func.R"))
 ```
 
 Then, download the data file and phylogenetic tree file that we will use to demonstrate the examples
@@ -112,8 +112,8 @@ osfr::osf_retrieve_file("https://osf.io/evysw/") %>% osfr::osf_download(conflict
 osfr::osf_retrieve_file("https://osf.io/t5kh4/") %>% osfr::osf_download(conflicts = "overwrite") 
 
 # Load the data file and tree file
-data1 <- read.csv(here::here("example1.csv"))
- tree <- read.tree(here::here("phylo_tree"))
+ data1 <- read.csv(here::here("example1.csv"))
+  tree <- read.tree(here::here("phylo_tree"))
  phylo <- vcv(tree, corr = TRUE)
 ```
 
@@ -278,7 +278,8 @@ Our second example is from @mcdonald2019 which demonstrates nicely a real datase
 pacman::p_load(tidyverse, metafor, here, osfr, ape, phytools)
 
 # Useful functions for calculating CV^2 within and between studies
-source("./func.R")
+osfr::osf_retrieve_file("https://osf.io/sqr4w/") %>% osfr::osf_download(conflicts = "overwrite")
+source(here::here("func.R"))
 
 # Download the data file from OSF
 osfr::osf_retrieve_file("https://osf.io/at6pn/") %>% osfr::osf_download(conflicts = "overwrite") 
