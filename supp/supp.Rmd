@@ -172,9 +172,9 @@ To implement Method 1A, we need to calculate log response ratios and their assoc
 Now we are ready to fit our multilevel meta-analytic model as per @bird2019.
 
 ```{r bird_1A, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
-################################################
-    # METHOD 1A
-################################################
+
+########## METHOD 1A ##########
+
 
     # Fit model with new sampling variance
     method_1A_bird <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj,
@@ -199,9 +199,9 @@ While Method 1A could be used our simulations show that it is better to apply Me
 Now we can fit the same model as described above using this new sampling variance:
 
 ```{r bird_1B, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
-################################################
-    # METHOD 1B
-################################################
+
+     ########## METHOD 1B  ##########
+
     # Fit model with new sampling variance and point estimate
     method_1B_bird <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_1B,
                            random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
@@ -214,9 +214,9 @@ Now we can fit the same model as described above using this new sampling varianc
 Method 2 involves a weighted regression approach. This can be implemented as follows:
 
 ```{r bird_2, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
-################################################
-    # METHOD 2
-################################################
+
+     ########## METHOD 2  ##########
+
                  V_es <- diag(data1$v_lnrr_laj_1B)
       row.names(V_es) <- data1$obs
            data1$obs2 <- rownames(V_es)
@@ -234,11 +234,11 @@ Method 2 involves a weighted regression approach. This can be implemented as fol
 Method 3 is a combined approach using Equation 5 as the sampling variance when we have the full data; otherwise using a weighted regression approach.
 
 ```{r bird_3, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
-  ################################################
-    # METHOD 3
-################################################
+
+ ########## METHOD 3  ##########
+
     # Find where missing SD's are in the data
-      missing_dat <- which(is.na(data1$Control_standard_deviation) &                is.na(data1$Experimental_standard_deviation))
+      missing_dat <- which(is.na(data1$Control_standard_deviation) & is.na(data1$Experimental_standard_deviation))
 
     # Set the effect sizes not missing data to zero in the V_es matrix
                         V_es2 <- diag(data1$v_lnrr_laj_1B)
@@ -350,6 +350,7 @@ Accoring to Table 1 (in the main MS), we can use equation 4 or 6 for the point e
 MLMA1A<-rma.mv(yi = lnrr_laj, V = v_lnrr_1A, random=list(~1|Study, ~1|ES_ID), data=data2)
 MLMA1A_res <- get_est(MLMA1A)
 ```
+
 ### Method 1B
 
 We will now calculate a new sampling varinace using Equation 7, that makes use of the weighted between study $CV^2$ for all observed effect sizes.
