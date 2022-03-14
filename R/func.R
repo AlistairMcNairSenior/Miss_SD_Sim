@@ -46,7 +46,7 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
   # Calculate between study CV. Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
   b_grp_cv_data <- data                                             %>%
     dplyr::group_by({{group}})                            %>%
-    dplyr::mutate(   w_CV2 = weighted.mean(na_if(({{x}} / {{sd}})^2, Inf), {{n}},
+    dplyr::mutate(   w_CV2 = weighted.mean(na_if(({{sd}} / {{x}})^2, Inf), {{n}},
                                            na.rm = TRUE),
                      n_mean = mean({{n}}, na.rm = TRUE))   %>%
     dplyr::ungroup(.)                                     %>%
