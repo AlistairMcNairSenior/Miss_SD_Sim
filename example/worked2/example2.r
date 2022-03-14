@@ -34,8 +34,8 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 
   # First calculate CV on missing dataset. Note missing data will be ignored
            a2 <- a2 %>%
-                  mutate(cv_Control = na_if(Control_mean / Control_standard_deviation, Inf),
-                    cv_Experimental = na_if(Experimental_mean / Experimental_standard_deviation, Inf))
+                  mutate(cv_Control = na_if(Control_standard_deviation / Control_mean, Inf),
+                    cv_Experimental = na_if(Experimental_standard_deviation / Experimental_mean, Inf))
 
     # Here, we want to use lnRR so we need to calculate this
     a2 <- escalc( m1i = Control_mean,
@@ -90,8 +90,8 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 
     # First calculate CV on missing dataset. Note missing data will be ignored
     a2missSD_stdy <- a2missSD_stdy %>%
-      mutate(cv_Control = na_if(Control_mean / Control_standard_deviation, Inf),
-             cv_Experimental = na_if(Experimental_mean / Experimental_standard_deviation, Inf))
+      mutate(cv_Control = na_if(Control_standard_deviation / Control_mean, Inf),
+             cv_Experimental = na_if(Experimental_standard_deviation / Experimental_mean, Inf))
 
     # Now, assume you needto exclude data with missing SD because you can't calculate effect size and sampling variance
     complete_case_MV <- na.omit(a2missSD_stdy)

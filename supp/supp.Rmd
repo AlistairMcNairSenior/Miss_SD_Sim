@@ -13,7 +13,7 @@ output:
     toc_float: yes
 ---
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = TRUE, tidy = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
 options(digits=2)
 ```
 
@@ -99,7 +99,7 @@ pacman::p_load(tidyverse, metafor, here, osfr, ape, phytools)
 
 # Useful functions for calculating CV^2 within and between studies
 osfr::osf_retrieve_file("https://osf.io/sqr4w/") %>% osfr::osf_download(conflicts = "overwrite")
-source("./func.R")
+source(here::here("func.R"))
 ```
 
 Then, download the data file and phylogenetic tree file that we will use to demonstrate the examples
@@ -112,8 +112,8 @@ osfr::osf_retrieve_file("https://osf.io/evysw/") %>% osfr::osf_download(conflict
 osfr::osf_retrieve_file("https://osf.io/t5kh4/") %>% osfr::osf_download(conflicts = "overwrite") 
 
 # Load the data file and tree file
-data1 <- read.csv(here::here("example1.csv"))
- tree <- read.tree(here::here("phylo_tree"))
+ data1 <- read.csv(here::here("example1.csv"))
+  tree <- read.tree(here::here("phylo_tree"))
  phylo <- vcv(tree, corr = TRUE)
 ```
 
@@ -257,7 +257,7 @@ Method 3 is a combined approach using Equation 5 as the sampling variance when w
 ```
 
 ### Comparing results
-We can compare the results of all the methods together (Table \@ref(tab:birdResults):
+We can compare the results of all the methods together (Table \@ref(tab:birdResults)):
 
 ```{r birdResults, tab.cap = "Results from re-analysis of Bird et al. 2019", echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
  results <- rbind(method_1A_bird_res, method_1B_bird_res, method2_bird_res, method3_bird_res)
@@ -278,7 +278,8 @@ Our second example is from @mcdonald2019 which demonstrates nicely a real datase
 pacman::p_load(tidyverse, metafor, here, osfr, ape, phytools)
 
 # Useful functions for calculating CV^2 within and between studies
-source("./func.R")
+osfr::osf_retrieve_file("https://osf.io/sqr4w/") %>% osfr::osf_download(conflicts = "overwrite")
+source(here::here("func.R"))
 
 # Download the data file from OSF
 osfr::osf_retrieve_file("https://osf.io/at6pn/") %>% osfr::osf_download(conflicts = "overwrite") 
@@ -314,8 +315,8 @@ Again, we need to calculate log response ratios and their associated sampling va
 ```{r cvavg2, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 # Calcuclate CV  
       data2 <- data2 %>% 
-                mutate(     cv_Control = na_if(CM / CSD, Inf),
-                       cv_Experimental = na_if(TM / TSD, Inf))
+                mutate(     cv_Control = na_if(CSD / CM, Inf),
+                       cv_Experimental = na_if(TSD / TM, Inf))
 
 # Calculate the average between study CV, which will replace missing values.
     data2 <- cv_avg(x = CM, sd = CSD,
