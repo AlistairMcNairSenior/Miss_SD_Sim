@@ -314,8 +314,8 @@ Again, we need to calculate log response ratios and their associated sampling va
 ```{r cvavg2, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 # Calcuclate CV  
       data2 <- data2 %>% 
-                mutate(     cv_Control = na_if(CM / CSD, Inf),
-                       cv_Experimental = na_if(TM / TSD, Inf))
+                mutate(     cv_Control = na_if(CSD / CM, Inf),
+                       cv_Experimental = na_if(TSD / TM, Inf))
 
 # Calculate the average between study CV, which will replace missing values.
     data2 <- cv_avg(x = CM, sd = CSD,
