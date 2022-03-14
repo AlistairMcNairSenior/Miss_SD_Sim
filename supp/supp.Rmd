@@ -163,10 +163,10 @@ To implement Method 1A, we need to calculate log response ratios and their assoc
     # Now calculate new yi and vi, called lnrr_laj & v_lnrr_laj, respectively. This uses either the between individual CV^2 when missing or normal CV^2 when not missing.
     data1 <- data1 %>%
               mutate(lnrr_laj = lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
-                                         cv1 = cv2_cont_new, cv2 = cv2_expt_new,
+                                         cv1_2 = cv2_cont_new, cv2_2 = cv2_expt_new,
                                          n1= Control_sample_size, n2 = Experimental_sample_size),
-                   v_lnrr_laj = v_lnrr_laj(cv1 = cv2_cont_new, n1= Control_sample_size,
-                                           cv2 = cv2_expt_new, n2 = Experimental_sample_size))
+                   v_lnrr_laj = v_lnrr_laj(cv1_2 = cv2_cont_new, n1= Control_sample_size,
+                                           cv2_2 = cv2_expt_new, n2 = Experimental_sample_size))
 ```
 
 Now we are ready to fit our multilevel meta-analytic model as per @bird2019.
@@ -269,20 +269,26 @@ We can compare the results of all the methods together:
 # **Worked Example 2**: Dealing with missing SD data when assessing strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems
 
 ### Introduction
-Our second example is from @mcdonald2019 which demonstrates nicely a real dataset with  missing standard deviation data as a result of it not being reported within papers. @mcdonald2019 studied the effects of strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems. They looked at a number of different ecological outcomes. Here, we focus on their data on the effects of SRG vs CG on biomass; this dataset contains 173 effect sizes from 67 studies. In their original analysis @mcdonald2019 find that the biomass of CG systems is significantly reduced relative to that SRG, but do not report the total heterogeneity. The dataset contains two dimensions of non-independence that are common to eco-evolutionary meta-analyses; 1) multiple effect sizes per study and 2) several effect sizes within the same study are computed as relative to the same control group [sometimes termed ‘stochastic dependency’; @Noble2017; @GleserOlkin2009].
+Our second example is from @mcdonald2019 which demonstrates nicely a real dataset with  missing standard deviation data as a result of it not being reported within papers. @mcdonald2019 studied the effects of strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems. They looked at a number of different ecological outcomes. Here, we focus on their data on the effects of SRG vs CG on biomass; this dataset contains 173 effect sizes from 67 studies. In their original analysis @mcdonald2019 find that the biomass of CG systems is significantly reduced relative to that SRG, but do not report the total heterogeneity. The dataset contains two dimensions of non-independence that are common to eco-evolutionary meta-analyses; 1) multiple effect sizes per study and 2) several effect sizes within the same study are computed as relative to the same control group [sometimes termed ‘stochastic dependency’; @Noble2017; @GleserOlkin2009]. For now, we will ignore point 2 for ease of presentation.
 
 ### Setting up
 
-
 ```{r echo = TRUE, eval = TRUE, results='hide', class.source='klippy'}
+#install.packages("pacman")
+pacman::p_load(tidyverse, metafor, here, osfr, ape, phytools)
+
+# Useful functions for calculating CV^2 within and between studies
+source("./func.R")
+
 # Download the data file from OSF
 osfr::osf_retrieve_file("https://osf.io/at6pn/") %>% osfr::osf_download(conflicts = "overwrite") 
 
 # Load the data file and tree file
 data2 <- read.csv(here::here("example2.csv"))
+data2$ES_ID<-as.factor(seq(1, nrow(data2), 1))
 ```
 
-Of the 173 effect sizes in the biomass dataset, 35.8% have missing SD data (Figure \@ref(fig:fig2)). Where missing, SDs were missing for both the CG (`CSD` in data) and SRG (`TSD` in data) treatment groups in the effect size (Figure \@ref(fig:fig2)). In their original analyses @mcdonald2019 handle these missing data by calculating the average CV from all studies without missing data. They then use the reported mean value for studies with missing SDs coupled with the average CV to impute the missing SD value. This method is similar to single imputation of missing SDs, by predicting their value from a mean-SD linear regression. Non-independence was handled by @mcdonald2019 using MLMA, which included a variance-covariance matrix to account for stochastic dependency.
+Of the `r dim(data2)[1]` effect sizes in the biomass dataset, `r (sum(is.na(data2$CSD)) / dim(data2)[1])*100`% have missing SD data (Figure \@ref(fig:fig2)). Where missing, SDs were missing for both the CG (`CSD` in data) and SRG (`TSD` in data) treatment groups in the effect size (Figure \@ref(fig:fig2)). In their original analyses @mcdonald2019 handle these missing data by calculating the average CV from all studies without missing data. They then use the reported mean value for studies with missing SDs coupled with the average CV to impute the missing SD value. This method is similar to single imputation of missing SDs, by predicting their value from a mean-SD linear regression. Non-independence was handled by @mcdonald2019 using MLMA, which included a variance-covariance matrix to account for stochastic dependency.
 
 ```{r fig2, fig.cap = "Missing data in the McDonald et al. (2019) dataset.", echo=FALSE, eval = TRUE, include=TRUE, message=FALSE, warning=FALSE}
 na.plot2 <- data2 %>%
@@ -301,7 +307,103 @@ na.plot2 <- data2 %>%
 na.plot2
 ```
 
+### Method 1A
+
+Again, we need to calculate log response ratios and their associated sampling variances differently depending on whether we have an observation with a missing standard deviation (SD) or not. Accoring to Table 1 (in the main MS), we can use equation 4 or 6 for the point estimate calculation and equation 5 for the sampling variance when we have a known SD and equation 7 when we have an unknown SD. We can do that as follows:
+
+```{r cvavg2, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+# Calcuclate CV  
+      data2 <- data2 %>% 
+                mutate(     cv_Control = na_if(CM / CSD, Inf),
+                       cv_Experimental = na_if(TM / TSD, Inf))
+
+# Calculate the average between study CV, which will replace missing values.
+    data2 <- cv_avg(x = CM, sd = CSD,
+                            n = CN, group = Study, label = "1",
+                             data = data2)
+    data2 <- cv_avg(x = TM, sd = TSD,
+                            n = TN, group = Study,
+                            label = "2", data = data2)
+    
+     # Use weighted mean CV in replacement for where CV's are missing. Otherwise, calculate CV^2 of data that is known.
+    data2 <- data2 %>%
+              mutate(cv2_cont_new = if_else(is.na(cv_Control),      b_CV2_1, cv_Control^2),
+                     cv2_expt_new = if_else(is.na(cv_Experimental), b_CV2_2, cv_Experimental^2))
+
+```
+
+
+
+```{r lnRR_McDon1A, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+   
+    # Now calculate new yi and vi, called lnrr_laj & v_lnrr_laj, respectively. This uses either the between individual CV^2 when missing or normal CV^2 when not missing.
+    data2 <- data2 %>%
+              mutate(lnrr_laj = lnrr_laj(m1 = CM, m2 = TM,
+                                         cv1_2 = cv2_cont_new, cv2_2 = cv2_expt_new,
+                                         n1= CN, n2 = TN),
+                   v_lnrr_1A = v_lnrr_laj( cv1_2 = cv2_cont_new, n1= CN,
+                                           cv2_2 = cv2_expt_new, n2 = TN))
+```
+
+```{r mcdon_1A, echo = TRUE, eval = TRUE, class.source='klippy'}
+# Model 1A: MLMA of missing SD effect sizes using pooled CV2
+MLMA1A<-rma.mv(yi = lnrr_laj, V = v_lnrr_1A, random=list(~1|Study, ~1|ES_ID), data=data2)
+MLMA1A_res <- get_est(MLMA1A)
+```
+### Method 1B
+
+```{r mcdon_1B, echo = TRUE, eval = TRUE, class.source='klippy'}
+
+ # Now calculate new v_lnrr_laj_1B using between study CV^2 for all observations.
+    data2 <- data2 %>%
+              mutate(v_lnrr_laj_1B = v_lnrr_laj(cv1_2 = b_CV2_1, n1= CN,
+                                                cv2_2 = b_CV2_2, n2 = TN))
+
+# Model 1B: MLMA of all effect sizes using pooled CV2
+MLMA1B<-rma.mv(yi = lnrr_laj, V = v_lnrr_laj_1B, random=list(~1|Study, ~1|ES_ID), data=data2)
+MLMA1B_res <- get_est(MLMA1B)
+```
+
+### Method 2
+```{r mcdon_2, echo = TRUE, eval = TRUE, class.source='klippy'}
+# Model 2: weighted regression of all effect sizes using pooled CV2 
+            Vf <- diag(data2$v_lnrr_laj_1B)
+ row.names(Vf) <- seq(1, length(data2$v_lnrr_laj_1B), 1)
+	colnames(Vf) <- seq(1, length(data2$v_lnrr_laj_1B), 1)
+  data2$ES_ID2 <- rownames(Vf)
+
+MLMA2<-rma.mv(yi = lnrr_laj, V = 0, random=list(~1|Study, ~1|ES_ID, ~1|ES_ID2), 
+              data=data2, R=list(ES_ID2=Vf), Rscale=F)
+MLMA2_res <- get_est(MLMA2)
+```
+
+
+### Method 3
+
+```{r mcdon_3, echo = TRUE, eval = TRUE, class.source='klippy'}
+# Model 2: weighted regression of all effect sizes using pooled CV2 
+
+missing<-which(is.na(data2$CSD) == T)
+diag(Vf)[-missing]<-0
+
+data2$vi_3<-data2$v_lnrr_laj_1B
+data2$vi_3[missing]<-0
+
+MLMA3<-rma.mv(yi = lnrr_laj, V = vi_3, random=list(~1|Study, ~1|ES_ID, ~1|ES_ID2), 
+              data=data2, R=list(ES_ID2=Vf), Rscale=F)
+MLMA3_res <- get_est(MLMA3)
+```
+
+### Comparing results
 In table 1 we present the results of re-analysis of the biomass data from @mcdonald2019, again using MLMA, but with the four different methods to handles missing SDs. For reference we also include the results of a complete cases analysis where studies with missing SDs have been excluded. The effect sizes for the different methods are all very similar, although the CI for the complete cases analysis is wider than for those that include studies with missing SDs. Method 1B estimated slightly lower heterogeneity than the other methods.
+
+```{r mcDonResults, echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+ results2 <- rbind(MLMA1A_res, MLMA1B_res, MLMA2_res, MLMA3_res)
+    results2$Method <- c("Method 1A", "Method 1B", "Method 2", "Method 3")
+    
+    results2 <- results2 %>% select(Method, Est., SE, "95% LCI", "95% UCI")
+    flextable::flextable(results2) %>% flextable::width(j = 1, 0.9)
+```
 
 # **Session Information**
 ```{r echo = FALSE, eval = TRUE}
