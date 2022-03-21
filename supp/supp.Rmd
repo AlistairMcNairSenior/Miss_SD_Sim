@@ -80,7 +80,7 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
 
 ```
 
-The function will take the mean (`x`), standard deviation (`sd`) and sample size (`n`) along with the desired dataframe and calculate the between study $CV^2$ that is needed for many of the methods implemented. The `group` argument is needed to identify the "study" / cluster variable which is important so that the function first takes the weighted mean $CV^2$ within the study first before calculating the $CV^2$ across studies. The new $CV^2$ is then added directly to the dataframe. You can label these new columns using the `label` argument, otherwise, it will append the name of the column for the treatment group with `b_CV2`. We'll show how this function is used as we overview the methods in detail below.
+The function will take the mean (`x`), standard deviation (`sd`) and sample size (`n`) along with the desired dataframe and calculate the between study $CV^2$ that is needed for many of the methods implemented. The `group` argument is needed to identify the "study" / cluster variable which is important so that the function first takes the weighted mean $CV^2$ within the study before calculating the $CV^2$ across studies. The new $CV^2$ is then added directly to the dataframe. You can label these new columns using the `label` argument, otherwise, it will append the name of the column for the treatment group with `b_CV2`. We'll show how this function is used as we overview the methods in detail below.
 
 # **Worked Example 1**: Dealing with missing SD data to explore the fitness impacts of competition between herbivorous insects
 
@@ -140,7 +140,7 @@ na.plot
 
 In our manuscript we provide the full data and complete case analysis (excluding rows with missing data). As such, here we jump straight into showing readers how to implement the different solutions to the missing standard deviation problem that is typical when conducting meta-analysis.
 
-To implement Method 1 described in the manuscript, we need to first calculate the between study $CV^2$. We will do this with the `cvg_avg` function we describe above. Here, we need to do this for the control and experimental groups as follows:
+To implement Method 1 described in the manuscript, we need to first calculate the between study $CV^2$. We will do this with the `cvg_avg` function we describe above. Here, we need to do this for the control and experimental groups as follows, such that variable `b_CV_1` and `b_CV_2` are the averages for the control and experimental groups, respectively:
 
 ```{r cvavg, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 # Calculate the average between study CV, which will replace missing values.
@@ -269,7 +269,7 @@ We can compare the results of all the methods together (Table \@ref(tab:birdResu
 # **Worked Example 2**: Dealing with missing SD data when assessing strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems
 
 ### Introduction
-Our second example is from @mcdonald2019 which demonstrates nicely a real dataset with  missing standard deviation data as a result of it not being reported within papers. @mcdonald2019 studied the effects of strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems. They looked at a number of different ecological outcomes. Here, we focus on their data on the effects of SRG vs CG on biomass; this dataset contains 173 effect sizes from 67 studies. In their original analysis @mcdonald2019 find that the biomass of CG systems is significantly reduced relative to that SRG, but do not report the total heterogeneity. The dataset contains two dimensions of non-independence that are common to eco-evolutionary meta-analyses; 1) multiple effect sizes per study and 2) several effect sizes within the same study are computed as relative to the same control group [sometimes termed ‘stochastic dependency’; @Noble2017; @GleserOlkin2009]. For now, we will ignore point 2 for ease of presentation.
+Our second example is from @mcdonald2019 which demonstrates nicely a real dataset with  missing standard deviation data as a result of it not being reported within papers. @mcdonald2019 studied the effects of strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems. They looked at a number of different ecological outcomes. Here, we focus on the effects of SRG vs CG on biomass; this dataset contains 173 effect sizes from 67 studies. In their original analysis @mcdonald2019 find that the biomass of CG systems is significantly reduced relative to that SRG, but do not report the total heterogeneity. The dataset contains two dimensions of non-independence that are common to eco-evolutionary meta-analyses; 1) multiple effect sizes per study and 2) several effect sizes within the same study are computed as relative to the same control group [sometimes termed ‘stochastic dependency’; @Noble2017; @GleserOlkin2009]. For now, we will ignore point 2 for ease of presentation.
 
 ### Setting up
 
