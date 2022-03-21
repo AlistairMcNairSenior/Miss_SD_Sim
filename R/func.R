@@ -18,25 +18,29 @@
 #' rm(list = c("x1", "x2"))
 #' # # Now generate some missing data
 #' t2 <- gen.miss(test_dat, "sd1", "sd2", 6)
-#' t2_cv <- cv_avg(x = x1, sd = sd1, n = n1, stdy, data =  t2, sub_b = TRUE)
-#' t2_cv <- cv_avg(x2, sd2, n2, stdy, label = "2", data =  t2_cv)
+#' t2_cv2 <- cv_avg(x = x1, sd = sd1, n = n1, stdy, data =  t2, sub_b = FALSE, cv2 = TRUE)
+#' t2_cv2 <- cv_avg(x2, sd2, n2, stdy, label = "2", data =  t2_cv, sub_b = FALSE)
 #' # Check calculations are correct. All match what is expected
 #' test <- t2_cv %>%  filter(stdy == "1")
 #' # Within
-#' sum(test$n1) #59
-#' sum(test$n2) #56
+#' mean(test$n1) # Matches 14.75
+#' mean(test$n2) # Matches 14
+#' # CV^2
 #' weighted.mean((test$sd1 / test$x1)^2, test$n1, na.rm = T)
 #' weighted.mean((test$sd2 / test$x2)^2, test$n2, na.rm = T)
+#' # mean(CV)^2
+#' t2_cv <- cv_avg(x = x1, sd = sd1, n = n1, stdy, data =  t2, sub_b = FALSE, cv2 = FALSE)
+#' weighted.mean((test$sd1 / test$x1), test$n1, na.rm = T)^2
 #' # Between
-#' wCV1 = unique(t2_cv$w_CV2_1)
+#' wCV1 = unique(t2_cv2$w_CV2_x1)
 #' w_nt1 = c(59,58,58,50)
 #' weighted.mean(wCV1, w_nt1)
-#' wCV2 = unique(t2_cv$w_CV2_2)
+#' wCV2 = unique(t2_cv2$w_CV2_2)
 #' w_nt2 = c(56, 56, 72, 63)
 #' weighted.mean(wCV2, w_nt2)
 #' }
 
-cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
+cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE, cv2=TRUE){
 
   # Check if the name is specified or not. If not, then assign it the name of the mean, x, variable input in the function. https://stackoverflow.com/questions/60644445/converting-tidyeval-arguments-to-string
   if(is.null(label)){
@@ -46,8 +50,7 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
   # Calculate between study CV. Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
   b_grp_cv_data <- data                                             %>%
     dplyr::group_by({{group}})                            %>%
-    dplyr::mutate(   w_CV2 = weighted.mean(na_if(({{sd}} / {{x}})^2, Inf), {{n}},
-                                           na.rm = TRUE),
+    dplyr::mutate(   w_CV2 = weighted_CV({{sd}}, {{x}}, {{n}}, cv2=cv2),
                      n_mean = mean({{n}}, na.rm = TRUE))   %>%
     dplyr::ungroup(.)                                     %>%
     dplyr::mutate(b_CV2 = weighted.mean(w_CV2, n_mean, na.rm = TRUE), .keep = "used")
@@ -66,6 +69,20 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE){
   return(data.frame(dat_new))
 }
 
+#' @title weighted_CV
+#' @description Calculates the weighted average CV^2 or CV followed by squaring within a study and the weighted averages CV^2 across a studies
+#' @param sd Standard deviation of an experimental group
+#' @param x Mean of an experimental group
+#' @param n The sample size of an experimental group
+#' @param cv2 Logical indicating whether the weighted average of CV^2 or CV should be taken (followed by squaring weighted average CV). Defaults to weighted average of CV^2.
+
+weighted_CV <- function(sd, x, n, cv2=TRUE){
+  if(cv2){
+    weighted.mean(na_if((sd / x)^2, Inf), n, na.rm = TRUE)
+  }else{
+    weighted.mean(na_if((sd / x), Inf), n, na.rm = TRUE)^2
+  }
+}
 
 #' @title get_est
 #' @description Extracts estimates from rma.mv and rma model objects
