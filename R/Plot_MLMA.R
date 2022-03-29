@@ -39,7 +39,7 @@ agg_results$Method[which(agg_results$Method == "Complete Data")]<-"Full Data"
 A<-ggplot(data=agg_results, aes(x=mean_bias, y=Method, col=Method, fill=Method)) +
 	geom_violin() + 
 	geom_beeswarm(groupOnX=F, size=0.05, cex=0.25, col="black") + 
-	xlim(-0.003, 0.008) +
+	xlim(-0.011, 0.008) +
 	xlab("Bias lnRR") + ylab("") + theme_bw() + 
 	theme(legend.position="none", axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title=element_text(size=15)) +
 	geom_vline(xintercept=0, col="dark grey", size=0.5)

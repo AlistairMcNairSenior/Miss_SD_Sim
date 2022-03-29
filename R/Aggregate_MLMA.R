@@ -13,7 +13,6 @@ setwd(wd)
 # Load the relevant libraries, and header
 library(metafor)
 library(plyr)
-library(doSNOW)
 
 # Check the files
 files<-dir("HPC_data/Miss_Sim")[-c(1:5)]

@@ -15,3 +15,5 @@ library(metafor)#
 library(plyr)#
 library(doSNOW)
 getwd()
+0.5/8
+8/0.5
