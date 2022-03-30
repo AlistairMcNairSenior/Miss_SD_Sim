@@ -120,17 +120,17 @@ for(p in 1:nrow(parameters)){
 			data_n$vi[drop]<-NA
 								
 			# Here we calculate the weighted mean CV^2 from those data available - this is pooled by study first
-			pooled<-ddply(data_n, .(Study), summarise, mean_Control.CV=mean(Control.CV^2, na.rm=T), mean_Treatment.CV=mean(Treatment.CV^2, na.rm=T), mean_Control.n=mean(Control.n), mean_Treatment.n=mean(Treatment.n)) 			
-			mcv21<-weighted.mean(pooled$mean_Treatment.CV, pooled$mean_Treatment.n, na.rm=TRUE)
-			mcv22<-weighted.mean(pooled$mean_Control.CV, pooled$mean_Control.n, na.rm=TRUE)
+			pooled<-ddply(data_n, .(Study), summarise, mean_Control.CV=mean(Control.CV, na.rm=T), mean_Treatment.CV=mean(Treatment.CV, na.rm=T), mean_Control.n=mean(Control.n), mean_Treatment.n=mean(Treatment.n)) 			
+			mcv1<-weighted.mean(pooled$mean_Treatment.CV, pooled$mean_Treatment.n, na.rm=TRUE)
+			mcv2<-weighted.mean(pooled$mean_Control.CV, pooled$mean_Control.n, na.rm=TRUE)
 										
 			# Method 1.1
 			# Use the weighted mean cv where SDs are missing.
 			# Then proceed to fit a meta-analysis as normal.
 			
-			# Now estimate a new yi and vi using the average CV^2s where data are missing
-			data_n$yi[drop]<-log(data_n$Treatment.Mean[drop] / data_n$Control.Mean[drop]) + 0.5 * (mcv21 / data_n$Treatment.n[drop] - mcv22 / data_n$Control.n[drop])
-			data_n$vi[drop]<-mcv21/data_n$Treatment.n[drop] + mcv22/data_n$Control.n[drop] + mcv21^2/(2 * data_n$Treatment.n[drop]^2) + mcv22^2/(2 * data_n$Control.n[drop]^2)
+			# Now estimate a new yi and vi using the average CV where data are missing
+			data_n$yi[drop]<-log(data_n$Treatment.Mean[drop] / data_n$Control.Mean[drop]) + 0.5 * (mcv1^2 / data_n$Treatment.n[drop] - mcv2^2 / data_n$Control.n[drop])
+			data_n$vi[drop]<-mcv1^2/data_n$Treatment.n[drop] + mcv2^2/data_n$Control.n[drop] + mcv1^4/(2 * data_n$Treatment.n[drop]^2) + mcv2^4/(2 * data_n$Control.n[drop]^2)
 			
 			# Fit the model
 			model1.1<-try(rma.mv(yi = yi, V = vi, random=list(~1|Effect), data=data_n), silent=T)
@@ -146,12 +146,11 @@ for(p in 1:nrow(parameters)){
 			# Use the weighted mean cv everywhere
 			# Then proceed to fit a meta-analysis as normal.
 			
-			# Now estimate a new yi and vi using the average CV^2s everywhere
-			data_n$yi_2<-log(data_n$Treatment.Mean / data_n$Control.Mean) + 0.5 * (mcv21 / data_n$Treatment.n - mcv22 / data_n$Control.n)			
-			data_n$vi_2<-mcv21/data_n$Treatment.n + mcv22/data_n$Control.n + mcv21^2/(2 * data_n$Treatment.n^2) + mcv22^2/(2 * data_n$Control.n^2)
+			# Now estimate a new vi using the average CVs everywhere - note for consistency yi is used throughout
+			data_n$vi_2<-mcv1^2/data_n$Treatment.n + mcv2^2/data_n$Control.n + mcv1^4/(2 * data_n$Treatment.n^2) + mcv2^4/(2 * data_n$Control.n^2)
 			
 			# Fit the model
-			model1.2<-try(rma.mv(yi = yi_2, V = vi_2, random=list(~1|Effect), data=data_n), silent=T)
+			model1.2<-try(rma.mv(yi = yi, V = vi_2, random=list(~1|Effect), data=data_n), silent=T)
 			
 			# Save the results if the model fitted
 			if(class(model1.2)[1] == "rma.mv"){
@@ -164,7 +163,7 @@ for(p in 1:nrow(parameters)){
 			# Now we fit a weighted regression(ish) rather than a meta-analysis in metafor
 				
 			# Create a matrix with v_tilda in the diagonal (note this is NOT the mix v_tilda and v_i)
-			Vf<-diag(mcv21/data_n$Treatment.n + mcv22/data_n$Control.n + mcv21^2/(2 * data_n$Treatment.n^2) + mcv22^2/(2 * data_n$Control.n^2))
+			Vf<-diag(mcv1^2/data_n$Treatment.n + mcv2^2/data_n$Control.n + mcv1^4/(2 * data_n$Treatment.n^2) + mcv2^4/(2 * data_n$Control.n^2))
 			row.names(Vf)<-data_n$Effect
 			colnames(Vf)<-data_n$Effect
 			
