@@ -36,24 +36,16 @@ agg_results$Method[which(agg_results$Method == "Method 1.1")]<-"Method 1A"
 agg_results$Method[which(agg_results$Method == "Method 1.2")]<-"Method 1B"
 agg_results$Method[which(agg_results$Method == "Complete Data")]<-"Full Data"
 
-A<-ggplot(data=agg_results, aes(x=mean_bias, y=Method, col=Method, fill=Method)) +
+A<-ggplot(data=agg_results, aes(x=median_bias, y=Method, col=Method, fill=Method)) +
 	geom_violin() + 
 	geom_beeswarm(groupOnX=F, size=0.05, cex=0.25, col="black") + 
-	xlim(-0.003, 0.008) +
+	xlim(-0.005, 0.008) +
 	xlab("Bias lnRR") + ylab("") + theme_bw() + 
 	theme(legend.position="none", axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title=element_text(size=15)) +
 	geom_vline(xintercept=0, col="dark grey", size=0.5)
 
 
-# # B<-ggplot(data=agg_results, (aes(x=as.factor(proportion_lost), y=mean_bias, fill=Method, col=Method))) + 
-	# geom_violin() +
-	# theme_bw() +
-	# geom_hline(yintercept=0, col="grey") +
-	# xlab("Proportion Missing") + ylab("Bias lnRR") +
-	# theme(legend.position="none", axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
-
-
-long<-agg_results[,c("Method", "mean_bias", "code")]
+long<-agg_results[,c("Method", "median_bias", "code")]
 wide<-reshape(long, direction="wide", idvar="code", timevar="Method")
 cor.mat<-cor(wide[,-1])
 rownames(cor.mat)<-c("Full", "Method 1A", "Method 1B", "Method 2", "Method 3")
@@ -62,7 +54,7 @@ colnames(cor.mat)<-c("Full", "Method 1A", "Method 1B", "Method 2", "Method 3")
 B<-ggcorrplot(cor.mat, lab=T, show.legend=FALSE, type="lower") + theme(plot.title=element_text(size=15))
 
 # Difference in the bias
-df<-data.frame(delta=abs(wide[,"mean_bias.Method 1A"]) - abs(wide[,"mean_bias.Method 1B"]))
+df<-data.frame(delta=abs(wide[,"median_bias.Method 1A"]) - abs(wide[,"median_bias.Method 1B"]))
 C<-ggplot(df, aes(x=delta)) + geom_histogram(bins=20) + theme_bw() + geom_vline(xintercept=0, col="red") +
 	xlab("Diff. |Bias| Meths 1A & 1B") + ylab("Frequency")
 
@@ -82,7 +74,7 @@ E<-ggplot(dat1.2, aes(x=log(range_bias, base=10), y=as.factor(sd_study_sd), fill
 	theme_bw() +
 	xlab("log10 Range of Bias lnRR") +
 	ylab(expression(sigma[s])) + 
-	theme(axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), axis.title.y=element_text(size=15), legend.position=c(0.8, 0.2), legend.text=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=15)) + guides(fill=guide_legend(title="Study Sample Size")) + xlim(-1.75, 1)	
+	theme(axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), axis.title.y=element_text(size=15), legend.position=c(0.8, 0.2), legend.text=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=15)) + guides(fill=guide_legend(title="Study Sample Size")) + xlim(-1.75, 1.25)	
 
 
 
