@@ -34,6 +34,23 @@ In this supplement we show readers how they can implement some of the missing da
 
 Importantly, this tutorial is self-contained. The code will download all the necessary files needed to run the examples directly to your working directory. This includes a subset of data from @bird2019, along with their pruned phylogenetic tree, and data from @mcdonald2019. For simplicity, we have not provided the code here to show readers how to prune the tree and process the data. That code can all be found on our [GitHub](https://github.com/AlistairMcNairSenior/Miss_SD_Sim) repository. Similarly, if users experience any issues with downloading the files needed to run any code they are hosted on [OSF](https://osf.io/h9x6w/). 
 
+# Extending the proposed methods to more complex situations 
+
+JUST PUTTING IT HERE - talk to Dan
+
+In many ecological meta-analyses, meta-analytic models are often made more complex by the need to account for phylogenetic relatedness when a meta-analytic dataset contains multiple species. Moreover, almost all meta-analytic studies test a number of moderators (predictors) to explain heterogeneity among effect sizes (i.e., meta-regression). Furthermore, effect sizes from the same studies can be correlated at the level of sampling error (e.g., the same individuals are used to calculate 2 effect sizes, see Noble et al. (2017). We can write a meta-analytic model which can accommodate these three points above, as follows (Nakagawa & Santos 2012; Cinar et al. 2022):
+
+## Equation 14
+
+where x_k is the kth moderator’s value and β_k is the regression coefficient of the kth moderator (h = 1, 2, …, Nmod, the number of moderators), ah is the phylogenetic effect for the hth species, considered multivariate normally distributed with a covariance of σ_a^2 "A"  (A is a correlation matrix derived from a phylogeny; see Hadfield & Nakagawa 2010); qh is the non-phylogenetic effect for the hth species, distributed with the variance of σ_q^2 (h = 1, 2, …, Nspecies, the number of species, which is different from Nstudy > Neffect-size); and the other notations are the same as above. M* is a variance-covariance matrix of the sampling variance, which may result, say, when effect sizes share a common-control (e.g., Noble et al. 2017); for example, when we have 5 cases from 3 studies, M* can be written as:
+
+## Equation 15
+
+where v_1 and v_2 are the sampling variances for the 1st and 2nd effect sizes from the same study, and ρ√(v_1 v_2 ) and ρ√(v_2 v_1 ) are the co-variances between the two effect sizes (the 1st study), v_3, v_4 and come from the same study (the 2nd study; if we want to make this equation similar to Equation 12, then v_3=ϕv ̃_3 and v_4=ϕv ̃_4), and v_5 is the sampling variance of the 5th effect size from another study. The correlation ρ needs to be provided, but can often be assumed to be 0.5 or 0.8 (Noble et al. 2017; for a formula for the direct estimation of the sampling covariance for lnRR, see Lajeunesse 2011).
+
+Constructing M* may be as challenging as just doing MI for many ecologists, because the actual value of ρ is often unknown (Noble et al. 2017). Fortunately, Hedges et al. (2010) derived the robust variance estimator (RVE), which bypasses these challenges by estimating ρ from the data. By using RVE we need only construct M, rather than M* (see also Tipton 2013). We show an implementation of this procedure in Supporting Information, using the clubSandwitch package (Pustejovsky 2017), which implements the RVE method with a multilevel meta-analysis in metafor (cf. Pustejovsky & Tipton 2021). 
+
+
 # **`cv_avg` Function**: Calculating between study $CV^2$
 To facilitate application of the methods we have written a general function for calculating the weighted $CV^2$ across studies. That function is in the `func.R` script, but we provide some detail here. 
 
