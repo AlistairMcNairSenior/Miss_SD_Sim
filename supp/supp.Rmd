@@ -7,7 +7,7 @@ csl: ./ecology-letters.csl
 output: 
   bookdown::html_document2:
     code_folding: hide
-    number_sections: no
+    number_sections: yes
     toc: yes
     toc_depth: 6
     toc_float: yes
@@ -54,11 +54,6 @@ where v_1 and v_2 are the sampling variances for the 1st and 2nd effect sizes fr
 Constructing M* may be as challenging as just doing MI for many ecologists, because the actual value of ρ is often unknown (Noble et al. 2017). Fortunately, Hedges et al. (2010) derived the robust variance estimator (RVE), which bypasses these challenges by estimating ρ from the data. By using RVE we need only construct M, rather than M* (see also Tipton 2013). We show an implementation of this procedure in Supporting Information, using the clubSandwitch package (Pustejovsky 2017), which implements the RVE method with a multilevel meta-analysis in metafor (cf. Pustejovsky & Tipton 2021). 
 
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 357b35d14af4e6693030502582e6c9b40a0c0b70
 # **`cv_avg` Function**: Calculating between study $CV^2$
 To facilitate application of the methods we have written a general function for calculating the weighted $CV^2$ across studies. That function is in the `func.R` script, but we provide some detail here. 
 
