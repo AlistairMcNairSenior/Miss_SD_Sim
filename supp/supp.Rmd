@@ -126,6 +126,7 @@ Then, download the data file and phylogenetic tree file that we will use to demo
 
 ```{r echo = TRUE, eval = TRUE, results='hide', class.source='klippy'}
 # Download the data file from OSF
+#data1 <- read.csv("")
 osfr::osf_retrieve_file("https://osf.io/evysw/") %>% osfr::osf_download(conflicts = "overwrite") 
 
 # Download the phylogeny from OSF
