@@ -118,24 +118,20 @@ First, load the libraries and source functions:
 pacman::p_load(tidyverse, metafor, here, osfr, ape, phytools)
 
 # Useful functions for calculating CV^2 within and between studies
-osfr::osf_retrieve_file("https://osf.io/sqr4w/") %>% osfr::osf_download(conflicts = "overwrite")
-source(here::here("func.R"))
+source("https://osf.io/sqr4w/download")
 ```
 
 Then, download the data file and phylogenetic tree file that we will use to demonstrate the examples
 
 ```{r echo = TRUE, eval = TRUE, results='hide', class.source='klippy'}
+# Load the data file and tree file
+
 # Download the data file from OSF
-#data1 <- read.csv("")
-osfr::osf_retrieve_file("https://osf.io/evysw/") %>% osfr::osf_download(conflicts = "overwrite") 
+data1 <- read.csv("https://osf.io/evysw/download")
 
 # Download the phylogeny from OSF
-osfr::osf_retrieve_file("https://osf.io/t5kh4/") %>% osfr::osf_download(conflicts = "overwrite") 
-
-# Load the data file and tree file
- data1 <- read.csv(here::here("example1.csv"))
-  tree <- read.tree(here::here("phylo_tree"))
- phylo <- vcv(tree, corr = TRUE)
+ tree <- read.tree("https://osf.io/t5kh4/download")
+phylo <- vcv(tree, corr = TRUE)
 ```
 
 The data from @bird2019 is incomplete. It is missing many SD values in the control and treatment group, which would normally mean we would have to exclude these data prior to analysis (Figure \@ref(fig:fig1))
