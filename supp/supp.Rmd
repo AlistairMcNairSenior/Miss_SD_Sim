@@ -11,6 +11,8 @@ output:
     toc: yes
     toc_depth: 6
     toc_float: yes
+editor_options: 
+  chunk_output_type: console
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, cache = FALSE)
@@ -152,25 +154,31 @@ na.plot
 ```
 
 ### Geary's Test
-As indicated in our manuscript, how well this method performs depends on whether lnRR is normally distributed. Abundance data is commonly used in ecology, but may often violate the normality assumption because such data are counts. We can use Geary's Test to ascertain effects that may be problematic. We'll do that here first. 
+As indicated in our manuscript, how well this method performs depends on whether lnRR is normally distributed. Abundance data is commonly used in ecology, but may often violate the normality assumption because such data are counts and are often over-dispersed. We can use a modified Geary's Test [@Lajeunesse2015] to ascertain effects that may be problematic. We'll do that first. 
 
 ```{r geary, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 # Function to calculate Geary's "number"
   geary <- function(mean, sd, n){
-    (1 / (sd / mean)) * ((4*(n^(3/2))) / (1 + 4*n))
+    (1 / (sd / mean)) * ((4*n)^(3/2) / (1 + 4*n))
   }
 
-  
-
-
-data1 <- cv_avg(x = Control_mean, sd = Control_standard_deviation,
-                            n = Control_sample_size, group = Author, label = "1",
-                             data = data1)
-    data1 <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation,
-                            n = Experimental_sample_size, group = Author,
-                            label = "2", data = data1)
+# Geary's test; assumption of normality assumed to be approximately correct when values are >= 3.
+data1 <- data1 %>% 
+         mutate(geary_control = geary(Control_mean, Control_standard_deviation, Control_sample_size),
+                    geary_trt = geary(Experimental_mean, Experimental_standard_deviation, Experimental_sample_size),
+                   geary_test = ifelse(geary_control >= 3 & geary_trt >= 3, "pass", "fail"))
+# How many fail?
+    geary_res <- data1 %>% group_by(geary_test) %>% summarise(n = n()) %>%  data.frame()
 ```
 
+Overall, it looks like we have `r geary_res[1,"n"]` effects that fail the test, representing `r geary_res[1,"n"] / sum(geary_res[-3,"n"])*100`% of the complete data. While @Lajeunesse2015 recommend doing a sensitivity analysis with and without the effect sizes that fail the test we will just exclude these data for simplicity for all subsequent analyses. 
+
+```{r exclude_geary, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+# Exclude data failing test
+data1 <- data1 %>% 
+         filter(geary_test == "pass")
+         
+```
 
 ### Method 1A  
 
