@@ -7,7 +7,7 @@ csl: ./ecology-letters.csl
 output: 
   bookdown::html_document2:
     code_folding: hide
-    number_sections: yes
+    number_sections: no
     toc: yes
     toc_depth: 6
     toc_float: yes
@@ -296,14 +296,12 @@ Our second example is from @mcdonald2019 which demonstrates nicely a real datase
 pacman::p_load(tidyverse, metafor, here, osfr, ape, phytools)
 
 # Useful functions for calculating CV^2 within and between studies
-osfr::osf_retrieve_file("https://osf.io/sqr4w/") %>% osfr::osf_download(conflicts = "overwrite")
-source(here::here("func.R"))
+source("https://osf.io/sqr4w/download")
 
 # Download the data file from OSF
-osfr::osf_retrieve_file("https://osf.io/at6pn/") %>% osfr::osf_download(conflicts = "overwrite") 
 
 # Load the data file and tree file
-data2 <- read.csv(here::here("example2.csv"))
+data2 <- read.csv("https://osf.io/at6pn/download")
 data2$ES_ID<-as.factor(seq(1, nrow(data2), 1))
 ```
 
