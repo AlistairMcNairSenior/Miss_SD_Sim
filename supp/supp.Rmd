@@ -115,7 +115,7 @@ First, load the libraries and source functions:
 
 ```{r echo = TRUE, eval = TRUE, class.source='klippy', results='hide'}
 #install.packages("pacman")
-pacman::p_load(tidyverse, metafor, here, osfr, ape, phytools)
+pacman::p_load(tidyverse, metafor, here, ape, phytools)
 
 # Useful functions for calculating CV^2 within and between studies
 source("https://osf.io/sqr4w/download")
@@ -293,7 +293,7 @@ Our second example is from @mcdonald2019 which demonstrates nicely a real datase
 
 ```{r echo = TRUE, eval = TRUE, results='hide', class.source='klippy'}
 #install.packages("pacman")
-pacman::p_load(tidyverse, metafor, here, osfr, ape, phytools)
+pacman::p_load(tidyverse, metafor, here, ape, phytools)
 
 # Useful functions for calculating CV^2 within and between studies
 source("https://osf.io/sqr4w/download")
