@@ -16,7 +16,6 @@ dat$Experimental_standard_deviation <- as.numeric(dat$Experimental_standard_devi
 dat$Control_standard_deviation <- as.numeric(dat$Control_standard_deviation)
 
 #remove rows with missing data
-    dat <- na.omit(dat)
 dat$obs <- 1:nrow(dat) # Needed for metafor to make model equivalent to MCMCglmm
 
 # Clean up the data to drop unnecessary columns
@@ -26,10 +25,10 @@ dat <- dat[,-which(colnames(dat)%in%c("vi", "yi_g", "Focal_insect_resolved_name"
 tree<- read.tree("./example/worked1/ele13245-sup-0008-phylogenys8.tre")
 
 ################################################
-    # Calculate effect sizes
-    # and load and prune tree
+    # Greary's Test, Calculate effect sizes
+    # and prune tree
 ################################################
-# Intercept only model. for Abundance fitness ONLY. The authors state: "We first estimated the average impact of insect interaction on each fitness component by fitting linear models in which the intercept was the only fixed effect." Table 1 provides the fitness components. Abundance has the most data.
+  # Intercept only model. for Abundance fitness ONLY. The authors state: "We first estimated the average impact of insect interaction on each fitness component by fitting linear models in which the intercept was the only fixed effect." Table 1 provides the fitness components. Abundance has the most data.
     a2 <- dat %>% filter(Fitness_component == "Abundance")
 
   # First calculate CV on missing dataset. Note missing data will be ignored
@@ -37,35 +36,17 @@ tree<- read.tree("./example/worked1/ele13245-sup-0008-phylogenys8.tre")
                   mutate(cv_Control = na_if(Control_standard_deviation / Control_mean, Inf),
                     cv_Experimental = na_if(Experimental_standard_deviation / Experimental_mean, Inf))
 
-    # Here, we want to use lnRR so we need to calculate this
-    a2 <- escalc( m1i = Control_mean,
-                  m2i = Experimental_mean,
-                 sd1i = Control_standard_deviation,
-                 sd2i = Experimental_standard_deviation,
-                  n1i = Control_sample_size,
-                  n2i = Experimental_sample_size,
-                 measure = "ROM", var.names=c("yi_lnrr","vi_lnrr"),
-                 append = TRUE, data = a2)
-    # Some NA's because lnRR, not too many though 311 -> 306
-
 
     # Add in Laj lnRR correction. Note we need to ^2 cv's here
     a2 <-  a2 %>%
   mutate(lnrr_laj_orig = na_if(lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
-                                        cv1_2 = cv_Control^2, cv2_2  = cv_Experimental^2,
+                                      cv1_2 = cv_Control^2, cv2_2  = cv_Experimental^2,
                               n1= Control_sample_size, n2 = Experimental_sample_size), Inf),
         v_lnrr_laj_orig = na_if(v_lnrr_laj(cv1_2 = cv_Control^2, n1= Control_sample_size,
                               cv2_2 = cv_Experimental^2, n2 = Experimental_sample_size), Inf))
-
-
-    ## There seem to be some big problems with the original data as it's saying large ratios of V. Exclude these large V calculations as clearly there is something wrong with these original data
-    a2 <-  a2 %>% filter(!v_lnrr_laj_orig > 80)
-    a2 <- na.omit(a2)
-
 ################################################
     # Geary's test
 ################################################
-
     # Function to calculate Geary's "number"
     geary <- function(mean, sd, n){
       (1 / (sd / mean)) * ((4*n)^(3/2) / (1 + 4*n))
@@ -78,7 +59,7 @@ tree<- read.tree("./example/worked1/ele13245-sup-0008-phylogenys8.tre")
              geary_test = ifelse(geary_control >= 3 & geary_trt >= 3, "pass", "fail"))
 
     # Exclude data failing test
-    a2  <- a2  %>%
+       a2  <- a2  %>%
       filter(geary_test == "pass")
 
 ################################################
@@ -111,6 +92,7 @@ tree<- read.tree("./example/worked1/ele13245-sup-0008-phylogenys8.tre")
     a2missSD_stdy <- a2missSD_stdy %>%
       mutate(cv_Control = na_if(Control_standard_deviation / Control_mean, Inf),
              cv_Experimental = na_if(Experimental_standard_deviation / Experimental_mean, Inf))
+
 
     # Now, assume you need to exclude data with missing SD because you can't calculate effect size and sampling variance
     complete_case_MV <- na.omit(a2missSD_stdy)
