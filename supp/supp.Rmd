@@ -44,11 +44,26 @@ Importantly, this tutorial is self-contained. The code will download all the nec
 
 In many ecological meta-analyses, meta-analytic models are often made more complex by the need to account for phylogenetic relatedness when a meta-analytic dataset contains multiple species. Moreover, almost all meta-analytic studies test a number of moderators (predictors) to explain heterogeneity among effect sizes (i.e., meta-regression). Furthermore, effect sizes from the same studies can be correlated at the level of sampling error [e.g., the same individuals are used to calculate 2 effect sizes, see @Noble2017]. We can write a meta-analytic model which can accommodate these three points above, as follows [@nakagawaSantos2012; @Cinar2022]:
 
-#### Equation 14
+
+$$
+\ln{\text{RR}}_{i} = \beta_{0} + \sum^{N_{mod}}_{k = 1}\beta_kx_k + a_h + q_h + s_j + u_i + m_i,
+$$
+$$
+a_{h} \sim \mathcal{N}(0, \sigma_a^2\textbf{A}), q_{h} \sim \mathcal{N}(0, \sigma_q^2), m_i \sim \mathcal{N}(0, \mathbf{M}^*) 
+$$
 
 where x_k is the kth moderator's value and β_k is the regression coefficient of the kth moderator (h = 1, 2, ..., Nmod, the number of moderators), ah is the phylogenetic effect for the hth species, considered multivariate normally distributed with a covariance of σ_a\^2 "A" [A is a correlation matrix derived from a phylogeny; see @Hadfield2010]; qh is the non-phylogenetic effect for the hth species, distributed with the variance of σ_q\^2 (h = 1, 2, ..., Nspecies, the number of species, which is different from Nstudy \> Neffect-size); and the other notations are the same as above. M\* is a variance-covariance matrix of the sampling variance, which may result, say, when effect sizes share a common-control [e.g., @Noble2017]; for example, when we have 5 cases from 3 studies, M\* can be written as:
 
-#### Equation 15
+$$
+\mathbf{M}^* = 
+	 \begin{bmatrix}
+    v_1 & \rho \sqrt{v_{1} v_2} & 0 & 0 & 0 \\
+  	\rho \sqrt{v_{2} v_{1}} & v_2  & 0 & 0 & 0 \\
+  	0 & 0 &  v_3 & \rho \sqrt{v_3 v_4} & 0 \\
+  	0 & 0 & \rho \sqrt{v_4 v_3}  & v_4 & 0 \\
+  	0 & 0 &  0 & 0  & v_5
+\end{bmatrix}
+$$
 
 where v_1 and v_2 are the sampling variances for the 1st and 2nd effect sizes from the same study, and ρ√(v_1 v_2 ) and ρ√(v_2 v_1 ) are the co-variances between the two effect sizes (the 1st study), v_3, v_4 and come from the same study (the 2nd study; if we want to make this equation similar to Equation 12, then v_3=ϕv ̃\_3 and v_4=ϕv ̃\_4), and v_5 is the sampling variance of the 5th effect size from another study. The correlation ρ needs to be provided, but can often be assumed to be 0.5 or 0.8 [@Noble2017; for a formula for the direct estimation of the sampling covariance for lnRR, see @Lajeunesse2011].
 
