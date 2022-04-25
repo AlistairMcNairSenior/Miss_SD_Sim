@@ -44,11 +44,9 @@ Importantly, this tutorial is self-contained. The code will download all the nec
 
 In many ecological meta-analyses, meta-analytic models are often made more complex by the need to account for phylogenetic relatedness when a meta-analytic dataset contains multiple species. Moreover, almost all meta-analytic studies test a number of moderators (predictors) to explain heterogeneity among effect sizes (i.e., meta-regression). Furthermore, effect sizes from the same studies can be correlated at the level of sampling error [e.g., the same individuals are used to calculate 2 effect sizes, see @Noble2017]. We can write a meta-analytic model which can accommodate these three points above, as follows [@nakagawaSantos2012; @Cinar2022]:
 
-
 $$
 \ln{\text{RR}}_{i} = \beta_{0} + \sum^{N_{mod}}_{k = 1}\beta_kx_k + a_h + q_h + s_j + u_i + m_i,
-$$
-$$
+$$ $$
 a_{h} \sim \mathcal{N}(0, \sigma_a^2\textbf{A}), q_{h} \sim \mathcal{N}(0, \sigma_q^2), m_i \sim \mathcal{N}(0, \mathbf{M}^*) 
 $$
 
@@ -56,12 +54,12 @@ where x_k is the kth moderator's value and β_k is the regression coefficient of
 
 $$
 \mathbf{M}^* = 
-	 \begin{bmatrix}
+     \begin{bmatrix}
     v_1 & \rho \sqrt{v_{1} v_2} & 0 & 0 & 0 \\
-  	\rho \sqrt{v_{2} v_{1}} & v_2  & 0 & 0 & 0 \\
-  	0 & 0 &  v_3 & \rho \sqrt{v_3 v_4} & 0 \\
-  	0 & 0 & \rho \sqrt{v_4 v_3}  & v_4 & 0 \\
-  	0 & 0 &  0 & 0  & v_5
+    \rho \sqrt{v_{2} v_{1}} & v_2  & 0 & 0 & 0 \\
+    0 & 0 &  v_3 & \rho \sqrt{v_3 v_4} & 0 \\
+    0 & 0 & \rho \sqrt{v_4 v_3}  & v_4 & 0 \\
+    0 & 0 &  0 & 0  & v_5
 \end{bmatrix}
 $$
 
