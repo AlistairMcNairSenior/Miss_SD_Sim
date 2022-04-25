@@ -238,4 +238,4 @@ tree<- read.tree("./example/worked1/ele13245-sup-0008-phylogenys8.tre")
 ################################################
     results <- rbind(whole_mv_res, complete_case_mv_res, method_1A_mv_res, method_1B_mv_res, method2_mv_res, method3_mv_res)
     row.names(results) <- c("Whole Data", "Complete Case", "Method 1A", "Method 1B", "Method 2", "Method 3")
-    write.csv(round(results, 3), "./example/worked2/results2.csv", row.names = TRUE)
+    write.csv(round(results, 3), "./example/worked1/results2.csv", row.names = TRUE)
