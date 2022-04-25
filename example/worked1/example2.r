@@ -9,7 +9,7 @@ source("./R/func.R")
     # Loading and sorting data out
 ################################################
 #load data
-dat  <- data.frame(read_excel("./example/worked2/ele13245-sup-0003-metas3.xlsx"))
+dat  <- data.frame(read_excel("./example/worked1/ele13245-sup-0003-metas3.xlsx"))
 
 # Fix column classes
 dat$Experimental_standard_deviation <- as.numeric(dat$Experimental_standard_deviation)
@@ -23,7 +23,7 @@ dat$obs <- 1:nrow(dat) # Needed for metafor to make model equivalent to MCMCglmm
 dat <- dat[,-which(colnames(dat)%in%c("vi", "yi_g", "Focal_insect_resolved_name", "Competing_insect_resolved_name", "Focal_insect_diet_breadth", "Competing_insect_diet_breadth", "Phylogenetic_distance_between_focal_insect_and_competing_insect", "Spatial_separation", "temporal_separation"))]
 
 #load phylogenetic tree
-tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
+tree<- read.tree("./example/worked1/ele13245-sup-0008-phylogenys8.tre")
 
 ################################################
     # Calculate effect sizes
@@ -112,7 +112,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
       mutate(cv_Control = na_if(Control_standard_deviation / Control_mean, Inf),
              cv_Experimental = na_if(Experimental_standard_deviation / Experimental_mean, Inf))
 
-    # Now, assume you needto exclude data with missing SD because you can't calculate effect size and sampling variance
+    # Now, assume you need to exclude data with missing SD because you can't calculate effect size and sampling variance
     complete_case_MV <- na.omit(a2missSD_stdy)
 
     # Prune tree.
@@ -132,11 +132,11 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     # Now calculate the average between study CV, which will replace missing values.
     # Note that mean N used
     a2missSD_stdy <- cv_avg(x = Control_mean, sd = Control_standard_deviation,
-                            n = Control_sample_size, group = Author, label = "1",
+                            n = Control_sample_size, group = Author, label = "1", cv2=FALSE,
                              data = a2missSD_stdy)
     a2missSD_stdy <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation,
                             n = Experimental_sample_size, group = Author,
-                            label = "2", data = a2missSD_stdy)
+                            label = "2", cv2=FALSE, data = a2missSD_stdy)
 
     # Now using weighted mean CV in replacement for where CV's are missing.
     # Note that function above already CV^2 so need to do that on original CV
