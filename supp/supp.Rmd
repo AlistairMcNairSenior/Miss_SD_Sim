@@ -44,30 +44,28 @@ Importantly, this tutorial is self-contained. The code will download all the nec
 
 In many ecological meta-analyses, meta-analytic models are often made more complex by the need to account for phylogenetic relatedness when a meta-analytic dataset contains multiple species. Moreover, almost all meta-analytic studies test a number of moderators (predictors) to explain heterogeneity among effect sizes (i.e., meta-regression). Furthermore, effect sizes from the same studies can be correlated at the level of sampling error [e.g., the same individuals are used to calculate 2 effect sizes, see @Noble2017]. We can write a meta-analytic model which can accommodate these three points above, as follows [@nakagawaSantos2012; @Cinar2022]:
 
-
 $$
 \ln{\text{RR}}_{i} = \beta_{0} + \sum^{N_{mod}}_{k = 1}\beta_kx_k + a_h + q_h + s_j + u_i + m_i,
-$$
-$$
+$$ $$
 a_{h} \sim \mathcal{N}(0, \sigma_a^2\textbf{A}), q_{h} \sim \mathcal{N}(0, \sigma_q^2), m_i \sim \mathcal{N}(0, \mathbf{M}^*) 
 $$
 
-where x_k is the kth moderator's value and β_k is the regression coefficient of the kth moderator (h = 1, 2, ..., Nmod, the number of moderators), ah is the phylogenetic effect for the hth species, considered multivariate normally distributed with a covariance of σ_a\^2 "A" [A is a correlation matrix derived from a phylogeny; see @Hadfield2010]; qh is the non-phylogenetic effect for the hth species, distributed with the variance of σ_q\^2 (h = 1, 2, ..., Nspecies, the number of species, which is different from Nstudy \> Neffect-size); and the other notations are the same as above. M\* is a variance-covariance matrix of the sampling variance, which may result, say, when effect sizes share a common-control [e.g., @Noble2017]; for example, when we have 5 cases from 3 studies, M\* can be written as:
+where $x_{k}$ is the kth moderator's value and $β_{k}$ is the regression coefficient of the kth moderator (h = 1, 2, ..., $N_{mod}$, the number of moderators), $a_{h}$ is the phylogenetic effect for the hth species, considered multivariate normally distributed with a covariance of $\sigma_{a}^2$ "A" [A is a correlation matrix derived from a phylogeny; see @Hadfield2010]; $q_{h}$ is the non-phylogenetic effect for the hth species, distributed with the variance of $\sigma_{q}^2$ ($h$ = 1, 2, ... $N_{species}$, the number of species, which is different from Nstudy \> Neffect-size); and the other notations are the same as above. $\bf{M}$\* is a variance-covariance matrix of the sampling variance, which may result, say, when effect sizes share a common-control [e.g., @Noble2017]; for example, when we have 5 cases from 3 studies, $\bf{M}$\* can be written as:
 
 $$
 \mathbf{M}^* = 
-	 \begin{bmatrix}
+     \begin{bmatrix}
     v_1 & \rho \sqrt{v_{1} v_2} & 0 & 0 & 0 \\
-  	\rho \sqrt{v_{2} v_{1}} & v_2  & 0 & 0 & 0 \\
-  	0 & 0 &  v_3 & \rho \sqrt{v_3 v_4} & 0 \\
-  	0 & 0 & \rho \sqrt{v_4 v_3}  & v_4 & 0 \\
-  	0 & 0 &  0 & 0  & v_5
+    \rho \sqrt{v_{2} v_{1}} & v_2  & 0 & 0 & 0 \\
+    0 & 0 &  v_3 & \rho \sqrt{v_3 v_4} & 0 \\
+    0 & 0 & \rho \sqrt{v_4 v_3}  & v_4 & 0 \\
+    0 & 0 &  0 & 0  & v_5
 \end{bmatrix}
 $$
 
-where v_1 and v_2 are the sampling variances for the 1st and 2nd effect sizes from the same study, and ρ√(v_1 v_2 ) and ρ√(v_2 v_1 ) are the co-variances between the two effect sizes (the 1st study), v_3, v_4 and come from the same study (the 2nd study; if we want to make this equation similar to Equation 12, then v_3=ϕv ̃\_3 and v_4=ϕv ̃\_4), and v_5 is the sampling variance of the 5th effect size from another study. The correlation ρ needs to be provided, but can often be assumed to be 0.5 or 0.8 [@Noble2017; for a formula for the direct estimation of the sampling covariance for lnRR, see @Lajeunesse2011].
+where $v_{1}$ and $v_{2}$ are the sampling variances for the 1st and 2nd effect sizes from the same study, and $\rho$ $\sqrt{v_{1}v_{2}}$ and $\rho$$\sqrt{v_{2}v_{1}}$ are the co-variances between the two effect sizes (the 1st study), $v_{3}$, $v_{4}$ and come from the same study (the 2nd study; if we want to make this equation similar to Equation 12, then $v_{3}$ = $\phi$ $\tilde{v}_{3}$ and $v_{4}$ = $\phi$ $\tilde{v}_{4}$, and $v_{5}$ is the sampling variance of the 5th effect size from another study. The correlation $\rho$ needs to be provided, but can often be assumed to be 0.5 or 0.8 [@Noble2017; for a formula for the direct estimation of the sampling covariance for lnRR, see @Lajeunesse2011].
 
-Constructing M\* may be as challenging as just doing MI for many ecologists, because the actual value of ρ is often unknown [@Noble2017]. Fortunately, @Hedges2010 derived the robust variance estimator (RVE), which bypasses these challenges by estimating ρ from the data. By using RVE we need only construct M, rather than M\* [see also @Tipton2013]. We show an implementation of this procedure in Appendix S3, using the `clubSandwich` package [@Pustejovsky2021b], which implements the RVE method with a multilevel meta-analysis in \`metafor\` [cf. @Pustejovsky2021].
+Constructing $\bf{M}$\* may be as challenging as just doing MI for many ecologists, because the actual value of $\rho$ is often unknown [@Noble2017]. Fortunately, @Hedges2010 derived the robust variance estimator (RVE), which bypasses these challenges by estimating $\rho$ from the data. By using RVE we need only construct $\bf{M}$\*, rather than $\\$\* [see also @Tipton2013]. We show an implementation of this procedure in Appendix S3, using the `clubSandwich` package [@Pustejovsky2021b], which implements the RVE method with a multilevel meta-analysis in `metafor` [cf. @Pustejovsky2021].
 
 # **`cv_avg` Function**: Calculating between study $CV^2$
 
@@ -156,7 +154,7 @@ The function will take the mean (`x`), standard deviation (`sd`) and sample size
 
 @bird2019 conducted a meta-analysis exploring the impacts of competition on herbivorous insect fitness when occupying the same host plant with another species or in isolation. Building on work by @Kaplan2007, they collected data on a series of fitness measurements [e.g., abundance, body size, development time, fecundity; see Table 1 in @bird2019] and explored the overall impacts of competition on the various fitness measures independently and in composite analyses. @bird2019 also tested the importance of a series of moderators they predicted would impact the magnitude of competition between species including population density, phylogenetic distance, diet breadth and spatial and temporal separation. A phylogeny was constructed using DNA sequence data and this gene tree was used to control for phylogenetic non-independence within analyses.
 
-For demonstration purposes, we focus on a subset of fitness data, abundance, and use a simple multilevel meta-analytic model to estimate the overall impact of competition on focal insect fitness (i.e., intercept or overall meta-analytic mean) while controlling for phylogeny, research group, and research year [as per the analysis by @bird2019]. Our use of log response ratio (lnRR) meant that we could only use a subset of abundance data from @bird2019 because of lnRR requiring ratio scale data. In addition, the ratio of minimum to largest sampling error variance calculated from the raw data was high suggesting some errors in the original published papers. To avoid model convergence issues we excluded these data and used a sample comprised of 293 effect sizes across 67 unique focal insect species with known phylogenetic relationships. We then introduced missing data at the paper level so that \~20% of papers had effect sizes with missing SD in the control and experimental treatment; a scenario that is typical of many meta-analyses.
+For demonstration purposes, we focus on a subset of fitness data, abundance, and use a simple multilevel meta-analytic model to estimate the overall impact of competition on focal insect fitness (i.e., intercept or overall meta-analytic mean) while controlling for phylogeny, research group, and research year [as per the analysis by @bird2019]. Our use of log response ratio (lnRR) meant that we could only use a subset of abundance data from @bird2019 because of lnRR requiring ratio scale data. We also excluded effects that failed Geary's test. We then introduced missing data at the paper level so that \~20% of papers had effect sizes with missing SD in the control and experimental treatment; a scenario that is typical of many meta-analyses.
 
 ### Setting up
 
@@ -196,7 +194,6 @@ data1 <- data1[,-which(colnames(data1)%in%c("vi", "yi_g", "Focal_insect_resolved
           mutate(cv_Control = na_if(Control_standard_deviation / Control_mean, Inf),
             cv_Experimental = na_if(Experimental_standard_deviation / Experimental_mean, Inf))
 
-
 # Download the phylogeny from OSF
  tree <- read.tree("https://osf.io/8cme5/download")
 
@@ -221,7 +218,7 @@ data1 <- data1 %>%
     geary_res <- data1 %>% group_by(geary_test) %>% summarise(n = n()) %>%  data.frame()
 ```
 
-Overall, it looks like we have `r geary_res[1,"n"]` effects that fail the test, representing `r geary_res[1,"n"] / sum(geary_res[-3,"n"])*100`% of the complete data. While @Lajeunesse2015 recommend doing a sensitivity analysis with and without the effect sizes that fail the test we will just exclude these data for simplicity for all subsequent analyses.
+Overall, it looks like we have `r geary_res[1,"n"]` effects that fail the test, representing `r geary_res[1,"n"] / sum(geary_res[-3,"n"])*100`% of the data. While @Lajeunesse2015 recommend doing a sensitivity analysis with and without the effect sizes that fail the test we will just exclude these data for simplicity for all subsequent analyses.
 
 ```{r exclude_geary, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 # Exclude data failing test
@@ -250,7 +247,7 @@ Now that we have excluded some data, we can prune the phylogenetic tree.
          
 ```
 
-### Generate Missing 
+### Generate Missing
 
 Now that we have the data ready we'll introduce some missing data to simulate a situation where we were not able to collect SD from a bunch of studies in the dataset. Normally, we would have to remove these because we would not be able to calculate sampling variance.
 
@@ -541,7 +538,7 @@ MLMA2_res <- get_est(MLMA2)
 
 Now use the weighted regression approach with Equation 7 as $v_{i}$, but equation 5 for the sampling variance when SD is known.
 
-```{r mcdon_3, echo = TRUE, eval = TRUE, class.source='klippy'}
+```{r mcdon_3, echo = TRUE, eval = TRUE,warning=FALSE,class.source='klippy'}
 # Model 2: weighted regression of all effect sizes using pooled CV2 
 
 missing<-which(is.na(data2$CSD) == T)
