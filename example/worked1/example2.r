@@ -9,7 +9,7 @@ source("./R/func.R")
     # Loading and sorting data out
 ################################################
 #load data
-dat  <- data.frame(read_excel("./example/worked2/ele13245-sup-0003-metas3.xlsx"))
+dat  <- data.frame(read_excel("./example/worked1/ele13245-sup-0003-metas3.xlsx"))
 
 # Fix column classes
 dat$Experimental_standard_deviation <- as.numeric(dat$Experimental_standard_deviation)
@@ -19,11 +19,11 @@ dat$Control_standard_deviation <- as.numeric(dat$Control_standard_deviation)
     dat <- na.omit(dat)
 dat$obs <- 1:nrow(dat) # Needed for metafor to make model equivalent to MCMCglmm
 
-# Clean up the data to drop unecessary columns
+# Clean up the data to drop unnecessary columns
 dat <- dat[,-which(colnames(dat)%in%c("vi", "yi_g", "Focal_insect_resolved_name", "Competing_insect_resolved_name", "Focal_insect_diet_breadth", "Competing_insect_diet_breadth", "Phylogenetic_distance_between_focal_insect_and_competing_insect", "Spatial_separation", "temporal_separation"))]
 
 #load phylogenetic tree
-tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
+tree<- read.tree("./example/worked1/ele13245-sup-0008-phylogenys8.tre")
 
 ################################################
     # Calculate effect sizes
@@ -49,7 +49,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     # Some NA's because lnRR, not too many though 311 -> 306
 
 
-    # Add in Laj lnRR correction. Note we need to ^2 cv's here because of
+    # Add in Laj lnRR correction. Note we need to ^2 cv's here
     a2 <-  a2 %>%
   mutate(lnrr_laj_orig = na_if(lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
                                         cv1_2 = cv_Control^2, cv2_2  = cv_Experimental^2,
@@ -60,11 +60,30 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 
     ## There seem to be some big problems with the original data as it's saying large ratios of V. Exclude these large V calculations as clearly there is something wrong with these original data
     a2 <-  a2 %>% filter(!v_lnrr_laj_orig > 80)
-
-    #hist(a2$v_lnrr_laj)
-
     a2 <- na.omit(a2)
 
+################################################
+    # Geary's test
+################################################
+
+    # Function to calculate Geary's "number"
+    geary <- function(mean, sd, n){
+      (1 / (sd / mean)) * ((4*n)^(3/2) / (1 + 4*n))
+    }
+
+    # Geary's test; assumption of normality assumed to be approximately correct when values are >= 3.
+    a2 <- a2 %>%
+      mutate(geary_control = geary(Control_mean, Control_standard_deviation, Control_sample_size),
+             geary_trt = geary(Experimental_mean, Experimental_standard_deviation, Experimental_sample_size),
+             geary_test = ifelse(geary_control >= 3 & geary_trt >= 3, "pass", "fail"))
+
+    # Exclude data failing test
+    a2  <- a2  %>%
+      filter(geary_test == "pass")
+
+################################################
+    # Phylogenetic test
+################################################
     # Prune tree
     #align focal species with branches of phylogenetic tree
     tree2_meta<-drop.tip(tree,
@@ -93,7 +112,7 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
       mutate(cv_Control = na_if(Control_standard_deviation / Control_mean, Inf),
              cv_Experimental = na_if(Experimental_standard_deviation / Experimental_mean, Inf))
 
-    # Now, assume you needto exclude data with missing SD because you can't calculate effect size and sampling variance
+    # Now, assume you need to exclude data with missing SD because you can't calculate effect size and sampling variance
     complete_case_MV <- na.omit(a2missSD_stdy)
 
     # Prune tree.
@@ -113,28 +132,29 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
     # Now calculate the average between study CV, which will replace missing values.
     # Note that mean N used
     a2missSD_stdy <- cv_avg(x = Control_mean, sd = Control_standard_deviation,
-                            n = Control_sample_size, group = Author, label = "1",
+                            n = Control_sample_size, group = Author, label = "1", cv2=FALSE,
                              data = a2missSD_stdy)
     a2missSD_stdy <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation,
                             n = Experimental_sample_size, group = Author,
-                            label = "2", data = a2missSD_stdy)
+                            label = "2", cv2=FALSE, data = a2missSD_stdy)
 
-    # Now using wighted mean CV in replacement for where CV's are missing.
+    # Now using weighted mean CV in replacement for where CV's are missing.
     # Note that function above already CV^2 so need to do that on original CV
     a2missSD_stdy <- a2missSD_stdy %>%
       mutate(cv2_cont_new = if_else(is.na(cv_Control),      b_CV2_1, cv_Control^2),
              cv2_expt_new = if_else(is.na(cv_Experimental), b_CV2_2, cv_Experimental^2))
 
 
-    # Caluclate the new unbiased lnRR
+    # Calculate the new unbiased lnRR
 
-    # Now calculate new yi andvi, called lnrr_laj & v_lnrr_laj, respectively.Note that the functions take CV^2
+    # Now calculate new yi and vi, called lnrr_laj & v_lnrr_laj, respectively.Note that the functions take CV^2
     a2missSD_stdy <- a2missSD_stdy %>%
       mutate(lnrr_laj = lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
                                  cv1 = cv2_cont_new, cv2 = cv2_expt_new,
                                  n1= Control_sample_size, n2 = Experimental_sample_size),
              v_lnrr_laj = v_lnrr_laj(cv1 = cv2_cont_new, n1= Control_sample_size,
                                      cv2 = cv2_expt_new, n2 = Experimental_sample_size))
+
 
 ################################################
     # Whole/full data model
@@ -218,4 +238,4 @@ tree<- read.tree("./example/worked2/ele13245-sup-0008-phylogenys8.tre")
 ################################################
     results <- rbind(whole_mv_res, complete_case_mv_res, method_1A_mv_res, method_1B_mv_res, method2_mv_res, method3_mv_res)
     row.names(results) <- c("Whole Data", "Complete Case", "Method 1A", "Method 1B", "Method 2", "Method 3")
-    write.csv(round(results, 3), "./example/worked2/results2.csv", row.names = TRUE)
+    write.csv(round(results, 3), "./example/worked1/results2.csv", row.names = TRUE)

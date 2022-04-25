@@ -7,6 +7,7 @@
 #' @param data The dataframe containing the mean, sd, n and grouping variables
 #' @param label A character string specifying the label one wishes to attach to columns to identify the treatment. Otherwise, if not specified it will default to the variable name for x
 #' @param sub_b A logical indicating whether the between study CV^2 (b_CV2) should be appended to the data only ('TRUE') or whether both within study CV^2 (w_CV2), mean sample size (n_mean) and between study CV^2 (b_CV2) should all be appended to the data only ('FALSE')
+#' @param cv2 A logical indicating whether one should take the weighted average of CV2 or the weighted average of CV followed by squaring this average. Default to FALSE.
 #' @example \dontrun{
 #' # test data for cv_avg function
 #' library(tidyverse)
@@ -40,7 +41,7 @@
 #' weighted.mean(wCV2, w_nt2)
 #' }
 
-cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE, cv2=TRUE){
+cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE, cv2=FALSE){
 
   # Check if the name is specified or not. If not, then assign it the name of the mean, x, variable input in the function. https://stackoverflow.com/questions/60644445/converting-tidyeval-arguments-to-string
   if(is.null(label)){
@@ -74,9 +75,9 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE, cv2=TRUE){
 #' @param sd Standard deviation of an experimental group
 #' @param x Mean of an experimental group
 #' @param n The sample size of an experimental group
-#' @param cv2 Logical indicating whether the weighted average of CV^2 or CV should be taken (followed by squaring weighted average CV). Defaults to weighted average of CV^2.
+#' @param cv2 Logical indicating whether the weighted average of CV^2 or CV should be taken (followed by squaring weighted average CV). Defaults to weighted average of CV.
 
-weighted_CV <- function(sd, x, n, cv2=TRUE){
+weighted_CV <- function(sd, x, n, cv2=FALSE){
   if(cv2){
     weighted.mean(na_if((sd / x)^2, Inf), n, na.rm = TRUE)
   }else{
