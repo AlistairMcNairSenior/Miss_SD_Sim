@@ -568,6 +568,23 @@ In Table \@ref(tab:mcDonResults) we present the results of re-analysis of the bi
     results2 <- results2 %>% select(Method, Est., SE, "95% LCI", "95% UCI")
     flextable::flextable(results2) %>% flextable::width(j = c(1, 5), c(0.9, 0.8))
 ```
+### Robust Variance Estimators
+In Appendix S1 we mention that robust variance estimators can also be used to control for dependency among effect sizes.  We'll demonstrate how missing data methods can be combined with RVE's when using worked example 2 for Method 1A. Example 2 contains a few effect sizes that share a common control group. This creates dependency among their sampling variances that we should control for in our models. However, other sources of non-independence may also be present that we are unaware of (e.g., shared traits; See @Noble2017). Cluster-robust methods are known to do an excellent job at correcting standard errors when such dependeny exists [see @Song2021; @Nakagawa2021; @Hedges2010; @Tipton2013]. 
+
+```{r robust, echo = TRUE, eval = TRUE,warning=FALSE,class.source='klippy'}
+
+# We ignore the few common-control comparisons we can calculate an adjusted sampling variance matrix to account for shared-sampling variance between effect sizes
+                V <- metafor::vcalc(vi = v_lnrr_1A, cluster = Common.control, rho = 0.5, data = data2)
+
+# Using our V matrix, we can re-fit our multi-level meta-analytic model
+       MLMA1A_adj <- rma.mv(yi = lnrr_laj, V = V, random=list(~1|Study, ~1|ES_ID), data=data2)
+       
+# Now we can apply cluster-robust inferences. We have little dependency in these data so we don't expect many changes
+    MLMA1A_robust <- robust(MLMA1A_adj, cluster = data2$Study, adjust = TRUE)
+    MLMA1A_robust
+```
+
+We can see that, in this situation, our results are robust to shared control and other within study dependencies. 
 
 # **Session Information**
 
