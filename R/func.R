@@ -105,9 +105,14 @@ get_est <- function(model){
 #' @param cv2_2 Coefficient of variation squared (CV^2) for treatment group 2
 #' @param n1 Sample size for treatment group 1
 #' @param n2 Sample size for treatment group 2
+#' @param taylor A logical indicating whether to calculate point estimate with Taylor expansion.
 #'
-lnrr_laj <- function(m1, m2, cv1_2, cv2_2, n1, n2){
-  log(m1 / m2) + 0.5*((cv1_2 / n1) - (cv2_2 / n2))
+lnrr_laj <- function(m1, m2, cv1_2, cv2_2, n1, n2, taylor=TRUE){
+  if(taylor){
+    log(m1 / m2) + 0.5*((cv1_2 / n1) - (cv2_2 / n2))
+  } else {
+    log(m1 / m2)
+  }
 }
 
 #' @title v_lnrr_laj
@@ -116,9 +121,14 @@ lnrr_laj <- function(m1, m2, cv1_2, cv2_2, n1, n2){
 #' @param cv2_2 Coefficient of variation squared (CV^2) for treatment group 2
 #' @param n1 Sample size for treatment group 1
 #' @param n2 Sample size for treatment group 2
-v_lnrr_laj <- function(cv1_2, cv2_2, n1, n2){
+#' @param taylor A logical indicating whether to calculate point estimate with Taylor expansion.
+v_lnrr_laj <- function(cv1_2, cv2_2, n1, n2,  taylor=TRUE){
+  if(taylor){
   ((cv1_2) / n1) + ((cv2_2) / n2) +
     ((cv1_2)^2 / (2*n1)^2) + ((cv2_2)^2 / (2*n2)^2)
+  } else {
+    ((cv1_2) / n1) + ((cv2_2) / n2)
+  }
 }
 
 
