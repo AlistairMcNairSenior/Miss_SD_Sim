@@ -45,15 +45,17 @@ Importantly, this tutorial is self-contained. The code will download all the nec
 In many ecological meta-analyses, meta-analytic models are often made more complex by the need to account for phylogenetic relatedness when a meta-analytic dataset contains multiple species. Moreover, almost all meta-analytic studies test a number of moderators (predictors) to explain heterogeneity among effect sizes (i.e., meta-regression). Furthermore, effect sizes from the same studies can be correlated at the level of sampling error [e.g., the same individuals are used to calculate 2 effect sizes, see @Noble2017]. We can write a meta-analytic model which can accommodate these three points above, as follows [@nakagawaSantos2012; @Cinar2022]:
 
 $$
-\ln{\text{RR}}_{i} = \beta_{0} + \sum^{N_{mod}}_{k = 1}\beta_kx_k + a_h + q_h + s_j + u_i + m_i,
-$$ $$
-a_{h} \sim \mathcal{N}(0, \sigma_a^2\textbf{A}), q_{h} \sim \mathcal{N}(0, \sigma_q^2), m_i \sim \mathcal{N}(0, \mathbf{M}^*) 
+\ln{\text{RR}}_{ijh} = \beta_{0} + \sum^{N_{mod}}_{k = 1}\beta_kx_k + a_h + q_h + s_j + u_i + m_{ij},
 $$
 
-where $x_{k}$ is the kth moderator's value and $β_{k}$ is the regression coefficient of the kth moderator (h = 1, 2, ..., $N_{mod}$, the number of moderators), $a_{h}$ is the phylogenetic effect for the hth species, considered multivariate normally distributed with a covariance of $\sigma_{a}^2$ "A" [A is a correlation matrix derived from a phylogeny; see @Hadfield2010]; $q_{h}$ is the non-phylogenetic effect for the hth species, distributed with the variance of $\sigma_{q}^2$ ($h$ = 1, 2, ... $N_{species}$, the number of species, which is different from Nstudy \> Neffect-size); and the other notations are the same as above. $\bf{M}$\* is a variance-covariance matrix of the sampling variance, which may result, say, when effect sizes share a common-control [e.g., @Noble2017]; for example, when we have 5 cases from 3 studies, $\bf{M}$\* can be written as:
+$$
+a_{h} \sim \mathcal{N}(0, \sigma_a^2\textbf{A}), q_{h} \sim \mathcal{N}(0, \sigma_q^2), m_{ij} \sim \mathcal{N}(0, \mathbf{V}^*) 
+$$
+
+where $x_{k}$ is the kth moderator's value and $β_{k}$ is the regression coefficient of the kth moderator (h = 1, 2, ..., $N_{mod}$, the number of moderators), $a_{h}$ is the phylogenetic effect for the hth species, considered multivariate normally distributed with a covariance of $\sigma_{a}^2$ "A" [A is a correlation matrix derived from a phylogeny; see @Hadfield2010]; $q_{h}$ is the non-phylogenetic effect for the hth species, distributed with the variance of $\sigma_{q}^2$ ($h$ = 1, 2, ... $N_{species}$, the number of species, which is different from Nstudy \> Neffect-size); and the other notations are the same as above. $\bf{V}$\* is a variance-covariance matrix of the sampling variance, which may result, say, when effect sizes share a common-control [e.g., @Noble2017]; for example, when we have 5 cases from 3 studies, $\bf{V}$\* can be written as:
 
 $$
-\mathbf{M}^* = 
+\mathbf{V}^* = 
      \begin{bmatrix}
     v_1 & \rho \sqrt{v_{1} v_2} & 0 & 0 & 0 \\
     \rho \sqrt{v_{2} v_{1}} & v_2  & 0 & 0 & 0 \\
@@ -65,11 +67,11 @@ $$
 
 where $v_{1}$ and $v_{2}$ are the sampling variances for the 1st and 2nd effect sizes from the same study, and $\rho$ $\sqrt{v_{1}v_{2}}$ and $\rho$$\sqrt{v_{2}v_{1}}$ are the co-variances between the two effect sizes (the 1st study), $v_{3}$, $v_{4}$ and come from the same study (the 2nd study; if we want to make this equation similar to Equation 12, then $v_{3}$ = $\phi$ $\tilde{v}_{3}$ and $v_{4}$ = $\phi$ $\tilde{v}_{4}$, and $v_{5}$ is the sampling variance of the 5th effect size from another study. The correlation $\rho$ needs to be provided, but can often be assumed to be 0.5 or 0.8 [@Noble2017; for a formula for the direct estimation of the sampling covariance for lnRR, see @Lajeunesse2011].
 
-Constructing $\bf{M}$\* may be as challenging as just doing MI for many ecologists, because the actual value of $\rho$ is often unknown [@Noble2017]. Fortunately, @Hedges2010 derived the robust variance estimator (RVE), which bypasses these challenges by estimating $\rho$ from the data. By using RVE we need only construct $\bf{M}$\*, rather than $\\$\* [see also @Tipton2013]. We show an implementation of this procedure in Appendix S3, using the `clubSandwich` package [@Pustejovsky2021b], which implements the RVE method with a multilevel meta-analysis in `metafor` [cf. @Pustejovsky2021].
+Constructing $\bf{V}$\* may be as challenging as just doing MI for many ecologists, because the actual value of $\rho$ is often unknown [@Noble2017]. Fortunately, @Hedges2010 derived the robust variance estimator (RVE), which bypasses these challenges by estimating $\rho$ from the data. By using RVE we need only construct $\bf{V}$\*, rather than $\\$\* [see also @Tipton2013]. We show an implementation of this procedure in Appendix S3, using the `clubSandwich` package [@Pustejovsky2021b], which implements the RVE method with a multilevel meta-analysis in `metafor` [cf. @Pustejovsky2021].
 
-# **`cv_avg` Function**: Calculating between study $CV^2$
+# **`cv_avg` Function**: Calculating between study $CV$
 
-To facilitate application of the methods we have written a general function for calculating the weighted $CV^2$ across studies. That function is in the `func.R` script, but we provide some detail here.
+To facilitate application of the methods we have written a general function for calculating the weighted $CV$ across studies. That function is in the `func.R` script, but we provide some detail here.
 
 ```{r echo = TRUE, results='hide', tidy=FALSE, tidy.opts=list(width.cutoff=80), class.source='klippy'}
 #' @title cv_avg
@@ -146,7 +148,7 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE, cv2=FALSE)
 
 ```
 
-The function will take the mean (`x`), standard deviation (`sd`) and sample size (`n`) along with the desired dataframe and calculate the between study $CV^2$ (note this is calculated by taking weighted average of CV and the squaring that average) that is needed for many of the methods implemented. The `group` argument is needed to identify the "study" / cluster variable which is important so that the function first takes the weighted mean $CV^2$ within the study before calculating the $CV^2$ across studies. The new $CV^2$ is then added directly to the dataframe. You can label these new columns using the `label` argument, otherwise, it will append the name of the column for the treatment group with `b_CV2`. We'll show how this function is used as we overview the methods in detail below.
+The function will take the mean (`x`), standard deviation (`sd`) and sample size (`n`) along with the desired dataframe and calculate the between study $CV$ (note this is calculated by taking weighted average of CV and the squaring that average) that is needed for many of the methods implemented. The `group` argument is needed to identify the "study" / cluster variable which is important so that the function first takes the weighted mean $CV$ within the study before calculating the $CV$ across studies. The new $CV$ is then added directly to the dataframe. You can label these new columns using the `label` argument, otherwise, it will append the name of the column for the treatment group with `b_CV2`. We'll show how this function is used as we overview the methods in detail below.
 
 # **Appendix S2**: Worked Example 1 - Dealing with missing SD data to explore the fitness impacts of competition between herbivorous insects
 
@@ -287,7 +289,7 @@ na.plot
 
 In our manuscript we provide the full data and complete case analysis (excluding rows with missing data). As such, here we jump straight into showing readers how to implement the different solutions to the missing standard deviation problem that is typical when conducting meta-analysis.
 
-To implement Method 1 described in the manuscript, we need to first calculate the between study $CV^2$. We will do this with the `cvg_avg` function we describe above. Here, we need to do this for the control and experimental groups as follows, such that variable `b_CV_1` and `b_CV_2` are the averages for the control and experimental groups, respectively:
+To implement Method 1 described in the manuscript, we need to first calculate the between study $CV$. We will do this with the `cvg_avg` function we describe above. Here, we need to do this for the control and experimental groups as follows, such that variable `b_CV_1` and `b_CV_2` are the averages for the control and experimental groups, respectively:
 
 ```{r cvavg, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 # Calculate the average between study CV, which will replace missing values.
@@ -460,7 +462,7 @@ na.plot2
 
 ### Method 1A
 
-Again, we need to calculate log response ratios and their associated sampling variances differently depending on whether we have an observation with a missing standard deviation (SD) or not. First, we need to calculate $CV^2$, which will make it easy to set up the data.
+Again, we need to calculate log response ratios and their associated sampling variances differently depending on whether we have an observation with a missing standard deviation (SD) or not. First, we need to calculate $CV$, which will make it easy to set up the data.
 
 ```{r cvavg2, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 # Calcuclate CV  
@@ -504,7 +506,7 @@ MLMA1A_res <- get_est(MLMA1A)
 
 ### Method 1B
 
-We will now calculate a new sampling variance using Equation 7, that makes use of the weighted between study $CV^2$ for all observed effect sizes.
+We will now calculate a new sampling variance using Equation 7, that makes use of the weighted between study $CV$ for all observed effect sizes.
 
 ```{r mcdon_1B, echo = TRUE, eval = TRUE, class.source='klippy'}
 
@@ -568,8 +570,10 @@ In Table \@ref(tab:mcDonResults) we present the results of re-analysis of the bi
     results2 <- results2 %>% select(Method, Est., SE, "95% LCI", "95% UCI")
     flextable::flextable(results2) %>% flextable::width(j = c(1, 5), c(0.9, 0.8))
 ```
+
 ### Robust Variance Estimators
-In Appendix S1 we mention that robust variance estimators can also be used to control for dependency among effect sizes.  We'll demonstrate how missing data methods can be combined with RVE's when using worked example 2 for Method 1A. Example 2 contains a few effect sizes that share a common control group. This creates dependency among their sampling variances that we should control for in our models. However, other sources of non-independence may also be present that we are unaware of (e.g., shared traits; See @Noble2017). Cluster-robust methods are known to do an excellent job at correcting standard errors when such dependeny exists [see @Song2021; @Nakagawa2021; @Hedges2010; @Tipton2013]. 
+
+In Appendix S1 we mention that robust variance estimators can also be used to control for dependency among effect sizes. We'll demonstrate how missing data methods can be combined with RVE's when using worked example 2 for Method 1A. Example 2 contains a few effect sizes that share a common control group. This creates dependency among their sampling variances that we should control for in our models. However, other sources of non-independence may also be present that we are unaware of (e.g., shared traits; See @Noble2017). Cluster-robust methods are known to do an excellent job at correcting standard errors when such dependency exists [see @Song2021; @Nakagawa2021; @Hedges2010; @Tipton2013].
 
 ```{r robust, echo = TRUE, eval = TRUE,warning=FALSE,class.source='klippy'}
 
@@ -584,7 +588,7 @@ In Appendix S1 we mention that robust variance estimators can also be used to co
     MLMA1A_robust
 ```
 
-We can see that, in this situation, our results are robust to shared control and other within study dependencies. 
+We can see that, in this situation, our results are robust to shared control and other within study dependencies.
 
 # **Session Information**
 
