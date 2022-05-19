@@ -57,11 +57,11 @@ where $x_{k}$ is the kth moderator's value and $β_{k}$ is the regression coeffi
 $$
 \mathbf{V}^* = 
      \begin{bmatrix}
-    v_1 & \rho \sqrt{v_{1} v_2} & 0 & 0 & 0 \\
-    \rho \sqrt{v_{2} v_{1}} & v_2  & 0 & 0 & 0 \\
-    0 & 0 &  v_3 & \rho \sqrt{v_3 v_4} & 0 \\
-    0 & 0 & \rho \sqrt{v_4 v_3}  & v_4 & 0 \\
-    0 & 0 &  0 & 0  & v_5
+    v_{11} & \rho \sqrt{v_{11} v_{12}} & 0 & 0 & 0 \\
+    \rho \sqrt{v_{12} v_{11}} & v_{12}  & 0 & 0 & 0 \\
+    0 & 0 &  v_{21} & \rho \sqrt{v_{21} v_{22}} & 0 \\
+    0 & 0 & \rho \sqrt{v_{22} v_{21}}  & v_{22} & 0 \\
+    0 & 0 &  0 & 0  & v_{31}
 \end{bmatrix}
 $$
 
