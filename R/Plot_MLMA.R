@@ -50,7 +50,7 @@ A<-ggplot(data=agg_results, aes(y=median_bias, x=Method, col=Method, fill=Method
 	ylim(-0.0025, 0.008) +
 	ylab("Bias lnRR") + xlab("") + theme_bw() + 
 	theme(legend.position="none", axis.title.y=element_text(size=15), axis.text.y=element_text(size=15), axis.text.x=element_text(size=15), plot.title=element_text(size=title_size)) +
-	geom_vline(xintercept=0, col="dark grey", size=0.5) + 
+	geom_hline(yintercept=0, col="dark grey", size=0.5) + 
 	scale_x_discrete(labels=c("Full Data", "Missing
 Cases", "All
 Cases", "Multiplicative", "Hybrid")) + scale_color_manual(values=method_cols) + scale_fill_manual(values=method_cols)
@@ -174,21 +174,19 @@ D<-ggplot(data=dat1.1, aes(x=as.factor(tau2), y=median_ICC, fill=as.factor(icc_s
 	geom_violin() + 
 	theme_bw() + 
 	xlab("") + ylab("Bias in ICC") +
-	theme(legend.position=c(0.85, 0.85), axis.text.x=element_text(size=15), axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=15), legend.text=element_text(size=15)) +
+	theme(legend.position=c(0.84, 0.85), axis.text.x=element_text(size=15), axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=title_size), legend.text=element_text(size=15)) +
 	geom_hline(yintercept=0, col="dark grey") + guides(fill=guide_legend(title="Simulated ICC")) +
 	scale_x_discrete(labels=c("Low Heterogeneity", "High Heterogeneity")) + scale_color_manual(values=other_cols) + scale_fill_manual(values=other_cols) +
-	annotate("text", 0.9, 0.75, label="Missing Cases", size=8)	
-
+	annotate("text", 0.9, 0.5, label="Missing Cases", size=8)	
 	
 E<-ggplot(data=dat1.2, aes(x=as.factor(tau2), y=median_ICC, fill=as.factor(icc_study))) +
 	geom_violin() + 
 	theme_bw() + 
 	xlab("") + ylab("Bias in ICC") +
-	theme(legend.position=c(0.85, 0.85), axis.text.x=element_text(size=15), axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=15), legend.text=element_text(size=15)) +
+	theme(legend.position=c(0.84, 0.85), axis.text.x=element_text(size=15), axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=title_size), legend.text=element_text(size=15)) +
 	geom_hline(yintercept=0, col="dark grey") + guides(fill=guide_legend(title="Simulated ICC")) +
 	scale_x_discrete(labels=c("Low Heterogeneity", "High Heterogeneity")) + scale_color_manual(values=other_cols) + scale_fill_manual(values=other_cols) +
-	annotate("text", 0.8, 0.75, label="All Cases", size=8)	
-	
+	annotate("text", 0.8, 0.5, label="All Cases", size=8)	
 	
 pdf("MS/fig/Bias_Het.pdf", height=14, width=12)
 
@@ -196,5 +194,40 @@ grid.arrange(A+labs(title="A."), B+labs(title="B."), C+labs(title="C."), D+labs(
 					c(6,3,3,3,3,6),
 					c(4,4,4,5,5,5)))	
 													
-dev.off()	
+dev.off()
+
+# % of Missing Data Plot
+agg_results$prop_jitter<-(agg_results$proportion_lost + runif(nrow(agg_results), 0, 0.016)) * 100
+A<-ggplot(data=agg_results, aes(x=prop_jitter, y=median_bias, col=Method, fill=Method)) + geom_point(size=0.75, alpha=1/2)	+
+	geom_smooth(alpha=1/3, method="gam", se=F) +
+	theme_bw() + geom_hline(yintercept=0, col="dark grey", size=0.5) + scale_color_manual(values=method_cols, labels=c("Full Data", "Missing Cases", "All Cases", "Multiplicative", "Hybrid")) + scale_fill_manual(values=method_cols, labels=c("Full Data", "Missing Cases", "All Cases", "Multiplicative", "Hybrid")) +
+	xlab("% Studies with Missing SDs") + ylab("Bias lnRR") +
+	theme(legend.position=c(0.88, 0.83), axis.text.x=element_text(size=15), axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), axis.title.y=element_text(size=15), legend.title=element_text(size=0), plot.title=element_text(size=title_size), legend.text=element_text(size=14), legend.key=element_rect(fill="transparent"), legend.background=element_rect(fill="transparent")) +
+	ylim(-0.003, 0.009)
+
+
+B<-ggplot(data=agg_results, aes(x=prop_jitter, y=coverage, col=Method, fill=Method)) + geom_point(size=0.75, alpha=1/2)	+
+	geom_smooth(alpha=1/3, method="gam", se=F) +
+	theme_bw() + geom_hline(yintercept=0.95, col="dark grey", size=0.5) + scale_color_manual(values=method_cols, labels=c("Full Data", "Missing Cases", "All Cases", "Multiplicative", "Hybrid")) + scale_fill_manual(values=method_cols, labels=c("Full Data", "Missing Cases", "All Cases", "Multiplicative", "Hybrid")) +
+	xlab("% Studies with Missing SDs") + ylab("Coverage (95% CI)") +
+	theme(legend.position="none", axis.text.x=element_text(size=15), axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), axis.title.y=element_text(size=15), plot.title=element_text(size=title_size)) +
+	ylim(0.925, 1)
+B
+
+
+C<-ggplot(data=agg_results, aes(x=prop_jitter, y=median_bias_tau2_lnR, col=Method, fill=Method)) + geom_point(size=0.75, alpha=1/2)	+
+	geom_smooth(alpha=1/3, method="gam", se=F) +
+	theme_bw() + geom_hline(yintercept=0, col="dark grey", size=0.5) + scale_color_manual(values=method_cols, labels=c("Full Data", "Missing Cases", "All Cases", "Multiplicative", "Hybrid")) + scale_fill_manual(values=method_cols, labels=c("Full Data", "Missing Cases", "All Cases", "Multiplicative", "Hybrid")) +
+	xlab("% Studies with Missing SDs") + ylab("Bias in Heterogeneity (log Ratio)") +
+	theme(legend.position="none", axis.text.x=element_text(size=15), axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), axis.title.y=element_text(size=15), plot.title=element_text(size=title_size)) +
+	ylim(-0.5, 8)
 	
+pdf("MS/fig/Prop_Missing.pdf", height=15, width=10)
+
+grid.arrange(A+labs(title="A."), B+labs(title="B."), C+labs(title="C."), layout_matrix=rbind(1,2,3))	
+													
+dev.off()
+
+
+
+
