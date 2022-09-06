@@ -35,13 +35,12 @@ title_size<-20
 head(agg_results)
 agg_results$range_bias<-agg_results$max_bias - agg_results$min_bias
 
-# Rename 1.1 and 1.2 to 1.A and 1.B, and complete to full
-# agg_results$Method_old<-agg_results$Method
-# agg_results$Method[which(agg_results$Method == "Method 1.1")]<-"Missing Cases"
-# agg_results$Method[which(agg_results$Method == "Method 1.2")]<-"All Cases"
-# agg_results$Method[which(agg_results$Method == "Method 2")]<-"Multiplicative"
-# agg_results$Method[which(agg_results$Method == "Method 3")]<-"Hybrid"
-# agg_results$Method[which(agg_results$Method == "Complete Data")]<-"Full Data"
+# Note for coding purposes in the Method column
+# "Method 1.1" = "Missing Cases"
+# "Method 1.2" = "All Cases"
+# "Method 2" = "Multiplicative"
+# "Method 3" = "Hybrid"
+# "Complete Data" = "Full Data"
 method_cols<-colorblind_pal()(8)[c(2,3,4,7,8)]
 other_cols<-colorblind_pal()(8)[c(1,5)]
 
@@ -52,33 +51,34 @@ A<-ggplot(data=agg_results, aes(y=median_bias, x=Method, col=Method, fill=Method
 	ylab("Bias lnRR") + xlab("") + theme_bw() + 
 	theme(legend.position="none", axis.title.y=element_text(size=15), axis.text.y=element_text(size=15), axis.text.x=element_text(size=15), plot.title=element_text(size=title_size)) +
 	geom_vline(xintercept=0, col="dark grey", size=0.5) + 
-	scale_x_discrete(labels=c("Full Data", "Miss.
+	scale_x_discrete(labels=c("Full Data", "Missing
 Cases", "All
-Cases", "Multiplic.", "Hybrid")) + scale_color_manual(values=method_cols) + scale_fill_manual(values=method_cols)
+Cases", "Multiplicative", "Hybrid")) + scale_color_manual(values=method_cols) + scale_fill_manual(values=method_cols)
 
 
 long<-agg_results[,c("Method", "median_bias", "code")]
 wide<-reshape(long, direction="wide", idvar="code", timevar="Method")
 cor.mat<-cor(wide[,-1])
-rownames(cor.mat)<-c("Full Data", "Miss. Cases", "All Cases", "Multiplicative", "Hybrid")
-colnames(cor.mat)<-c("Full Data", "Miss. Cases", "All Cases", "Multiplicative", "Hybrid")
+rownames(cor.mat)<-c("Full Data", "Missing Cases", "All Cases", "Multiplicative", "Hybrid")
+colnames(cor.mat)<-c("Full Data", "Missing Cases", "All Cases", "Multiplicative", "Hybrid")
 
 B<-ggcorrplot(cor.mat, lab=T, show.legend=FALSE, type="lower") + theme(plot.title=element_text(size=title_size), axis.text.x=element_text(size=15),  axis.text.y=element_text(size=15))
 
 # Difference in the bias
-df<-data.frame(delta=abs(wide[,"median_bias.Missing Cases"]) - abs(wide[,"median_bias.All Cases"]))
+df<-data.frame(delta=abs(wide[,"median_bias.Method 1.1"]) - abs(wide[,"median_bias.Method 1.2"]))
 C<-ggplot(df, aes(x=delta)) + geom_histogram(bins=20) + theme_bw() + geom_vline(xintercept=0, col="red") +
-	xlab("Diff. |Bias| Miss. & All Cases") + ylab("Frequency") + 
-	theme(axis.title.y=element_text(size=15), axis.text.y=element_text(size=15), axis.text.x=element_text(size=12), axis.title.x=element_text(size=12), plot.title=element_text(size=title_size))
+	xlab("Difference in |Bias| 
+Missing - All Cases") + ylab("Frequency") + 
+	theme(axis.title.y=element_text(size=15), axis.text.y=element_text(size=15), axis.text.x=element_text(size=15), axis.title.x=element_text(size=15), plot.title=element_text(size=title_size))
 
 D<-ggplot(data=agg_results, aes(y=log(range_bias, base=10), x=Method, col=Method, fill=Method)) +
 	geom_violin() + 
 	geom_beeswarm(groupOnX=T, size=2, cex=0.5, col="black", alpha=1/3, shape=1) + 
 	ylab("log10 Range of Bias lnRR") + xlab("") + theme_bw() + 
 	theme(legend.position="none", axis.title.y=element_text(size=15), axis.text.y=element_text(size=15), axis.text.x=element_text(size=15), plot.title=element_text(size=title_size)) + 
-	scale_x_discrete(labels=c("Full Data", "Miss. 
+	scale_x_discrete(labels=c("Full Data", "Missing
 Cases", "All 
-Cases", "Multiplic.", "Hybrid")) + scale_color_manual(values=method_cols) + scale_fill_manual(values=method_cols)
+Cases", "Multiplicative", "Hybrid")) + scale_color_manual(values=method_cols) + scale_fill_manual(values=method_cols)
 
 
 # Get the data for Methods 1.A & 1.B
@@ -102,31 +102,38 @@ dev.off()
 
 # Analysis of bias in coverage
 
-A<-ggplot(data=agg_results, aes(x=coverage, y=Method, col=Method, fill=Method)) +
+A<-ggplot(data=agg_results, aes(y=coverage, x=Method, col=Method, fill=Method)) +
 	geom_violin() + 
-	geom_beeswarm(groupOnX=F, size=0.05, cex=0.25, col="black") + 
-	xlim(0.9, 1) +
-	xlab("Coverage (95% CI)") + ylab("") + theme_bw() + 
-	theme(legend.position="none", axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title=element_text(size=15)) +
-	geom_vline(xintercept=0.95, col="dark grey", size=0.5)
+	geom_beeswarm(groupOnX=T, size=2, cex=0.5, col="black", alpha=1/3, shape=1) + 
+	ylim(0.9, 1) +
+	ylab("Coverage (95% CI)") + xlab("") + theme_bw() + 
+	theme(legend.position="none", axis.title.y=element_text(size=15), axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title=element_text(size=title_size)) +
+	geom_hline(yintercept=0.95, col="dark grey", size=0.5) +
+	scale_x_discrete(labels=c("Full Data", "Missing
+Cases", "All 
+Cases", "Multiplicative", "Hybrid")) + scale_color_manual(values=method_cols) + scale_fill_manual(values=method_cols)
+
 	
 B<-ggplot(data=dat1.1, aes(x=as.factor(tau2), y=coverage, fill=as.factor(icc_study))) +
 	geom_violin() + 
 	theme_bw() + 
 	ylim(0.9, 1) +
-	xlab(expression(italic(T)^2)) + ylab("Coverage (95% CI)") +
-	theme(legend.position=c(0.85, 0.875), axis.text.x=element_text(size=12), axis.title.x=element_text(size=15), axis.text.y=element_text(size=12), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=15), plot.subtitle=element_text(size=15), legend.text=element_text(size=15)) +
+	xlab("") + ylab("Coverage (95% CI)") +
+	theme(legend.position=c(0.85, 0.875), axis.text.x=element_text(size=15), axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=title_size), plot.subtitle=element_text(size=20), legend.text=element_text(size=15)) +
 	geom_hline(yintercept=0.95, col="dark grey") + guides(fill=guide_legend(title="Simulated ICC")) +
-	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1))) + labs(subtitle="Method 1A")
+	scale_x_discrete(labels=c("Low Heterogeneity", "High Heterogeneity")) + scale_color_manual(values=other_cols) + scale_fill_manual(values=other_cols) +
+	annotate("text", 0.9, 1, label="Missing Cases", size=8)
 
 C<-ggplot(data=dat1.2, aes(x=as.factor(tau2), y=coverage, fill=as.factor(icc_study))) +
 	geom_violin() + 
 	theme_bw() + 
-	xlab(expression(italic(T)^2)) + ylab("Coverage (95% CI)") +
+	xlab("") + ylab("Coverage (95% CI)") +
 	ylim(0.9, 1) +
-	theme(legend.position=c(0.85, 0.875), axis.text.x=element_text(size=12), axis.title.x=element_text(size=15), axis.text.y=element_text(size=12), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=15), plot.subtitle=element_text(size=15), legend.text=element_text(size=15)) +
+	theme(legend.position=c(0.85, 0.875), axis.text.x=element_text(size=15), axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=title_size), plot.subtitle=element_text(size=20), legend.text=element_text(size=15)) +
 	geom_hline(yintercept=0.95, col="dark grey") + guides(fill=guide_legend(title="Simulated ICC")) +
-	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1))) + labs(subtitle="Method 1B")
+	scale_x_discrete(labels=c("Low Heterogeneity", "High Heterogeneity")) + scale_color_manual(values=other_cols) + scale_fill_manual(values=other_cols) +
+	annotate("text", 0.8, 1, label="All Cases", size=8)
+
 
 pdf("MS/fig/Coverage.pdf", height=7, width=18)
 
@@ -136,42 +143,58 @@ dev.off()
 	
 # Analysis of bias in Tau2
 	
-A<-ggplot(data=agg_results, aes(x=median_bias_tau2_lnR, y=Method, col=Method, fill=Method)) +
+A<-ggplot(data=agg_results, aes(y=median_bias_tau2_lnR, x=Method, col=Method, fill=Method)) +
 	geom_violin() + 
-	geom_beeswarm(groupOnX=F, size=0.05, cex=0.25, col="black") + 
-	xlim(-1, 6) +
-	xlab("Bias in Heterogeneity (log Ratio)") + ylab("") + theme_bw() + 
-	theme(legend.position="none", axis.title.x=element_text(size=15), axis.text.x=element_text(size=12), axis.text.y=element_text(size=15), plot.title=element_text(size=15)) +
-	geom_vline(xintercept=0, col="dark grey", size=0.5)
+	geom_beeswarm(groupOnX=T, size=2, cex=0.175, col="black", alpha=1/3, shape=1) + 
+	ylim(-1, 6) +
+	ylab("Bias in Heterogeneity (log Ratio)") + xlab("") + theme_bw() + 
+	theme(legend.position="none", axis.title.x=element_text(size=15), axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title=element_text(size=title_size), axis.title.y=element_text(size=15), ) +
+	geom_hline(yintercept=0, col="dark grey", size=0.5) + scale_x_discrete(labels=c("Full Data", "Missing
+Cases", "All 
+Cases", "Multiplicative", "Hybrid")) + scale_color_manual(values=method_cols) + scale_fill_manual(values=method_cols)
 
 B<-ggplot(data=agg_results, aes(x=as.factor(tau2), y=median_bias_tau2_lnR, fill=Method)) +
 	geom_boxplot() + theme_bw() + 
-	xlab(expression(italic(T)^2)) + ylab("Bias in Heterogeneity (log Ratio)") +
-	theme(legend.position="none", axis.text.x=element_text(size=12), axis.title.x=element_text(size=15), axis.text.y=element_text(size=12), axis.title.y=element_text(size=15), plot.title=element_text(size=15)) +
+	xlab("") + ylab("Bias in Heterogeneity (log Ratio)") +
+	theme(legend.position="none", axis.text.x=element_text(size=15), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), axis.text.y=element_text(size=15), plot.title=element_text(size=title_size)) +
 	geom_hline(yintercept=0, col="dark grey") +
-	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1)))
+	scale_x_discrete(labels=c("Low Heterogeneity", "High Heterogeneity")) + scale_color_manual(values=method_cols) + scale_fill_manual(values=method_cols)
 
-C<-ggplot(data=agg_results, aes(x=median_ICC, y=Method, col=Method, fill=Method)) +
-	geom_violin() + 
-	geom_beeswarm(groupOnX=F, size=0.05, cex=0.25, col="black") + 
-	xlim(-0.5, 0.75) +
-	xlab("Bias in ICC") + ylab("") + theme_bw() + 
-	theme(legend.position="none", axis.title.x=element_text(size=15), axis.text.x=element_text(size=12), axis.text.y=element_text(size=15), plot.title=element_text(size=15)) +
-	geom_vline(xintercept=0, col="dark grey", size=0.5)
+C<-ggplot(data=agg_results, aes(y=median_ICC, x=Method, col=Method, fill=Method)) +
+	geom_violin(adjust=10) + 
+	geom_beeswarm(groupOnX=T, size=2, cex=0.175, col="black", alpha=1/3, shape=1) +
+	ylim(-0.5, 0.75) +
+	ylab("Bias in ICC") + xlab("") + theme_bw() + 
+	theme(legend.position="none", axis.title.y=element_text(size=15), axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title=element_text(size=title_size)) +
+	geom_hline(yintercept=0, col="dark grey", size=0.5) + scale_x_discrete(labels=c("Full Data", "Missing
+Cases", "All 
+Cases", "Multiplicative", "Hybrid")) + scale_color_manual(values=method_cols) + scale_fill_manual(values=method_cols)
 		
-D<-ggplot(data=dat1.2, aes(x=as.factor(tau2), y=median_ICC, fill=as.factor(icc_study))) +
+D<-ggplot(data=dat1.1, aes(x=as.factor(tau2), y=median_ICC, fill=as.factor(icc_study))) +
 	geom_violin() + 
 	theme_bw() + 
-	xlab(expression(italic(T)^2)) + ylab("Bias in ICC") +
-	theme(legend.position=c(0.85, 0.85), axis.text.x=element_text(size=12), axis.title.x=element_text(size=15), axis.text.y=element_text(size=12), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=15), legend.text=element_text(size=15)) +
+	xlab("") + ylab("Bias in ICC") +
+	theme(legend.position=c(0.85, 0.85), axis.text.x=element_text(size=15), axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=15), legend.text=element_text(size=15)) +
 	geom_hline(yintercept=0, col="dark grey") + guides(fill=guide_legend(title="Simulated ICC")) +
-	scale_x_discrete(labels=c(expression(9e-06~~or~~over(italic(T), lnRR)==0.01), expression(0.09~~or~~over(italic(T), lnRR)==1)))	
+	scale_x_discrete(labels=c("Low Heterogeneity", "High Heterogeneity")) + scale_color_manual(values=other_cols) + scale_fill_manual(values=other_cols) +
+	annotate("text", 0.9, 0.75, label="Missing Cases", size=8)	
+
 	
+E<-ggplot(data=dat1.2, aes(x=as.factor(tau2), y=median_ICC, fill=as.factor(icc_study))) +
+	geom_violin() + 
+	theme_bw() + 
+	xlab("") + ylab("Bias in ICC") +
+	theme(legend.position=c(0.85, 0.85), axis.text.x=element_text(size=15), axis.title.x=element_text(size=15), axis.text.y=element_text(size=15), axis.title.y=element_text(size=15), legend.title=element_text(size=15), plot.title=element_text(size=15), legend.text=element_text(size=15)) +
+	geom_hline(yintercept=0, col="dark grey") + guides(fill=guide_legend(title="Simulated ICC")) +
+	scale_x_discrete(labels=c("Low Heterogeneity", "High Heterogeneity")) + scale_color_manual(values=other_cols) + scale_fill_manual(values=other_cols) +
+	annotate("text", 0.8, 0.75, label="All Cases", size=8)	
+	
+	
+pdf("MS/fig/Bias_Het.pdf", height=14, width=12)
 
-pdf("MS/fig/Bias_Het.pdf", height=10, width=12)
-
-grid.arrange(A+labs(title="A."), B+labs(title="B."), C+labs(title="C."), D+labs(title="D."), layout_matrix=rbind(c(1,2),
-					c(3,4)))	
+grid.arrange(A+labs(title="A."), B+labs(title="B."), C+labs(title="C."), D+labs(title="D."), E+labs(title="E."), layout_matrix=rbind(c(1,1,1,2,2,2),
+					c(6,3,3,3,3,6),
+					c(4,4,4,5,5,5)))	
 													
 dev.off()	
 	
