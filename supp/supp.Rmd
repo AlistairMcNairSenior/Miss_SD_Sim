@@ -148,7 +148,7 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE, cv2=FALSE)
 
 ```
 
-The function will take the mean (`x`), standard deviation (`sd`) and sample size (`n`) along with the desired dataframe and calculate the between study $CV$ (note this is calculated by taking weighted average of CV and the squaring that average) that is needed for many of the methods implemented. The `group` argument is needed to identify the "study" / cluster variable which is important so that the function first takes the weighted mean $CV$ within the study before calculating the $CV$ across studies. The new $CV$ is then added directly to the dataframe. You can label these new columns using the `label` argument, otherwise, it will append the name of the column for the treatment group with `b_CV2`. We'll show how this function is used as we overview the methods in detail below.
+The function will take the mean (`x`), standard deviation (`sd`) and sample size (`n`) along with the desired dataframe and calculate the between study $CV$ (note this is calculated by taking weighted average of CV and then squaring that average) that is needed for many of the methods implemented. The `group` argument is needed to identify the "study" / cluster variable which is important so that the function first takes the weighted mean $CV$ within the study before calculating the $CV$ across studies. The new $CV$ is then added directly to the dataframe. You can label these new columns using the `label` argument, otherwise, it will append the name of the column for the treatment group with `b_CV2`. We'll show how this function is used as we overview the methods in detail below.
 
 # **Appendix S2**: Worked Example 1 - Dealing with missing SD data to explore the fitness impacts of competition between herbivorous insects
 
@@ -285,11 +285,11 @@ na.plot <- data1 %>%
 na.plot
 ```
 
-### Method 1A
+### Missing-cases Method
 
 In our manuscript we provide the full data and complete case analysis (excluding rows with missing data). As such, here we jump straight into showing readers how to implement the different solutions to the missing standard deviation problem that is typical when conducting meta-analysis.
 
-To implement Method 1 described in the manuscript, we need to first calculate the between study $CV$. We will do this with the `cvg_avg` function we describe above. Here, we need to do this for the control and experimental groups as follows, such that variable `b_CV_1` and `b_CV_2` are the averages for the control and experimental groups, respectively:
+To implement the Missing-cases Method described in the manuscript, we need to first calculate the between study $CV$. We will do this with the `cvg_avg` function we describe above. Here, we need to do this for the control and experimental groups as follows, such that variable `b_CV_1` and `b_CV_2` are the averages for the control and experimental groups, respectively:
 
 ```{r cvavg, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 # Calculate the average between study CV, which will replace missing values.
@@ -301,7 +301,7 @@ To implement Method 1 described in the manuscript, we need to first calculate th
                             label = "2", data = data1)
 ```
 
-To implement Method 1A, we need to calculate log response ratios and their associated sampling variances differently depending on whether we have an observation with a missing standard deviation (SD) or not. According to Table 1 (in the main MS), we can use equation 4 or 6 for the point estimate calculation and equation 5 for the sampling variance when we have a known SD and equation 7 when we have an unknown SD. We can do that as follows:
+To implement Missing-cases Method, we need to calculate log response ratios and their associated sampling variances differently depending on whether we have an observation with a missing standard deviation (SD) or not. According to Table 1 (in the main MS), we can use equation 4 or 6 for the point estimate calculation and equation 5 for the sampling variance when we have a known SD and equation 7 when we have an unknown SD. We can do that as follows:
 
 ```{r lnRR_1A, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
     # Use weighted mean CV in replacement for where CV's are missing. Otherwise, calculate CV^2 of data that is known.
@@ -322,20 +322,20 @@ Now we are ready to fit our multilevel meta-analytic model as per @bird2019.
 
 ```{r bird_1A, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 
-########## METHOD 1A ##########
+########## Missing-cases (MC) ##########
 
 
     # Fit model with new sampling variance
-    method_1A_bird <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj,
+    method_MC_bird <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj,
                                random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                                R = list(Focal_insect = phylo), data = data1)
 
-    method_1A_bird_res <- get_est(method_1A_bird)
+    method_MC_bird_res <- get_est(method_MC_bird)
 ```
 
-### Method 1B
+### All-cases Method
 
-While Method 1A could be used our simulations show that it is better to apply Method 1B. The only real difference is that we apply equation 7 to calculate sampling variance regardless of whether we are missing the standard deviation or not for a row. In other words, we simply using the between study $CV^2$ for all CV's in the control and experimental group.
+While the Missing-cases Method could be used our simulations show that it is better to apply the All-cases Method. The only real difference is that we apply equation 7 to calculate sampling variance regardless of whether we are missing the standard deviation or not for a row. In other words, we simply using the between study $CV^2$ for all CV's in the control and experimental group.
 
 ```{r lnRR_1B, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 
@@ -349,44 +349,44 @@ Now we can fit the same model as described above using this new sampling varianc
 
 ```{r bird_1B, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 
-     ########## METHOD 1B  ##########
+     ########## All-cases Method (AC) ##########
 
     # Fit model with new sampling variance and point estimate
-    method_1B_bird <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_1B,
+    method_AC_bird <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_1B,
                            random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                            R = list(Focal_insect = phylo), data = data1)
 
-    method_1B_bird_res <- get_est(method_1B_bird)
+    method_AC_bird_res <- get_est(method_AC_bird)
 ```
 
-### Method 2
+### Multiplicative Method
 
-Method 2 involves a weighted regression approach. This can be implemented as follows:
+The Multiplicative Method involves a weighted regression approach. This can be implemented as follows:
 
 ```{r bird_2, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 
-     ########## METHOD 2  ##########
+     ########## Multiplicative Method (MM) ##########
 
                  V_es <- diag(data1$v_lnrr_laj_1B)
       row.names(V_es) <- data1$obs
            data1$obs2 <- rownames(V_es)
 
-    method2_bird <-rma.mv(lnrr_laj ~ 1, V = 0, 
+    method_MM_bird <-rma.mv(lnrr_laj ~ 1, V = 0, 
                           random=list(~1|Group, ~1|Year,
                                       ~1|Focal_insect, ~1|obs, ~1|obs2),
                         data=data1, R=list(obs2=V_es, Focal_insect = phylo),
                         Rscale=F)
     
-    method2_bird_res <- get_est(method2_bird)
+    method_MM_bird_res <- get_est(method_MM_bird)
 ```
 
-### Method 3
+### Hybrid Method
 
-Method 3 is a combined approach using Equation 5 as the sampling variance when we have the full data; otherwise using a weighted regression approach.
+The Hybrid Method is a combined approach using Equation 5 as the sampling variance when we have the full data; otherwise using a weighted regression approach.
 
 ```{r bird_3, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 
- ########## METHOD 3  ##########
+ ########## Hybrid Method (HM)  ##########
 
     # Find where missing SD's are in the data
       missing_dat <- which(is.na(data1$Control_standard_deviation) & is.na(data1$Experimental_standard_deviation))
@@ -401,10 +401,10 @@ Method 3 is a combined approach using Equation 5 as the sampling variance when w
                  data1$v_lnrr_laj_m3 <- data1$v_lnrr_laj
     data1$v_lnrr_laj_m3[missing_dat] <- 0
 
-    method3_bird <-rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_m3, 
+    method_HM_bird <-rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_m3, 
                           random = list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs, ~1|obs2),
                             data = data1, R = list(obs2=V_es2, Focal_insect = phylo), Rscale=F)
-    method3_bird_res <- get_est(method3_bird)
+    method_HM_bird_res <- get_est(method_HM_bird)
 ```
 
 ### Comparing results
@@ -412,8 +412,8 @@ Method 3 is a combined approach using Equation 5 as the sampling variance when w
 We can compare the results of all the methods together (Table \@ref(tab:birdResults)):
 
 ```{r birdResults, tab.cap = "Results from re-analysis of Bird et al. 2019", echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
- results <- rbind(method_1A_bird_res, method_1B_bird_res, method2_bird_res, method3_bird_res)
-    results$Method <- c("Method 1A", "Method 1B", "Method 2", "Method 3")
+ results <- rbind(method_MC_bird_res, method_AC_bird_res, method_MM_bird_res, method_HM_bird_res)
+    results$Method <- c("Missing-cases", "All-cases", "Multiplicative", "Hybrid")
     
     results <- results %>% select(Method, Est., SE, "95% LCI", "95% UCI")
     flextable::flextable(results) %>% flextable::width(j = c(1, 5), c(0.9, 0.8))
@@ -460,12 +460,12 @@ na.plot2 <- data2 %>%
 na.plot2
 ```
 
-### Method 1A
+### Missing-cases Method
 
 Again, we need to calculate log response ratios and their associated sampling variances differently depending on whether we have an observation with a missing standard deviation (SD) or not. First, we need to calculate $CV$, which will make it easy to set up the data.
 
 ```{r cvavg2, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
-# Calcuclate CV  
+# Calculate CV  
       data2 <- data2 %>% 
                 mutate(     cv_Control = na_if(CSD / CM, Inf),
                        cv_Experimental = na_if(TSD / TM, Inf))
@@ -499,12 +499,12 @@ According to Table 1 (in the main MS), we can use equation 4 or 6 for the point 
 ```
 
 ```{r mcdon_1A, echo = TRUE, eval = TRUE, class.source='klippy'}
-# Model 1A: MLMA of missing SD effect sizes using pooled CV2
-MLMA1A<-rma.mv(yi = lnrr_laj, V = v_lnrr_1A, random=list(~1|Study, ~1|ES_ID), data=data2)
-MLMA1A_res <- get_est(MLMA1A)
+# Missing-cases Method: MLMA of missing SD effect sizes using pooled CV2
+MLMA_MC<-rma.mv(yi = lnrr_laj, V = v_lnrr_1A, random=list(~1|Study, ~1|ES_ID), data=data2)
+MLMA_MC_res <- get_est(MLMA_MC)
 ```
 
-### Method 1B
+### All-cases Method
 
 We will now calculate a new sampling variance using Equation 7, that makes use of the weighted between study $CV$ for all observed effect sizes.
 
@@ -515,33 +515,33 @@ We will now calculate a new sampling variance using Equation 7, that makes use o
               mutate(v_lnrr_laj_1B = v_lnrr_laj(cv1_2 = b_CV2_2, n1 = TN,
                                                 cv2_2 = b_CV2_1, n2 = CN))
 
-# Model 1B: MLMA of all effect sizes using pooled CV2
-MLMA1B<-rma.mv(yi = lnrr_laj, V = v_lnrr_laj_1B, random=list(~1|Study, ~1|ES_ID), data=data2)
-MLMA1B_res <- get_est(MLMA1B)
+# All-cases Method: MLMA of all effect sizes using pooled CV2
+MLMA_AC<-rma.mv(yi = lnrr_laj, V = v_lnrr_laj_1B, random=list(~1|Study, ~1|ES_ID), data=data2)
+MLMA_AC_res <- get_est(MLMA_AC)
 ```
 
-### Method 2
+### Multiplicative Method
 
 Now use the weighted regression approach with Equation 7 as $v_{i}$.
 
 ```{r mcdon_2, echo = TRUE, eval = TRUE, class.source='klippy'}
-# Model 2: weighted regression of all effect sizes using pooled CV2 
+# Multiplicative Method: weighted regression of all effect sizes using pooled CV2 
             Vf <- diag(data2$v_lnrr_laj_1B)
  row.names(Vf) <- seq(1, length(data2$v_lnrr_laj_1B), 1)
 	colnames(Vf) <- seq(1, length(data2$v_lnrr_laj_1B), 1)
   data2$ES_ID2 <- rownames(Vf)
 
-MLMA2<-rma.mv(yi = lnrr_laj, V = 0, random=list(~1|Study, ~1|ES_ID, ~1|ES_ID2), 
+MLMA_MM<-rma.mv(yi = lnrr_laj, V = 0, random=list(~1|Study, ~1|ES_ID, ~1|ES_ID2), 
               data=data2, R=list(ES_ID2=Vf), Rscale=F)
-MLMA2_res <- get_est(MLMA2)
+MLMA_MM_res <- get_est(MLMA_MM)
 ```
 
-### Method 3
+### Hybrid Method
 
 Now use the weighted regression approach with Equation 7 as $v_{i}$, but equation 5 for the sampling variance when SD is known.
 
 ```{r mcdon_3, echo = TRUE, eval = TRUE,warning=FALSE,class.source='klippy'}
-# Model 2: weighted regression of all effect sizes using pooled CV2 
+# Hybrid Method: weighted regression of all effect sizes using pooled CV2 
 
 missing<-which(is.na(data2$CSD) == T)
 diag(Vf)[-missing]<-0
@@ -554,9 +554,9 @@ diag(Vf)[-missing]<-0
 data2$vi_3<-data2$v_lnrr_1A
 data2$vi_3[missing]<-0
 
-MLMA3<-rma.mv(yi = lnrr_laj, V = vi_3, random=list(~1|Study, ~1|ES_ID, ~1|ES_ID2), 
+MLMA_HM<-rma.mv(yi = lnrr_laj, V = vi_3, random=list(~1|Study, ~1|ES_ID, ~1|ES_ID2), 
               data=data2, R=list(ES_ID2=Vf), Rscale=F)
-MLMA3_res <- get_est(MLMA3)
+MLMA_HM_res <- get_est(MLMA_HM)
 ```
 
 ### Comparing results
@@ -564,8 +564,8 @@ MLMA3_res <- get_est(MLMA3)
 In Table \@ref(tab:mcDonResults) we present the results of re-analysis of the biomass data from @mcdonald2019, again using MLMA, but with the four different methods to handles missing SDs. For reference we also include the results of a complete cases analysis where studies with missing SDs have been excluded. The effect sizes for the different methods are all very similar, although the CI for the complete cases analysis is wider than for those that include studies with missing SDs. Method 1B estimated slightly lower heterogeneity than the other methods.
 
 ```{r mcDonResults, tab.cap = "Results from re-analysis of McDonald et al. 2019", echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
- results2 <- rbind(MLMA1A_res, MLMA1B_res, MLMA2_res, MLMA3_res)
-    results2$Method <- c("Method 1A", "Method 1B", "Method 2", "Method 3")
+ results2 <- rbind(MLMA_MC_res, MLMA_AC_res, MLMA_MM_res, MLMA_HM_res)
+    results2$Method <- c("Missing-cases", "All-cases", "Multiplicative", "Hybrid")
     
     results2 <- results2 %>% select(Method, Est., SE, "95% LCI", "95% UCI")
     flextable::flextable(results2) %>% flextable::width(j = c(1, 5), c(0.9, 0.8))
@@ -573,7 +573,7 @@ In Table \@ref(tab:mcDonResults) we present the results of re-analysis of the bi
 
 ### Robust Variance Estimators
 
-In Appendix S1 we mention that robust variance estimators can also be used to control for dependency among effect sizes. We'll demonstrate how missing data methods can be combined with RVE's when using worked example 2 for Method 1A. Example 2 contains a few effect sizes that share a common control group. This creates dependency among their sampling variances that we should control for in our models. However, other sources of non-independence may also be present that we are unaware of (e.g., shared traits; See @Noble2017). Cluster-robust methods are known to do an excellent job at correcting standard errors when such dependency exists [see @Song2021; @Nakagawa2021; @Hedges2010; @Tipton2013].
+In Appendix S1 we mention that robust variance estimators can also be used to control for dependency among effect sizes. We'll demonstrate how missing data methods can be combined with RVE's when using worked example 2 for the Missing-cases method. Example 2 contains a few effect sizes that share a common control group. This creates dependency among their sampling variances that we should control for in our models. However, other sources of non-independence may also be present that we are unaware of (e.g., shared traits; See @Noble2017). Cluster-robust methods are known to do an excellent job at correcting standard errors when such dependency exists [see @Song2021; @Nakagawa2021; @Hedges2010; @Tipton2013].
 
 ```{r robust, echo = TRUE, eval = TRUE,warning=FALSE,class.source='klippy'}
 
@@ -581,19 +581,23 @@ In Appendix S1 we mention that robust variance estimators can also be used to co
                 V <- metafor::vcalc(vi = v_lnrr_1A, cluster = Common.control, rho = 0.5, data = data2)
 
 # Using our V matrix, we can re-fit our multi-level meta-analytic model
-       MLMA1A_adj <- rma.mv(yi = lnrr_laj, V = V, random=list(~1|Study, ~1|ES_ID), data=data2)
+       MLMA_MC_adj <- rma.mv(yi = lnrr_laj, V = V, random=list(~1|Study, ~1|ES_ID), data=data2)
        
 # Now we can apply cluster-robust inferences. We have little dependency in these data so we don't expect many changes
-    MLMA1A_robust <- robust(MLMA1A_adj, cluster = data2$Study, adjust = TRUE)
-    MLMA1A_robust
+    MLMA_MC_robust <- robust(MLMA_MC_adj, cluster = data2$Study, adjust = TRUE)
+    MLMA_MC_robust
 ```
 
 We can see that, in this situation, our results are robust to shared control and other within study dependencies.
+
+# **References**
+
+<div id="refs"></div>
+
+<br>
 
 # **Session Information**
 
 ```{r echo = FALSE, eval = TRUE}
 sessionInfo() %>% pander::pander()
 ```
-
-# **References**
