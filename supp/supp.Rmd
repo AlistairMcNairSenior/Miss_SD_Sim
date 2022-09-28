@@ -164,7 +164,7 @@ First, load the libraries and source functions:
 
 ```{r echo = TRUE, eval = TRUE, class.source='klippy', results='hide'}
 #install.packages("pacman")
-pacman::p_load(tidyverse, metafor, here, ape, phytools)
+pacman::p_load(tidyverse, metafor, here, ape, phytools, patchwork)
 
 # Useful functions for calculating CV^2 within and between studies
 source("https://osf.io/sqr4w/download")
@@ -223,8 +223,10 @@ data1 <- data1 %>%
 Overall, it looks like we have `r geary_res[1,"n"]` effects that fail the test, representing `r geary_res[1,"n"] / sum(geary_res[-3,"n"])*100`% of the data. While @Lajeunesse2015 recommend doing a sensitivity analysis with and without the effect sizes that fail the test we will just exclude these data for simplicity for all subsequent analyses.
 
 ```{r exclude_geary, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+# We'll create two data sets to run a sensitivity analysis. The first data set will include all the data. The second will drop out data that fail the test
+
 # Exclude data failing test
-data1 <- data1 %>% 
+data2 <- data1 %>% 
          filter(geary_test == "pass")
          
 ```
@@ -246,7 +248,21 @@ Now that we have excluded some data, we can prune the phylogenetic tree.
 
 # Create a phylogenetic correlation matrix
     phylo <- vcv(tree, corr = TRUE)
-         
+    
+### We'll now do the same with the reduced data set where we have excluded effects failing Geary's test. Note that this only drops out 1 species.
+
+# Prune tree
+    tree2 <- drop.tip(tree, tree$tip.label[which(tree$tip.label %in% data2$Focal_insect==FALSE)])
+    check.species <- function(x) {any(x==tree$tip.label)}
+
+# Drop species in data not in tree
+    data2 <- data2[sapply(data2[,"Focal_insect"],check.species),]
+
+# Check tree and data species match
+    tree_checks(data = data2, tree = tree2, species_name_col = "Focal_insect", type = "checks")
+
+# Create a phylogenetic correlation matrix
+    phylo2 <- vcv(tree2, corr = TRUE)
 ```
 
 ### Generate Missing
@@ -260,16 +276,42 @@ Now that we have the data ready we'll introduce some missing data to simulate a 
     data1[which(data1$Author %in% stdies),
            c("Experimental_standard_deviation", "Control_standard_deviation")] <- NA
 
-    # First calculate CV on missing dataset. Note missing data will be ignored
+    # First calculate CV on missing data set. Note missing data will be ignored
     data1 <- data1 %>%
+      mutate(cv_Control = na_if(Control_standard_deviation / Control_mean, Inf),
+             cv_Experimental = na_if(Experimental_standard_deviation / Experimental_mean, Inf))
+    
+ # Repeat this with the second data set where Geary's failures are removed.
+    set.seed(675)
+    stdies <- sample(unique(data2$Author), size = 0.2*(length(unique(data2$Author))))
+    data2[which(data2$Author %in% stdies),
+           c("Experimental_standard_deviation", "Control_standard_deviation")] <- NA
+
+    # First calculate CV on missing data set. Note missing data will be ignored
+    data2 <- data2 %>%
       mutate(cv_Control = na_if(Control_standard_deviation / Control_mean, Inf),
              cv_Experimental = na_if(Experimental_standard_deviation / Experimental_mean, Inf))
 ```
 
 We can view the missing data pattern to ensure that we are in fact missing SD in control and experimental groups (Figure \@ref(fig:fig1)).
 
-```{r fig1, fig.cap = "Missing data in the Bird et al. (2019) dataset", echo=FALSE, eval = TRUE, include=TRUE, message=FALSE, warning=FALSE}
+```{r fig1, fig.cap = "Missing data in the Bird et al. (2019) dataset. A is the full dataset and B is the dataset that excludes effects that fail Geary's test.", echo=FALSE, eval = TRUE, include=TRUE, message=FALSE, warning=FALSE}
 na.plot <- data1 %>%
+  mutate(id = row_number()) %>%
+  gather(-id, key = "key", value = "val") %>%
+  mutate(isna = is.na(val)) %>%
+  ggplot(aes(key, id, fill = isna)) +
+    geom_raster(alpha=0.8) +
+    scale_fill_manual(name = "",
+        values = c('steelblue', 'tomato3'),
+        labels = c("Present", "Missing")) +
+    labs(x = "Variable",
+           y = "Row Number") +
+    theme(legend.position = "none") + 
+    coord_flip()
+
+
+na.plot2 <- data2 %>%
   mutate(id = row_number()) %>%
   gather(-id, key = "key", value = "val") %>%
   mutate(isna = is.na(val)) %>%
@@ -282,7 +324,7 @@ na.plot <- data1 %>%
            y = "Row Number") +
     coord_flip()
 
-na.plot
+(na.plot | na.plot2) + plot_annotation(tag_levels = 'A')
 ```
 
 ### Missing-cases Method
@@ -299,6 +341,14 @@ To implement the Missing-cases Method described in the manuscript, we need to fi
     data1 <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation,
                             n = Experimental_sample_size, group = Author,
                             label = "2", data = data1)
+    
+# Calculate the average between study CV, which will replace missing values, for the reduced dataset that excludes effects failing Geary's test.
+    data2 <- cv_avg(x = Control_mean, sd = Control_standard_deviation,
+                            n = Control_sample_size, group = Author, label = "1",
+                             data = data2)
+    data2 <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation,
+                            n = Experimental_sample_size, group = Author,
+                            label = "2", data = data2)
 ```
 
 To implement Missing-cases Method, we need to calculate log response ratios and their associated sampling variances differently depending on whether we have an observation with a missing standard deviation (SD) or not. According to Table 1 (in the main MS), we can use equation 4 or 6 for the point estimate calculation and equation 5 for the sampling variance when we have a known SD and equation 7 when we have an unknown SD. We can do that as follows:
@@ -316,6 +366,21 @@ To implement Missing-cases Method, we need to calculate log response ratios and 
                                          n1= Control_sample_size, n2 = Experimental_sample_size),
                    v_lnrr_laj = v_lnrr_laj(cv1_2 = cv2_cont_new, n1= Control_sample_size,
                                            cv2_2 = cv2_expt_new, n2 = Experimental_sample_size))
+    
+## Repeat with reduced data set (data 2)
+    
+       # Use weighted mean CV in replacement for where CV's are missing. Otherwise, calculate CV^2 of data that is known.
+    data2 <- data2 %>%
+              mutate(cv2_cont_new = if_else(is.na(cv_Control),      b_CV2_1, cv_Control^2),
+                     cv2_expt_new = if_else(is.na(cv_Experimental), b_CV2_2, cv_Experimental^2))
+
+    # Now calculate new yi and vi, called lnrr_laj & v_lnrr_laj, respectively. This uses either the between individual CV^2 when missing or normal CV^2 when not missing.
+    data2 <- data2 %>%
+              mutate(lnrr_laj = lnrr_laj(m1 = Control_mean, m2 = Experimental_mean,
+                                         cv1_2 = cv2_cont_new, cv2_2 = cv2_expt_new,
+                                         n1= Control_sample_size, n2 = Experimental_sample_size),
+                   v_lnrr_laj = v_lnrr_laj(cv1_2 = cv2_cont_new, n1= Control_sample_size,
+                                           cv2_2 = cv2_expt_new, n2 = Experimental_sample_size))
 ```
 
 Now we are ready to fit our multilevel meta-analytic model as per @bird2019.
@@ -323,14 +388,19 @@ Now we are ready to fit our multilevel meta-analytic model as per @bird2019.
 ```{r bird_1A, echo=TRUE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
 
 ########## Missing-cases (MC) ##########
-
-
     # Fit model with new sampling variance
     method_MC_bird <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj,
                                random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
                                R = list(Focal_insect = phylo), data = data1)
 
     method_MC_bird_res <- get_est(method_MC_bird)
+    
+    # Fit model with new sampling variance using reduced data set
+    method_MC_bird_2 <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj,
+                               random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
+                               R = list(Focal_insect = phylo), data = data2)
+
+    method_MC_bird_res_2 <- get_est(method_MC_bird_2)
 ```
 
 ### All-cases Method
@@ -341,6 +411,13 @@ While the Missing-cases Method could be used our simulations show that it is bet
 
     # Now calculate new v_lnrr_laj_1B using between study CV^2 for all observations.
     data1 <- data1 %>%
+              mutate(v_lnrr_laj_1B = v_lnrr_laj(cv1 = b_CV2_1, n1= Control_sample_size,
+                                                cv2 = b_CV2_2, n2 = Experimental_sample_size))
+
+### Do the same with the reduced data set
+
+  # Now calculate new v_lnrr_laj_1B using between study CV^2 for all observations.
+    data2 <- data2 %>%
               mutate(v_lnrr_laj_1B = v_lnrr_laj(cv1 = b_CV2_1, n1= Control_sample_size,
                                                 cv2 = b_CV2_2, n2 = Experimental_sample_size))
 ```
@@ -357,6 +434,14 @@ Now we can fit the same model as described above using this new sampling varianc
                            R = list(Focal_insect = phylo), data = data1)
 
     method_AC_bird_res <- get_est(method_AC_bird)
+    
+    # Fit model with new sampling variance using reduced data set
+    method_AC_bird_2 <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_1B,
+                           random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
+                           R = list(Focal_insect = phylo), data = data2)
+
+    method_AC_bird_res_2 <- get_est(method_AC_bird_2)
+    
 ```
 
 ### Multiplicative Method
@@ -378,6 +463,22 @@ The Multiplicative Method involves a weighted regression approach. This can be i
                         Rscale=F)
     
     method_MM_bird_res <- get_est(method_MM_bird)
+    
+    
+    # Take the same approach with new sampling variance using reduced data set
+    
+                 V_es_2 <- diag(data2$v_lnrr_laj_1B)
+      row.names(V_es_2) <- data2$obs
+             data2$obs2 <- rownames(V_es_2)
+
+    method_MM_bird_2 <-rma.mv(lnrr_laj ~ 1, V = 0, 
+                          random=list(~1|Group, ~1|Year,
+                                      ~1|Focal_insect, ~1|obs, ~1|obs2),
+                        data=data2, R=list(obs2=V_es, Focal_insect = phylo),
+                        Rscale=F)
+    
+    method_MM_bird_res_2 <- get_est(method_MM_bird_2)
+    
 ```
 
 ### Hybrid Method
