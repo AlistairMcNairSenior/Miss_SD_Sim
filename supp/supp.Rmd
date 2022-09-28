@@ -322,6 +322,8 @@ na.plot2 <- data2 %>%
         labels = c("Present", "Missing")) +
     labs(x = "Variable",
            y = "Row Number") +
+    theme(axis.text = element_blank(),
+          axis.title.y = element_blank() ) +
     coord_flip()
 
 (na.plot | na.plot2) + plot_annotation(tag_levels = 'A')
@@ -367,6 +369,9 @@ To implement Missing-cases Method, we need to calculate log response ratios and 
                    v_lnrr_laj = v_lnrr_laj(cv1_2 = cv2_cont_new, n1= Control_sample_size,
                                            cv2_2 = cv2_expt_new, n2 = Experimental_sample_size))
     
+    # We need to exclude some missing data in the raw data set and data that is not defined on the ratio scale.
+    data1 <- data1 %>% filter(!is.infinite(lnrr_laj) & !is.na(lnrr_laj))
+    
 ## Repeat with reduced data set (data 2)
     
        # Use weighted mean CV in replacement for where CV's are missing. Otherwise, calculate CV^2 of data that is known.
@@ -398,7 +403,7 @@ Now we are ready to fit our multilevel meta-analytic model as per @bird2019.
     # Fit model with new sampling variance using reduced data set
     method_MC_bird_2 <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj,
                                random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
-                               R = list(Focal_insect = phylo), data = data2)
+                               R = list(Focal_insect = phylo2), data = data2)
 
     method_MC_bird_res_2 <- get_est(method_MC_bird_2)
 ```
@@ -438,7 +443,7 @@ Now we can fit the same model as described above using this new sampling varianc
     # Fit model with new sampling variance using reduced data set
     method_AC_bird_2 <- rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_1B,
                            random=list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs),
-                           R = list(Focal_insect = phylo), data = data2)
+                           R = list(Focal_insect = phylo2), data = data2)
 
     method_AC_bird_res_2 <- get_est(method_AC_bird_2)
     
@@ -474,7 +479,7 @@ The Multiplicative Method involves a weighted regression approach. This can be i
     method_MM_bird_2 <-rma.mv(lnrr_laj ~ 1, V = 0, 
                           random=list(~1|Group, ~1|Year,
                                       ~1|Focal_insect, ~1|obs, ~1|obs2),
-                        data=data2, R=list(obs2=V_es, Focal_insect = phylo),
+                        data=data2, R=list(obs2=V_es, Focal_insect = phylo2),
                         Rscale=F)
     
     method_MM_bird_res_2 <- get_est(method_MM_bird_2)
@@ -506,18 +511,47 @@ The Hybrid Method is a combined approach using Equation 5 as the sampling varian
                           random = list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs, ~1|obs2),
                             data = data1, R = list(obs2=V_es2, Focal_insect = phylo), Rscale=F)
     method_HM_bird_res <- get_est(method_HM_bird)
+    
+    
+# Take the same approach with new sampling variance using reduced data set
+    
+     # Find where missing SD's are in the data
+      missing_dat_2 <- which(is.na(data2$Control_standard_deviation) & is.na(data2$Experimental_standard_deviation))
+
+    # Set the effect sizes not missing data to zero in the V_es matrix
+                        V_es2_2 <- diag(data2$v_lnrr_laj_1B)
+    diag(V_es2_2)[-missing_dat_2] <- 0
+             row.names(V_es2_2) <- data2$obs
+                   data2$obs2 <- rownames(V_es2_2)
+
+    # Set the v_lnrr_laj to 0
+                 data2$v_lnrr_laj_m3 <- data2$v_lnrr_laj
+    data2$v_lnrr_laj_m3[missing_dat_2] <- 0
+
+    method_HM_bird_2 <-rma.mv(lnrr_laj ~ 1, V = v_lnrr_laj_m3, 
+                          random = list(~1|Group, ~1|Year, ~1|Focal_insect, ~1|obs, ~1|obs2),
+                            data = data2, R = list(obs2=V_es2, Focal_insect = phylo2), Rscale=F)
+    method_HM_bird_res_2 <- get_est(method_HM_bird_2)
 ```
 
 ### Comparing results
 
-We can compare the results of all the methods together (Table \@ref(tab:birdResults)):
+We can compare the results of all the methods together for both the full data (Table \@ref(tab:birdResultsFull)) and the reduced dataset that excludes effect sizes failing Geary's test (Table \@ref(tab:birdResults)):
 
-```{r birdResults, tab.cap = "Results from re-analysis of Bird et al. 2019", echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+```{r birdResultsFull, tab.cap = "Results from re-analysis of Bird et al. 2019 using the full dataset", echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
  results <- rbind(method_MC_bird_res, method_AC_bird_res, method_MM_bird_res, method_HM_bird_res)
     results$Method <- c("Missing-cases", "All-cases", "Multiplicative", "Hybrid")
     
     results <- results %>% select(Method, Est., SE, "95% LCI", "95% UCI")
     flextable::flextable(results) %>% flextable::width(j = c(1, 5), c(0.9, 0.8))
+```
+
+```{r birdResults, tab.cap = "Results from re-analysis of Bird et al. 2019 using the reduced dataset where effects failing Geary's test are excluded.", echo=FALSE, include=TRUE, message=FALSE, warning=FALSE, class.source='klippy'}
+ results2 <- rbind(method_MC_bird_res_2, method_AC_bird_res_2, method_MM_bird_res_2, method_HM_bird_res_2)
+    results2$Method <- c("Missing-cases", "All-cases", "Multiplicative", "Hybrid")
+    
+    results2 <- results2 %>% select(Method, Est., SE, "95% LCI", "95% UCI")
+    flextable::flextable(results2) %>% flextable::width(j = c(1, 5), c(0.9, 0.8))
 ```
 
 # **Appendix S3**: Worked Example 2 - Dealing with missing SD data when assessing strategic-rest grazing (SRG) regimes on both ungrazed and constantly grazed (CG) systems
