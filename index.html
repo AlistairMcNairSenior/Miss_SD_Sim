@@ -11,7 +11,7 @@
 
 <meta name="author" content="Shinichi Nakagawa, Daniel W. A. Noble, Malgorzata Lagisz, Rebecca Spake, Wolfgang Viechtbauer and Alistair M. Senior" />
 
-<meta name="date" content="2022-11-29" />
+<meta name="date" content="2022-12-14" />
 
 <title>Supplemental Materials for: A robust and readily implementable method for the meta-analysis of response ratios with and without missing standard deviations</title>
 
@@ -1533,11 +1533,10 @@ line-height:1;
 margin-left:auto;
 margin-right:auto;
 border-width: 0;
+display: table;
+margin-top: 1.275em;
+margin-bottom: 1.275em;
 border-color: transparent;
-caption-side: top;
-}
-.tabwid-caption-bottom table{
-caption-side: bottom;
 }
 .tabwid_left table{
 margin-left:0;
@@ -1545,7 +1544,7 @@ margin-left:0;
 .tabwid_right table{
 margin-right:0;
 }
-.tabwid td, .tabwid th {
+.tabwid td {
 padding: 0;
 }
 .tabwid a {
@@ -1560,8 +1559,9 @@ background-color: transparent;
 .tabwid table tr {
 background-color: transparent;
 }
-.katex-display {
-margin: 0 0 !important;
+</style>
+<style type="text/css">.flextable-shadow-host{
+overflow: scroll;
 }
 </style>
 
@@ -1782,7 +1782,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Supplemental Materials for: A robust and readily implementable method for the meta-analysis of response ratios with and without missing standard deviations</h1>
 <h4 class="author">Shinichi Nakagawa, Daniel W. A. Noble, Malgorzata Lagisz, Rebecca Spake, Wolfgang Viechtbauer and Alistair M. Senior</h4>
-<h4 class="date">2022-11-29</h4>
+<h4 class="date">2022-12-14</h4>
 
 </div>
 
@@ -1914,6 +1914,23 @@ cv_avg &lt;- function(x, sd, n, group, data, label = NULL, sub_b = TRUE, cv2=FAL
   }
 
   return(data.frame(dat_new))
+}
+
+# You also need the helper function
+
+#&#39; @title weighted_CV
+#&#39; @description Calculates the weighted average CV^2 or CV followed by squaring within a study and the weighted averages CV^2 across a studies
+#&#39; @param sd Standard deviation of an experimental group
+#&#39; @param x Mean of an experimental group
+#&#39; @param n The sample size of an experimental group
+#&#39; @param cv2 Logical indicating whether the weighted average of CV^2 or CV should be taken (followed by squaring weighted average CV). Defaults to weighted average of CV.
+
+weighted_CV &lt;- function(sd, x, n, cv2=FALSE){
+  if(cv2){
+    weighted.mean(na_if((sd / x)^2, Inf), n, na.rm = TRUE)
+  }else{
+    weighted.mean(na_if((sd / x), Inf), n, na.rm = TRUE)^2
+  }
 }</code></pre>
 <p>The function will take the mean (<code>x</code>), standard deviation (<code>sd</code>) and sample size (<code>n</code>) along with the desired dataframe and calculate the between study <span class="math inline">\(CV\)</span> (note this is calculated by taking weighted average of CV and then squaring that average) that is needed for many of the methods implemented. The <code>group</code> argument is needed to identify the “study” / cluster variable which is important so that the function first takes the weighted mean <span class="math inline">\(CV\)</span> within the study before calculating the <span class="math inline">\(CV\)</span> across studies. The new <span class="math inline">\(CV\)</span> is then added directly to the dataframe. You can label these new columns using the <code>label</code> argument, otherwise, it will append the name of the column for the treatment group with <code>b_CV2</code>. We’ll show how this function is used as we overview the methods in detail below.</p>
 </div>
@@ -2220,7 +2237,7 @@ Figure 1: Missing data in the Bird et al. (2019) dataset. A is the full dataset
 <div id="comparing-results" class="section level3">
 <h3>Comparing results</h3>
 <p>We can compare the results of all the methods together for both the full data (Table <a href="#tab:birdResultsFull">1</a>) and the reduced dataset that excludes effect sizes failing Geary’s test (Table <a href="#tab:birdResults">2</a>):</p>
-<template id="3adabd1b-a3c9-456a-898c-180071ca2498"><style>
+<template id="a2508781-4172-49f2-ad9e-2a2a01e34321"><style>
 .tabwid table{
 border-spacing:0px !important;
 border-collapse:collapse;
@@ -2228,11 +2245,10 @@ line-height:1;
 margin-left:auto;
 margin-right:auto;
 border-width: 0;
+display: table;
+margin-top: 1.275em;
+margin-bottom: 1.275em;
 border-color: transparent;
-caption-side: top;
-}
-.tabwid-caption-bottom table{
-caption-side: bottom;
 }
 .tabwid_left table{
 margin-left:0;
@@ -2240,7 +2256,7 @@ margin-left:0;
 .tabwid_right table{
 margin-right:0;
 }
-.tabwid td, .tabwid th {
+.tabwid td {
 padding: 0;
 }
 .tabwid a {
@@ -2255,26 +2271,28 @@ background-color: transparent;
 .tabwid table tr {
 background-color: transparent;
 }
-.katex-display {
-margin: 0 0 !important;
-}
-</style><div class="tabwid"><style>.cl-5995104a{}.cl-595b2150{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-5991afd6{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-5991afe0{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-5991c0a2{width:0.9in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5991c0a3{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5991c0ac{width:0.8in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5991c0ad{width:0.9in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5991c0ae{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5991c0b6{width:0.8in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5991c0b7{width:0.9in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5991c0c0{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5991c0c1{width:0.8in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class="cl-5995104a">
-
-<caption>
-<span id="tab:birdResultsFull">Table 1: </span><span>Results from re-analysis of Bird et al. 2019 using the full dataset</span>
+</style><div class="tabwid"><style>.cl-8c90fed4{}.cl-8c8d609e{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-8c8d6d6e{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-8c8d6d6f{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-8c8d8ad8{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c8d8ae2{width:57.6pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c8d8ae3{width:64.8pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c8d8ae4{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c8d8ae5{width:57.6pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c8d8aec{width:64.8pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c8d8aed{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c8d8af6{width:57.6pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c8d8af7{width:64.8pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class="cl-8c90fed4">
+<caption class>
+<p><span id="tab:birdResultsFull">Table 1: </span>Results from re-analysis of Bird et al. 2019 using the full dataset</p>
 </caption>
-
-<thead><tr style="overflow-wrap:break-word;"><th class="cl-5991c0a2"><p class="cl-5991afd6"><span class="cl-595b2150">Method</span></p></th><th class="cl-5991c0a3"><p class="cl-5991afe0"><span class="cl-595b2150">Est.</span></p></th><th class="cl-5991c0a3"><p class="cl-5991afe0"><span class="cl-595b2150">SE</span></p></th><th class="cl-5991c0a3"><p class="cl-5991afe0"><span class="cl-595b2150">95% LCI</span></p></th><th class="cl-5991c0ac"><p class="cl-5991afe0"><span class="cl-595b2150">95% UCI</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-5991c0ad"><p class="cl-5991afd6"><span class="cl-595b2150">Missing-cases</span></p></td><td class="cl-5991c0ae"><p class="cl-5991afe0"><span class="cl-595b2150">0.21</span></p></td><td class="cl-5991c0ae"><p class="cl-5991afe0"><span class="cl-595b2150">0.22</span></p></td><td class="cl-5991c0ae"><p class="cl-5991afe0"><span class="cl-595b2150">-0.22</span></p></td><td class="cl-5991c0b6"><p class="cl-5991afe0"><span class="cl-595b2150">0.63</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-5991c0ad"><p class="cl-5991afd6"><span class="cl-595b2150">All-cases</span></p></td><td class="cl-5991c0ae"><p class="cl-5991afe0"><span class="cl-595b2150">-0.76</span></p></td><td class="cl-5991c0ae"><p class="cl-5991afe0"><span class="cl-595b2150">1.34</span></p></td><td class="cl-5991c0ae"><p class="cl-5991afe0"><span class="cl-595b2150">-3.38</span></p></td><td class="cl-5991c0b6"><p class="cl-5991afe0"><span class="cl-595b2150">1.86</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-5991c0ad"><p class="cl-5991afd6"><span class="cl-595b2150">Multiplicative</span></p></td><td class="cl-5991c0ae"><p class="cl-5991afe0"><span class="cl-595b2150">-0.57</span></p></td><td class="cl-5991c0ae"><p class="cl-5991afe0"><span class="cl-595b2150">1.82</span></p></td><td class="cl-5991c0ae"><p class="cl-5991afe0"><span class="cl-595b2150">-4.14</span></p></td><td class="cl-5991c0b6"><p class="cl-5991afe0"><span class="cl-595b2150">3.00</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-5991c0b7"><p class="cl-5991afd6"><span class="cl-595b2150">Hybrid</span></p></td><td class="cl-5991c0c0"><p class="cl-5991afe0"><span class="cl-595b2150">0.17</span></p></td><td class="cl-5991c0c0"><p class="cl-5991afe0"><span class="cl-595b2150">0.24</span></p></td><td class="cl-5991c0c0"><p class="cl-5991afe0"><span class="cl-595b2150">-0.30</span></p></td><td class="cl-5991c0c1"><p class="cl-5991afe0"><span class="cl-595b2150">0.63</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="ba65a944-7118-4243-adde-9000f448661c"></div>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-8c8d8af7"><p class="cl-8c8d6d6e"><span class="cl-8c8d609e">Method</span></p></td><td class="cl-8c8d8aed"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">Est.</span></p></td><td class="cl-8c8d8aed"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">SE</span></p></td><td class="cl-8c8d8aed"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">95% LCI</span></p></td><td class="cl-8c8d8af6"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">95% UCI</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-8c8d8ae3"><p class="cl-8c8d6d6e"><span class="cl-8c8d609e">Missing-cases</span></p></td><td class="cl-8c8d8ad8"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">0.21</span></p></td><td class="cl-8c8d8ad8"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">0.22</span></p></td><td class="cl-8c8d8ad8"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">-0.22</span></p></td><td class="cl-8c8d8ae2"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">0.63</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-8c8d8ae3"><p class="cl-8c8d6d6e"><span class="cl-8c8d609e">All-cases</span></p></td><td class="cl-8c8d8ad8"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">-0.76</span></p></td><td class="cl-8c8d8ad8"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">1.34</span></p></td><td class="cl-8c8d8ad8"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">-3.38</span></p></td><td class="cl-8c8d8ae2"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">1.86</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-8c8d8ae3"><p class="cl-8c8d6d6e"><span class="cl-8c8d609e">Multiplicative</span></p></td><td class="cl-8c8d8ad8"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">-0.57</span></p></td><td class="cl-8c8d8ad8"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">1.82</span></p></td><td class="cl-8c8d8ad8"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">-4.14</span></p></td><td class="cl-8c8d8ae2"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">3.00</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-8c8d8aec"><p class="cl-8c8d6d6e"><span class="cl-8c8d609e">Hybrid</span></p></td><td class="cl-8c8d8ae4"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">0.17</span></p></td><td class="cl-8c8d8ae4"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">0.24</span></p></td><td class="cl-8c8d8ae4"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">-0.30</span></p></td><td class="cl-8c8d8ae5"><p class="cl-8c8d6d6f"><span class="cl-8c8d609e">0.63</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="99391ffb-a5c4-435c-9018-a3ecbd20365a"></div>
 <script>
-var dest = document.getElementById("ba65a944-7118-4243-adde-9000f448661c");
-var template = document.getElementById("3adabd1b-a3c9-456a-898c-180071ca2498");
+var dest = document.getElementById("99391ffb-a5c4-435c-9018-a3ecbd20365a");
+var template = document.getElementById("a2508781-4172-49f2-ad9e-2a2a01e34321");
+var caption = template.content.querySelector("caption");
+if(caption) {
+  caption.style.cssText = "display:block;text-align:center;";
+  var newcapt = document.createElement("p");
+  newcapt.appendChild(caption)
+  dest.parentNode.insertBefore(newcapt, dest.previousSibling);
+}
 var fantome = dest.attachShadow({mode: 'open'});
 var templateContent = template.content;
 fantome.appendChild(templateContent);
 </script>
 
-<template id="e74ce37e-7af8-4a56-83e5-6c97ee47aa7b"><style>
+<template id="ae90c6d0-b431-4ac7-950b-6c1086ede918"><style>
 .tabwid table{
 border-spacing:0px !important;
 border-collapse:collapse;
@@ -2282,11 +2300,10 @@ line-height:1;
 margin-left:auto;
 margin-right:auto;
 border-width: 0;
+display: table;
+margin-top: 1.275em;
+margin-bottom: 1.275em;
 border-color: transparent;
-caption-side: top;
-}
-.tabwid-caption-bottom table{
-caption-side: bottom;
 }
 .tabwid_left table{
 margin-left:0;
@@ -2294,7 +2311,7 @@ margin-left:0;
 .tabwid_right table{
 margin-right:0;
 }
-.tabwid td, .tabwid th {
+.tabwid td {
 padding: 0;
 }
 .tabwid a {
@@ -2309,20 +2326,22 @@ background-color: transparent;
 .tabwid table tr {
 background-color: transparent;
 }
-.katex-display {
-margin: 0 0 !important;
-}
-</style><div class="tabwid"><style>.cl-59a320f4{}.cl-599e2e46{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-59a04bfe{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-59a04c08{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-59a057e8{width:0.9in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-59a057f2{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-59a057fc{width:0.8in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-59a057fd{width:0.9in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-59a05806{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-59a05807{width:0.8in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-59a05808{width:0.9in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-59a05810{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-59a0581a{width:0.8in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class="cl-59a320f4">
-
-<caption>
-<span id="tab:birdResults">Table 2: </span><span>Results from re-analysis of Bird et al. 2019 using the reduced dataset where effects failing Geary’s test are excluded.</span>
+</style><div class="tabwid"><style>.cl-8c98f472{}.cl-8c967184{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-8c967b7a{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-8c967b84{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-8c9694a2{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c9694a3{width:57.6pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c9694ac{width:64.8pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c9694ad{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c9694b6{width:57.6pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c9694c0{width:64.8pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c9694c1{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c9694ca{width:57.6pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8c9694cb{width:64.8pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class="cl-8c98f472">
+<caption class>
+<p><span id="tab:birdResults">Table 2: </span>Results from re-analysis of Bird et al. 2019 using the reduced dataset where effects failing Geary’s test are excluded.</p>
 </caption>
-
-<thead><tr style="overflow-wrap:break-word;"><th class="cl-59a057e8"><p class="cl-59a04bfe"><span class="cl-599e2e46">Method</span></p></th><th class="cl-59a057f2"><p class="cl-59a04c08"><span class="cl-599e2e46">Est.</span></p></th><th class="cl-59a057f2"><p class="cl-59a04c08"><span class="cl-599e2e46">SE</span></p></th><th class="cl-59a057f2"><p class="cl-59a04c08"><span class="cl-599e2e46">95% LCI</span></p></th><th class="cl-59a057fc"><p class="cl-59a04c08"><span class="cl-599e2e46">95% UCI</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-59a057fd"><p class="cl-59a04bfe"><span class="cl-599e2e46">Missing-cases</span></p></td><td class="cl-59a05806"><p class="cl-59a04c08"><span class="cl-599e2e46">0.18</span></p></td><td class="cl-59a05806"><p class="cl-59a04c08"><span class="cl-599e2e46">0.090</span></p></td><td class="cl-59a05806"><p class="cl-59a04c08"><span class="cl-599e2e46">0.0071</span></p></td><td class="cl-59a05807"><p class="cl-59a04c08"><span class="cl-599e2e46">0.36</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-59a057fd"><p class="cl-59a04bfe"><span class="cl-599e2e46">All-cases</span></p></td><td class="cl-59a05806"><p class="cl-59a04c08"><span class="cl-599e2e46">0.14</span></p></td><td class="cl-59a05806"><p class="cl-59a04c08"><span class="cl-599e2e46">0.095</span></p></td><td class="cl-59a05806"><p class="cl-59a04c08"><span class="cl-599e2e46">-0.0406</span></p></td><td class="cl-59a05807"><p class="cl-59a04c08"><span class="cl-599e2e46">0.33</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-59a057fd"><p class="cl-59a04bfe"><span class="cl-599e2e46">Multiplicative</span></p></td><td class="cl-59a05806"><p class="cl-59a04c08"><span class="cl-599e2e46">0.19</span></p></td><td class="cl-59a05806"><p class="cl-59a04c08"><span class="cl-599e2e46">0.082</span></p></td><td class="cl-59a05806"><p class="cl-59a04c08"><span class="cl-599e2e46">0.0266</span></p></td><td class="cl-59a05807"><p class="cl-59a04c08"><span class="cl-599e2e46">0.35</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-59a05808"><p class="cl-59a04bfe"><span class="cl-599e2e46">Hybrid</span></p></td><td class="cl-59a05810"><p class="cl-59a04c08"><span class="cl-599e2e46">0.17</span></p></td><td class="cl-59a05810"><p class="cl-59a04c08"><span class="cl-599e2e46">0.084</span></p></td><td class="cl-59a05810"><p class="cl-59a04c08"><span class="cl-599e2e46">0.0050</span></p></td><td class="cl-59a0581a"><p class="cl-59a04c08"><span class="cl-599e2e46">0.33</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="9126f425-4f2e-44c6-96e3-b2dd685f0339"></div>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-8c9694cb"><p class="cl-8c967b7a"><span class="cl-8c967184">Method</span></p></td><td class="cl-8c9694c1"><p class="cl-8c967b84"><span class="cl-8c967184">Est.</span></p></td><td class="cl-8c9694c1"><p class="cl-8c967b84"><span class="cl-8c967184">SE</span></p></td><td class="cl-8c9694c1"><p class="cl-8c967b84"><span class="cl-8c967184">95% LCI</span></p></td><td class="cl-8c9694ca"><p class="cl-8c967b84"><span class="cl-8c967184">95% UCI</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-8c9694ac"><p class="cl-8c967b7a"><span class="cl-8c967184">Missing-cases</span></p></td><td class="cl-8c9694a2"><p class="cl-8c967b84"><span class="cl-8c967184">0.18</span></p></td><td class="cl-8c9694a2"><p class="cl-8c967b84"><span class="cl-8c967184">0.090</span></p></td><td class="cl-8c9694a2"><p class="cl-8c967b84"><span class="cl-8c967184">0.0071</span></p></td><td class="cl-8c9694a3"><p class="cl-8c967b84"><span class="cl-8c967184">0.36</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-8c9694ac"><p class="cl-8c967b7a"><span class="cl-8c967184">All-cases</span></p></td><td class="cl-8c9694a2"><p class="cl-8c967b84"><span class="cl-8c967184">0.14</span></p></td><td class="cl-8c9694a2"><p class="cl-8c967b84"><span class="cl-8c967184">0.095</span></p></td><td class="cl-8c9694a2"><p class="cl-8c967b84"><span class="cl-8c967184">-0.0406</span></p></td><td class="cl-8c9694a3"><p class="cl-8c967b84"><span class="cl-8c967184">0.33</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-8c9694ac"><p class="cl-8c967b7a"><span class="cl-8c967184">Multiplicative</span></p></td><td class="cl-8c9694a2"><p class="cl-8c967b84"><span class="cl-8c967184">0.19</span></p></td><td class="cl-8c9694a2"><p class="cl-8c967b84"><span class="cl-8c967184">0.082</span></p></td><td class="cl-8c9694a2"><p class="cl-8c967b84"><span class="cl-8c967184">0.0266</span></p></td><td class="cl-8c9694a3"><p class="cl-8c967b84"><span class="cl-8c967184">0.35</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-8c9694c0"><p class="cl-8c967b7a"><span class="cl-8c967184">Hybrid</span></p></td><td class="cl-8c9694ad"><p class="cl-8c967b84"><span class="cl-8c967184">0.17</span></p></td><td class="cl-8c9694ad"><p class="cl-8c967b84"><span class="cl-8c967184">0.084</span></p></td><td class="cl-8c9694ad"><p class="cl-8c967b84"><span class="cl-8c967184">0.0050</span></p></td><td class="cl-8c9694b6"><p class="cl-8c967b84"><span class="cl-8c967184">0.33</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="786b6dde-2de4-4a68-98bd-b07b9cb0981b"></div>
 <script>
-var dest = document.getElementById("9126f425-4f2e-44c6-96e3-b2dd685f0339");
-var template = document.getElementById("e74ce37e-7af8-4a56-83e5-6c97ee47aa7b");
+var dest = document.getElementById("786b6dde-2de4-4a68-98bd-b07b9cb0981b");
+var template = document.getElementById("ae90c6d0-b431-4ac7-950b-6c1086ede918");
+var caption = template.content.querySelector("caption");
+if(caption) {
+  caption.style.cssText = "display:block;text-align:center;";
+  var newcapt = document.createElement("p");
+  newcapt.appendChild(caption)
+  dest.parentNode.insertBefore(newcapt, dest.previousSibling);
+}
 var fantome = dest.attachShadow({mode: 'open'});
 var templateContent = template.content;
 fantome.appendChild(templateContent);
@@ -2438,7 +2457,7 @@ MLMA_HM_res &lt;- get_est(MLMA_HM)</code></pre>
 <div id="comparing-results-1" class="section level3">
 <h3>Comparing results</h3>
 <p>In Table <a href="#tab:mcDonResults">3</a> we present the results of re-analysis of the biomass data from <span class="citation">McDonald <em>et al.</em> (2019)</span>, again using MLMA, but with the four different methods to handles missing SDs. For reference we also include the results of a complete cases analysis where studies with missing SDs have been excluded. The effect sizes for the different methods are all very similar, although the CI for the complete cases analysis is wider than for those that include studies with missing SDs. Method 1B estimated slightly lower heterogeneity than the other methods.</p>
-<template id="a3499c2f-e0d9-4ecd-86ac-c5be597558c4"><style>
+<template id="015c39ff-a9c2-4c3d-912d-b3dbbdf88c08"><style>
 .tabwid table{
 border-spacing:0px !important;
 border-collapse:collapse;
@@ -2446,11 +2465,10 @@ line-height:1;
 margin-left:auto;
 margin-right:auto;
 border-width: 0;
+display: table;
+margin-top: 1.275em;
+margin-bottom: 1.275em;
 border-color: transparent;
-caption-side: top;
-}
-.tabwid-caption-bottom table{
-caption-side: bottom;
 }
 .tabwid_left table{
 margin-left:0;
@@ -2458,7 +2476,7 @@ margin-left:0;
 .tabwid_right table{
 margin-right:0;
 }
-.tabwid td, .tabwid th {
+.tabwid td {
 padding: 0;
 }
 .tabwid a {
@@ -2473,20 +2491,22 @@ background-color: transparent;
 .tabwid table tr {
 background-color: transparent;
 }
-.katex-display {
-margin: 0 0 !important;
-}
-</style><div class="tabwid"><style>.cl-5b3bf954{}.cl-5b36d17c{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-5b38cf90{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-5b38cfa4{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-5b38e1a6{width:0.9in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b38e1b0{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b38e1ba{width:0.8in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b38e1bb{width:0.9in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b38e1c4{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b38e1c5{width:0.8in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b38e1ce{width:0.9in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b38e1cf{width:0.75in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5b38e228{width:0.8in;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class="cl-5b3bf954">
-
-<caption>
-<span id="tab:mcDonResults">Table 3: </span><span>Results from re-analysis of McDonald et al. 2019</span>
+</style><div class="tabwid"><style>.cl-8dcdc7a0{}.cl-8dcb7ebe{font-family:'Helvetica';font-size:11pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-8dcb84d6{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-8dcb84d7{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-8dcb9a66{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8dcb9a70{width:57.6pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8dcb9a71{width:64.8pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8dcb9a7a{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8dcb9a7b{width:57.6pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8dcb9a7c{width:64.8pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8dcb9a84{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8dcb9a85{width:57.6pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8dcb9a86{width:64.8pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table class="cl-8dcdc7a0">
+<caption class>
+<p><span id="tab:mcDonResults">Table 3: </span>Results from re-analysis of McDonald et al. 2019</p>
 </caption>
-
-<thead><tr style="overflow-wrap:break-word;"><th class="cl-5b38e1a6"><p class="cl-5b38cf90"><span class="cl-5b36d17c">Method</span></p></th><th class="cl-5b38e1b0"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">Est.</span></p></th><th class="cl-5b38e1b0"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">SE</span></p></th><th class="cl-5b38e1b0"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">95% LCI</span></p></th><th class="cl-5b38e1ba"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">95% UCI</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-5b38e1bb"><p class="cl-5b38cf90"><span class="cl-5b36d17c">Missing-cases</span></p></td><td class="cl-5b38e1c4"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">-0.21</span></p></td><td class="cl-5b38e1c4"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">0.043</span></p></td><td class="cl-5b38e1c4"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">-0.30</span></p></td><td class="cl-5b38e1c5"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">-0.13</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-5b38e1bb"><p class="cl-5b38cf90"><span class="cl-5b36d17c">All-cases</span></p></td><td class="cl-5b38e1c4"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">-0.21</span></p></td><td class="cl-5b38e1c4"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">0.042</span></p></td><td class="cl-5b38e1c4"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">-0.30</span></p></td><td class="cl-5b38e1c5"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">-0.13</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-5b38e1bb"><p class="cl-5b38cf90"><span class="cl-5b36d17c">Multiplicative</span></p></td><td class="cl-5b38e1c4"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">-0.21</span></p></td><td class="cl-5b38e1c4"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">0.043</span></p></td><td class="cl-5b38e1c4"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">-0.30</span></p></td><td class="cl-5b38e1c5"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">-0.13</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-5b38e1ce"><p class="cl-5b38cf90"><span class="cl-5b36d17c">Hybrid</span></p></td><td class="cl-5b38e1cf"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">-0.21</span></p></td><td class="cl-5b38e1cf"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">0.042</span></p></td><td class="cl-5b38e1cf"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">-0.29</span></p></td><td class="cl-5b38e228"><p class="cl-5b38cfa4"><span class="cl-5b36d17c">-0.12</span></p></td></tr></tbody></table></div></template>
-<div class="flextable-shadow-host" id="e8432e53-7eaa-4afa-a228-3ac99b536512"></div>
+<thead><tr style="overflow-wrap:break-word;"><td class="cl-8dcb9a86"><p class="cl-8dcb84d6"><span class="cl-8dcb7ebe">Method</span></p></td><td class="cl-8dcb9a84"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">Est.</span></p></td><td class="cl-8dcb9a84"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">SE</span></p></td><td class="cl-8dcb9a84"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">95% LCI</span></p></td><td class="cl-8dcb9a85"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">95% UCI</span></p></td></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-8dcb9a71"><p class="cl-8dcb84d6"><span class="cl-8dcb7ebe">Missing-cases</span></p></td><td class="cl-8dcb9a66"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">-0.21</span></p></td><td class="cl-8dcb9a66"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">0.043</span></p></td><td class="cl-8dcb9a66"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">-0.30</span></p></td><td class="cl-8dcb9a70"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">-0.13</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-8dcb9a71"><p class="cl-8dcb84d6"><span class="cl-8dcb7ebe">All-cases</span></p></td><td class="cl-8dcb9a66"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">-0.21</span></p></td><td class="cl-8dcb9a66"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">0.042</span></p></td><td class="cl-8dcb9a66"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">-0.30</span></p></td><td class="cl-8dcb9a70"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">-0.13</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-8dcb9a71"><p class="cl-8dcb84d6"><span class="cl-8dcb7ebe">Multiplicative</span></p></td><td class="cl-8dcb9a66"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">-0.21</span></p></td><td class="cl-8dcb9a66"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">0.043</span></p></td><td class="cl-8dcb9a66"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">-0.30</span></p></td><td class="cl-8dcb9a70"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">-0.13</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-8dcb9a7c"><p class="cl-8dcb84d6"><span class="cl-8dcb7ebe">Hybrid</span></p></td><td class="cl-8dcb9a7a"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">-0.21</span></p></td><td class="cl-8dcb9a7a"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">0.042</span></p></td><td class="cl-8dcb9a7a"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">-0.29</span></p></td><td class="cl-8dcb9a7b"><p class="cl-8dcb84d7"><span class="cl-8dcb7ebe">-0.12</span></p></td></tr></tbody></table></div></template>
+<div class="flextable-shadow-host" id="c7653d43-e1c0-4639-b891-525bc7571c66"></div>
 <script>
-var dest = document.getElementById("e8432e53-7eaa-4afa-a228-3ac99b536512");
-var template = document.getElementById("a3499c2f-e0d9-4ecd-86ac-c5be597558c4");
+var dest = document.getElementById("c7653d43-e1c0-4639-b891-525bc7571c66");
+var template = document.getElementById("015c39ff-a9c2-4c3d-912d-b3dbbdf88c08");
+var caption = template.content.querySelector("caption");
+if(caption) {
+  caption.style.cssText = "display:block;text-align:center;";
+  var newcapt = document.createElement("p");
+  newcapt.appendChild(caption)
+  dest.parentNode.insertBefore(newcapt, dest.previousSibling);
+}
 var fantome = dest.attachShadow({mode: 'open'});
 var templateContent = template.content;
 fantome.appendChild(templateContent);
@@ -2599,16 +2619,16 @@ Viechtbauer, W. (2010). Conducting meta-analyses in r with the metafor package. 
 </div>
 <div id="session-information" class="section level1">
 <h1><strong>Session Information</strong></h1>
-<p><strong>R version 4.2.1 (2022-06-23)</strong></p>
-<p><strong>Platform:</strong> x86_64-apple-darwin17.0 (64-bit)</p>
+<p><strong>R version 4.2.0 (2022-04-22)</strong></p>
+<p><strong>Platform:</strong> aarch64-apple-darwin20 (64-bit)</p>
 <p><strong>locale:</strong>
-en_AU.UTF-8||en_AU.UTF-8||en_AU.UTF-8||C||en_AU.UTF-8||en_AU.UTF-8</p>
+en_US.UTF-8||en_US.UTF-8||en_US.UTF-8||C||en_US.UTF-8||en_US.UTF-8</p>
 <p><strong>attached base packages:</strong>
 <em>stats</em>, <em>graphics</em>, <em>grDevices</em>, <em>utils</em>, <em>datasets</em>, <em>methods</em> and <em>base</em></p>
 <p><strong>other attached packages:</strong>
-<em>patchwork(v.1.1.2)</em>, <em>phytools(v.1.2-0)</em>, <em>maps(v.3.4.1)</em>, <em>ape(v.5.6-2)</em>, <em>here(v.1.0.1)</em>, <em>metafor(v.3.8-1)</em>, <em>metadat(v.1.2-0)</em>, <em>Matrix(v.1.5-3)</em>, <em>forcats(v.0.5.2)</em>, <em>stringr(v.1.4.1)</em>, <em>dplyr(v.1.0.10)</em>, <em>purrr(v.0.3.5)</em>, <em>readr(v.2.1.3)</em>, <em>tidyr(v.1.2.1)</em>, <em>tibble(v.3.1.8)</em>, <em>ggplot2(v.3.4.0)</em> and <em>tidyverse(v.1.3.2)</em></p>
+<em>patchwork(v.1.1.1)</em>, <em>phytools(v.1.0-3)</em>, <em>maps(v.3.4.0)</em>, <em>ape(v.5.6-2)</em>, <em>here(v.1.0.1)</em>, <em>metafor(v.3.8-1)</em>, <em>metadat(v.1.2-0)</em>, <em>Matrix(v.1.4-1)</em>, <em>forcats(v.0.5.2)</em>, <em>stringr(v.1.4.1)</em>, <em>dplyr(v.1.0.10)</em>, <em>purrr(v.0.3.4)</em>, <em>readr(v.2.1.3)</em>, <em>tidyr(v.1.2.1)</em>, <em>tibble(v.3.1.8)</em>, <em>ggplot2(v.3.3.6)</em> and <em>tidyverse(v.1.3.2)</em></p>
 <p><strong>loaded via a namespace (and not attached):</strong>
-<em>googledrive(v.2.0.0)</em>, <em>colorspace(v.2.0-3)</em>, <em>ellipsis(v.0.3.2)</em>, <em>rprojroot(v.2.0.3)</em>, <em>flextable(v.0.8.3)</em>, <em>base64enc(v.0.1-3)</em>, <em>fs(v.1.5.2)</em>, <em>rstudioapi(v.0.14)</em>, <em>farver(v.2.1.1)</em>, <em>remotes(v.2.4.2)</em>, <em>optimParallel(v.1.0-2)</em>, <em>fansi(v.1.0.3)</em>, <em>lubridate(v.1.9.0)</em>, <em>mathjaxr(v.1.6-0)</em>, <em>xml2(v.1.3.3)</em>, <em>codetools(v.0.2-18)</em>, <em>mnormt(v.2.1.1)</em>, <em>cachem(v.1.0.6)</em>, <em>knitr(v.1.41)</em>, <em>jsonlite(v.1.8.3)</em>, <em>broom(v.1.0.1)</em>, <em>dbplyr(v.2.2.1)</em>, <em>compiler(v.4.2.1)</em>, <em>httr(v.1.4.4)</em>, <em>backports(v.1.4.1)</em>, <em>assertthat(v.0.2.1)</em>, <em>fastmap(v.1.1.0)</em>, <em>gargle(v.1.2.1)</em>, <em>cli(v.3.4.1)</em>, <em>htmltools(v.0.5.3)</em>, <em>tools(v.4.2.1)</em>, <em>igraph(v.1.3.5)</em>, <em>coda(v.0.19-4)</em>, <em>gtable(v.0.3.1)</em>, <em>glue(v.1.6.2)</em>, <em>clusterGeneration(v.1.3.7)</em>, <em>V8(v.4.2.2)</em>, <em>fastmatch(v.1.1-3)</em>, <em>Rcpp(v.1.0.9)</em>, <em>cellranger(v.1.1.0)</em>, <em>jquerylib(v.0.1.4)</em>, <em>vctrs(v.0.5.1)</em>, <em>katex(v.1.4.0)</em>, <em>nlme(v.3.1-160)</em>, <em>xfun(v.0.35)</em>, <em>rvest(v.1.0.3)</em>, <em>timechange(v.0.1.1)</em>, <em>lifecycle(v.1.0.3)</em>, <em>pacman(v.0.5.1)</em>, <em>phangorn(v.2.10.0)</em>, <em>googlesheets4(v.1.0.1)</em>, <em>klippy(v.0.0.0.9500)</em>, <em>MASS(v.7.3-58.1)</em>, <em>scales(v.1.2.1)</em>, <em>hms(v.1.1.2)</em>, <em>parallel(v.4.2.1)</em>, <em>expm(v.0.999-6)</em>, <em>yaml(v.2.3.6)</em>, <em>curl(v.4.3.3)</em>, <em>pander(v.0.6.5)</em>, <em>gdtools(v.0.2.4)</em>, <em>sass(v.0.4.2)</em>, <em>stringi(v.1.7.8)</em>, <em>highr(v.0.9)</em>, <em>equatags(v.0.2.0)</em>, <em>plotrix(v.3.8-2)</em>, <em>zip(v.2.2.2)</em>, <em>rlang(v.1.0.6)</em>, <em>pkgconfig(v.2.0.3)</em>, <em>systemfonts(v.1.0.4)</em>, <em>evaluate(v.0.18)</em>, <em>lattice(v.0.20-45)</em>, <em>labeling(v.0.4.2)</em>, <em>tidyselect(v.1.2.0)</em>, <em>magrittr(v.2.0.3)</em>, <em>bookdown(v.0.30)</em>, <em>R6(v.2.5.1)</em>, <em>generics(v.0.1.3)</em>, <em>combinat(v.0.0-8)</em>, <em>DBI(v.1.1.3)</em>, <em>pillar(v.1.8.1)</em>, <em>haven(v.2.5.1)</em>, <em>withr(v.2.5.0)</em>, <em>scatterplot3d(v.0.3-42)</em>, <em>modelr(v.0.1.10)</em>, <em>crayon(v.1.5.2)</em>, <em>uuid(v.1.1-0)</em>, <em>utf8(v.1.2.2)</em>, <em>tzdb(v.0.3.0)</em>, <em>rmarkdown(v.2.18)</em>, <em>officer(v.0.4.4)</em>, <em>grid(v.4.2.1)</em>, <em>readxl(v.1.4.1)</em>, <em>data.table(v.1.14.6)</em>, <em>xslt(v.1.4.3)</em>, <em>reprex(v.2.0.2)</em>, <em>digest(v.0.6.30)</em>, <em>numDeriv(v.2016.8-1.1)</em>, <em>munsell(v.0.5.0)</em>, <em>bslib(v.0.4.1)</em> and <em>quadprog(v.1.5-8)</em></p>
+<em>googledrive(v.2.0.0)</em>, <em>colorspace(v.2.0-3)</em>, <em>ellipsis(v.0.3.2)</em>, <em>rprojroot(v.2.0.3)</em>, <em>flextable(v.0.7.1)</em>, <em>base64enc(v.0.1-3)</em>, <em>fs(v.1.5.2)</em>, <em>rstudioapi(v.0.14)</em>, <em>farver(v.2.1.1)</em>, <em>remotes(v.2.4.2)</em>, <em>fansi(v.1.0.3)</em>, <em>lubridate(v.1.8.0)</em>, <em>mathjaxr(v.1.6-0)</em>, <em>xml2(v.1.3.3)</em>, <em>codetools(v.0.2-18)</em>, <em>mnormt(v.2.1.0)</em>, <em>cachem(v.1.0.6)</em>, <em>knitr(v.1.40)</em>, <em>jsonlite(v.1.8.2)</em>, <em>broom(v.1.0.1)</em>, <em>dbplyr(v.2.2.1)</em>, <em>compiler(v.4.2.0)</em>, <em>httr(v.1.4.4)</em>, <em>backports(v.1.4.1)</em>, <em>assertthat(v.0.2.1)</em>, <em>fastmap(v.1.1.0)</em>, <em>gargle(v.1.2.1)</em>, <em>cli(v.3.4.1)</em>, <em>htmltools(v.0.5.3)</em>, <em>tools(v.4.2.0)</em>, <em>igraph(v.1.3.2)</em>, <em>coda(v.0.19-4)</em>, <em>gtable(v.0.3.1)</em>, <em>glue(v.1.6.2)</em>, <em>clusterGeneration(v.1.3.7)</em>, <em>fastmatch(v.1.1-3)</em>, <em>Rcpp(v.1.0.9)</em>, <em>cellranger(v.1.1.0)</em>, <em>jquerylib(v.0.1.4)</em>, <em>vctrs(v.0.4.2)</em>, <em>nlme(v.3.1-157)</em>, <em>xfun(v.0.33)</em>, <em>rvest(v.1.0.3)</em>, <em>lifecycle(v.1.0.2)</em>, <em>pacman(v.0.5.1)</em>, <em>phangorn(v.2.8.1)</em>, <em>googlesheets4(v.1.0.1)</em>, <em>klippy(v.0.0.0.9500)</em>, <em>MASS(v.7.3-56)</em>, <em>scales(v.1.2.1)</em>, <em>hms(v.1.1.2)</em>, <em>parallel(v.4.2.0)</em>, <em>expm(v.0.999-6)</em>, <em>yaml(v.2.3.5)</em>, <em>curl(v.4.3.2)</em>, <em>pander(v.0.6.5)</em>, <em>gdtools(v.0.2.4)</em>, <em>sass(v.0.4.2)</em>, <em>stringi(v.1.7.8)</em>, <em>highr(v.0.9)</em>, <em>equatags(v.0.1.1)</em>, <em>plotrix(v.3.8-2)</em>, <em>zip(v.2.2.0)</em>, <em>rlang(v.1.0.6)</em>, <em>pkgconfig(v.2.0.3)</em>, <em>systemfonts(v.1.0.4)</em>, <em>evaluate(v.0.16)</em>, <em>lattice(v.0.20-45)</em>, <em>labeling(v.0.4.2)</em>, <em>tidyselect(v.1.1.2)</em>, <em>magrittr(v.2.0.3)</em>, <em>bookdown(v.0.28)</em>, <em>R6(v.2.5.1)</em>, <em>generics(v.0.1.3)</em>, <em>combinat(v.0.0-8)</em>, <em>DBI(v.1.1.3)</em>, <em>pillar(v.1.8.1)</em>, <em>haven(v.2.5.1)</em>, <em>withr(v.2.5.0)</em>, <em>scatterplot3d(v.0.3-41)</em>, <em>modelr(v.0.1.9)</em>, <em>crayon(v.1.5.2)</em>, <em>locatexec(v.0.1.1)</em>, <em>uuid(v.1.1-0)</em>, <em>utf8(v.1.2.2)</em>, <em>tzdb(v.0.3.0)</em>, <em>rmarkdown(v.2.16.2)</em>, <em>officer(v.0.4.2)</em>, <em>grid(v.4.2.0)</em>, <em>readxl(v.1.4.1)</em>, <em>data.table(v.1.14.2)</em>, <em>xslt(v.1.4.3)</em>, <em>reprex(v.2.0.2)</em>, <em>digest(v.0.6.29)</em>, <em>numDeriv(v.2016.8-1.1)</em>, <em>munsell(v.0.5.0)</em>, <em>bslib(v.0.4.0)</em> and <em>quadprog(v.1.5-8)</em></p>
 </div>
 
 
