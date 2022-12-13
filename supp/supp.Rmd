@@ -167,6 +167,24 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE, cv2=FALSE)
   return(data.frame(dat_new))
 }
 
+# You also need the helper function
+
+#' @title weighted_CV
+#' @description Calculates the weighted average CV^2 or CV followed by squaring within a study and the weighted averages CV^2 across a studies
+#' @param sd Standard deviation of an experimental group
+#' @param x Mean of an experimental group
+#' @param n The sample size of an experimental group
+#' @param cv2 Logical indicating whether the weighted average of CV^2 or CV should be taken (followed by squaring weighted average CV). Defaults to weighted average of CV.
+
+weighted_CV <- function(sd, x, n, cv2=FALSE){
+  if(cv2){
+    weighted.mean(na_if((sd / x)^2, Inf), n, na.rm = TRUE)
+  }else{
+    weighted.mean(na_if((sd / x), Inf), n, na.rm = TRUE)^2
+  }
+}
+
+
 ```
 
 The function will take the mean (`x`), standard deviation (`sd`) and sample size (`n`) along with the desired dataframe and calculate the between study $CV$ (note this is calculated by taking weighted average of CV and then squaring that average) that is needed for many of the methods implemented. The `group` argument is needed to identify the "study" / cluster variable which is important so that the function first takes the weighted mean $CV$ within the study before calculating the $CV$ across studies. The new $CV$ is then added directly to the dataframe. You can label these new columns using the `label` argument, otherwise, it will append the name of the column for the treatment group with `b_CV2`. We'll show how this function is used as we overview the methods in detail below.
