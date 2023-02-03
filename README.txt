@@ -1,5 +1,5 @@
 
-VISIT: [https://alistairmcnairsenior.github.io/Miss_SD_Sim/](https://alistairmcnairsenior.github.io/Miss_SD_Sim/)
+VISIT: https://alistairmcnairsenior.github.io/Miss_SD_Sim/
 
 This repo was created by AM Senior to contain R code for the simulation described in Nakagawa et al. A practical and readily implementable method for handling missing standard deviations in the meta-analysis of response ratios.
 
