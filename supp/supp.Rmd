@@ -768,6 +768,12 @@ We can see that, in this situation, our results are robust to shared control and
 
 # **Appendix S5**: More on Geary's Test and What to do
 
+Many ecological data sets will have data that do not meet normality assumptions (e.g., abundance data). In other words, the variables one wishes to meta-analyse will often have extreme values which can create problems when calculating $CV^2$ because it will lead to extreme between study $CV^2$. This will create problems when applying our missing data methods. Some adjustments are necessary to the calculation of $CV^2$ under these conditions. 
+
+More formally, we recommend that authors explicitly test whether an effect size meets normality assumptions (which in fact is good practice in any case). This can be achieved using Geary's test (proposed by @Lajeunesse2015). We then recommend that $CV^2$ be calculated with only those effect sizes that pass Geary's test. 
+
+The `cv_avg` function has built in capabilities to do this through the use of the `geary` argument. By default, this is set to TRUE. Authors can provide their data, it will conduct Geary's tests and calculate the within and between study $CV^2$ using only the effect sizes passing the test. It will also indicate which rows within the data fail the test so this information can be formally reported in the meta-analysis. 
+
 ```{r echo = TRUE, results='hide', tidy=FALSE, tidy.opts=list(width.cutoff=80), class.source='klippy'}
 #' @title cv_avg
 #' @description Calculates the weighted average CV^2 within a study and the weighted average CV^2 across a study
