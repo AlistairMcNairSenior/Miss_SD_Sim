@@ -768,9 +768,12 @@ We can see that, in this situation, our results are robust to shared control and
 
 # **Appendix S5**: More on Geary's Test and What to do
 
+### Introduction
 Many ecological data sets will have data that do not meet normality assumptions (e.g., abundance data). In other words, the variables one wishes to meta-analyse will often have extreme values which can create problems when calculating $CV^2$ because it will lead to extreme between study $CV^2$. This will create problems when applying our missing data methods. Some adjustments are necessary to the calculation of $CV^2$ under these conditions. 
 
-More formally, we recommend that authors explicitly test whether an effect size meets normality assumptions (which in fact is good practice in any case). This can be achieved using Geary's test (proposed by @Lajeunesse2015). We then recommend that $CV^2$ be calculated with only those effect sizes that pass Geary's test. 
+More formally, we recommend that authors explicitly test whether an effect size meets normality assumptions (which in fact is good practice in any case). This can be achieved using Geary's test (proposed by @Lajeunesse2015). More specifically, authors should test whether each treatment group (control and treatment) pass the test, and if either fails, the data fails the test. We then recommend that $CV^2$ be calculated with only those effect sizes that pass Geary's test. 
+
+### Adjustment to `cv_avg`
 
 The `cv_avg` function has built in capabilities to do this through the use of the `geary` argument. By default, this is set to TRUE. Authors can provide their data, it will conduct Geary's tests and calculate the within and between study $CV^2$ using only the effect sizes passing the test. It will also indicate which rows within the data fail the test so this information can be formally reported in the meta-analysis. 
 
@@ -888,10 +891,76 @@ weighted_CV <- function(sd, x, n, cv2=FALSE){
   geary <- function(mean, sd, n){
     (1 / (sd / mean)) * ((4*n)^(3/2) / (1 + 4*n))
   }
-         
+        
+```
+
+### Re-exploring @mcdonald2019 
+
+First, download all files from  OSF: https://osf.io/h9x6w/. Then, load the libraries and source functions:
+
+```{r echo = TRUE, eval = TRUE, class.source='klippy', results='hide'}
+#install.packages("pacman")
+pacman::p_load(tidyverse, metafor, here, ape, phytools, patchwork)
+
+# Useful functions for calculating CV^2 within and between studies. This file can be downloaded from OSF: https://osf.io/h9x6w/
+source("./func.R")
+```
+
+Then, download the data file and phylogenetic tree file that we will use to demonstrate the examples
+
+```{r echo = TRUE, eval = TRUE, results='hide', warning=FALSE,class.source='klippy'}
+# Load the data file and tree file
+
+# Download the data file from OSF and do some cleaning. This file can be downloaded from OSF: https://osf.io/h9x6w/
+data1 <- read.csv("./example1.csv")
+
+# Fix column classes
+data1$Experimental_standard_deviation <- as.numeric(data1$Experimental_standard_deviation)
+     data1$Control_standard_deviation <- as.numeric(data1$Control_standard_deviation)
+
+# Needed for metafor to make model equivalent to MCMCglmm
+data1$obs <- 1:nrow(data1) 
+
+# Clean up the data to drop unnecessary columns
+data1 <- data1[,-which(colnames(data1)%in%c("vi", "yi_g", "Focal_insect_resolved_name", "Competing_insect_resolved_name", "Focal_insect_diet_breadth", "Competing_insect_diet_breadth", "Phylogenetic_distance_between_focal_insect_and_competing_insect", "Spatial_separation", "temporal_separation"))]
+
+ # Filter abundance data
+    data1 <- data1 %>% filter(Fitness_component == "Abundance")
+
+  # Calculate CV on missing dataset. Note missing data will be ignored
+    data1 <- data1 %>%
+          mutate(cv_Control = na_if(Control_standard_deviation / Control_mean, Inf),
+            cv_Experimental = na_if(Experimental_standard_deviation / Experimental_mean, Inf))
+
+# Download the phylogeny from OSF: https://osf.io/h9x6w/
+ tree <- read.tree("./phylo_tree.tre")
 
 ```
 
+
+
+
+
+
+
+### Step 1: Geary's Test and calculate `cv_avg` with only data passing the test
+
+Using our function we can now calculate the between-study CV using the data that pass Geary's test while also summarise how much data fail. 
+ 
+```{r, echo = TRUE, results='hide', tidy=FALSE, tidy.opts=list(width.cutoff=80), class.source='klippy'}
+
+data1 <- cv_avg(x = Control_mean, sd = Control_standard_deviation, n = Control_sample_size, data = data1, geary = TRUE)
+
+```
+
+ 
+### Propagate the CV to the entire dataset
+
+### Step 2:
+
++ Only meta-analyse effects that pass Geary's test. 
++ We want to meta-analyse CV in the control and treatment groups, then we use this CV for replacement of missing data
++ 
 
 # **References**
 
