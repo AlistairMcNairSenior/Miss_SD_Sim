@@ -832,7 +832,9 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE, cv2=FALSE,
   if(geary){
     data <- data %>% 
             mutate(geary_num = geary({{x}}, {{sd}}, {{n}}),
-                  geary_test = ifelse(geary_num >= 3, "pass", "fail"))
+                  geary_test = ifelse(geary_num >= 3, "pass", "fail")) %>% 
+            rename(paste0("geary_num", "_", label) = "geary_num",  #### NEED TO FIX RENAME
+                   paste0("geary_test", "_", label) = "geary_test")
   }
   
   # Calculate between study CV. Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
@@ -939,17 +941,15 @@ data1 <- data1[,-which(colnames(data1)%in%c("vi", "yi_g", "Focal_insect_resolved
 
 
 
-
-
-
-
 ### Step 1: Geary's Test and calculate `cv_avg` with only data passing the test
 
 Using our function we can now calculate the between-study CV using the data that pass Geary's test while also summarise how much data fail. 
  
 ```{r, echo = TRUE, results='hide', tidy=FALSE, tidy.opts=list(width.cutoff=80), class.source='klippy'}
 
-data1 <- cv_avg(x = Control_mean, sd = Control_standard_deviation, n = Control_sample_size, data = data1, geary = TRUE)
+data1 <- cv_avg(x = Control_mean, sd = Control_standard_deviation, n = Control_sample_size, data = data1, geary = TRUE, label = 'ctrl')
+data1 <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation, n = Experimental_sample_size, data = data1, geary = TRUE, label = 'trt')
+
 
 ```
 
