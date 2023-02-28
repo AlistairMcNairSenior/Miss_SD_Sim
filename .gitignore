@@ -8,3 +8,5 @@ example1.csv
 example2.csv
 func.R
 .DS_Store
+.vscode/settings.json
+.vscode/
