@@ -800,10 +800,10 @@ The `cv_avg` function has built in capabilities to do this through the use of th
 #' rm(list = c("x1", "x2"))
 #' # # Now generate some missing data
 #' t2 <- gen.miss(test_dat, "sd1", "sd2", 6)
-#' t2_cv2 <- cv_avg(x = x1, sd = sd1, n = n1, group = stdy, data =  t2, sub_b = TRUE, cv2 = FALSE, geary = TRUE)
-#' t2_cv2 <- cv_avg(x2, sd2, n2, group = stdy, label = "2", data =  t2_cv, sub_b = FALSE, geary = TRUE)
+#' t2_cv2 <- cv_avg(x = x1, sd = sd1, n = n1, group = stdy, data =  t2, sub_b = TRUE, cv2 = TRUE, geary = FALSE)
+#' t2_cv2 <- cv_avg(x2, sd2, n2, group = stdy, label = "2", data =  t2_cv2, sub_b = FALSE, geary = FALSE)
 #' # Check calculations are correct. All match what is expected
-#' test <- t2_cv %>%  filter(stdy == "1")
+#' test <- t2_cv2 %>%  filter(stdy == "1")
 #' # Within
 #' mean(test$n1) # Matches 14.75
 #' mean(test$n2) # Matches 14
