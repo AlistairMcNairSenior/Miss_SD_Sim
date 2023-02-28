@@ -833,17 +833,17 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE, cv2=FALSE,
     data <- data %>% 
             mutate(geary_num = geary({{x}}, {{sd}}, {{n}}),
                   geary_test = ifelse(geary_num >= 3, "pass", "fail")) %>% 
-            rename(paste0("geary_num", "_", label) = "geary_num",  #### NEED TO FIX RENAME
-                   paste0("geary_test", "_", label) = "geary_test")
+            rename_with(.cols = starts_with("geary"), ~ paste0(.x, "_", label)) %>% 
+            mutate(tmp = ifelse(geary({{x}}, {{sd}}, {{n}}) >= 3, "pass", "fail"))
   }
   
   # Calculate between study CV. Take weighted mean CV within study, and then take a weighted mean across studies of the within study CV. Weighted based on sample size and pooled sample size.
   if(geary){
   b_grp_cv_data <- data                                   %>%
     dplyr::group_by({{group}})                            %>%
-    dplyr::mutate(   w_CV2 = ifelse(geary_test == "pass", 
+    dplyr::mutate(   w_CV2 = ifelse(tmp == "pass", 
                                      weighted_CV({{sd}}, {{x}}, {{n}}, cv2=cv2), NA),
-                     n_mean = mean({{n}}, na.rm = TRUE))   %>%
+                     n_mean = mean({{n}}, na.rm = TRUE), )   %>%
     dplyr::ungroup(.)                                     %>%
     dplyr::mutate(b_CV2 = weighted.mean(w_CV2, n_mean, na.rm = TRUE), .keep = "used")
   } else{
@@ -859,9 +859,10 @@ cv_avg <- function(x, sd, n, group, data, label = NULL, sub_b = TRUE, cv2=FALSE,
 
   # Append these calculated columns back to the original data and return the full dataset.
   if(sub_b){
-    b_grp_cv_data <- b_grp_cv_data %>% dplyr::select(grep("b_", names(b_grp_cv_data)))
+    b_grp_cv_data <- b_grp_cv_data %>% dplyr::select(grep("b_", names(b_grp_cv_data))) %>% dplyr::select(-grep("tmp", names(b_grp_cv_data)))
     dat_new <- cbind(data, b_grp_cv_data)
   } else {
+    b_grp_cv_data <- b_grp_cv_data %>% dplyr::select(-grep("tmp", names(b_grp_cv_data)))
     dat_new <- cbind(data, b_grp_cv_data)
   }
 
@@ -893,6 +894,7 @@ weighted_CV <- function(sd, x, n, cv2=FALSE){
   geary <- function(mean, sd, n){
     (1 / (sd / mean)) * ((4*n)^(3/2) / (1 + 4*n))
   }
+  
         
 ```
 
@@ -947,10 +949,11 @@ Using our function we can now calculate the between-study CV using the data that
  
 ```{r, echo = TRUE, results='hide', tidy=FALSE, tidy.opts=list(width.cutoff=80), class.source='klippy'}
 
-data1 <- cv_avg(x = Control_mean, sd = Control_standard_deviation, n = Control_sample_size, data = data1, geary = TRUE, label = 'ctrl')
+data1 <- cv_avg(x = Control_mean, sd = Control_standard_deviation, n = Control_sample_size, data = data1, geary = TRUE, label = 'ctrl', sub_b = TRUE)
 data1 <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation, n = Experimental_sample_size, data = data1, geary = TRUE, label = 'trt')
 
-
+data1 <- cv_avg(x = Control_mean, sd = Control_standard_deviation, n = Control_sample_size, data = data1, geary = FALSE, label = 'ctrl', sub_b = TRUE)
+data1 <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation, n = Experimental_sample_size, data = data1, geary = FALSE, label = 'trt')
 ```
 
  
