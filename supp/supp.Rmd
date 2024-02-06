@@ -97,9 +97,9 @@ To facilitate application of the methods we have written a general function for 
 ```{r echo = TRUE, results='hide', tidy=FALSE, tidy.opts=list(width.cutoff=80), class.source='klippy'}
 #' @title cv_avg
 #' @description Calculates the weighted average CV^2 within a study and the weighted average CV^2 across a study
-#' @param x Mean of an experimental group
-#' @param sd Standard deviation of an experimental group
-#' @param n The sample size of an experimental group
+#' @param x Mean of an experimental or control group
+#' @param sd Standard deviation of an experimental or control group
+#' @param n The sample size of an experimental or control group
 #' @param group Study, grouping or cluster variable one wishes to calculate the within and between weighted CV^2. In meta-analysis this will most likely be 'study'.
 #' @param data The dataframe containing the mean, sd, n and grouping variables
 #' @param label A character string specifying the label one wishes to attach to columns to identify the treatment. Otherwise, if not specified it will default to the variable name for x
@@ -747,7 +747,7 @@ In Table \@ref(tab:mcDonResults) we present the results of re-analysis of the bi
     flextable::flextable(results2) %>% flextable::width(j = c(1, 5), c(0.9, 0.8))
 ```
 
-### Robust Variance Estimators
+### Robust Variance Estimators 
 
 In Appendix S1 we mention that robust variance estimators can also be used to control for dependency among effect sizes. We'll demonstrate how missing data methods can be combined with RVE's when using worked example 2 for the Missing-cases method. Example 2 contains a few effect sizes that share a common control group. This creates dependency among their sampling variances that we should control for in our models. However, other sources of non-independence may also be present that we are unaware of (e.g., shared traits; See @Noble2017). Cluster-robust methods are known to do an excellent job at correcting standard errors when such dependency exists [see @Song2021; @Nakagawa2021; @Hedges2010; @Tipton2013].
 
@@ -766,7 +766,7 @@ In Appendix S1 we mention that robust variance estimators can also be used to co
 
 We can see that, in this situation, our results are robust to shared control and other within study dependencies.
 
-# **Appendix S5**: More on Geary's Test and What to do
+# **Appendix S5**: More on Geary's Test and What to do ** UNDER CONSTRUCTION **
 
 ### Introduction
 Many ecological data sets will have data that do not meet normality assumptions (e.g., abundance data). In other words, the variables one wishes to meta-analyse will often have extreme values which can create problems when calculating $CV^2$ because it will lead to extreme between study $CV^2$. This will create problems when applying our missing data methods. Some adjustments are necessary to the calculation of $CV^2$ under these conditions. 
@@ -780,9 +780,9 @@ The `cv_avg` function has built in capabilities to do this through the use of th
 ```{r echo = TRUE, results='hide', tidy=FALSE, tidy.opts=list(width.cutoff=80), class.source='klippy'}
 #' @title cv_avg
 #' @description Calculates the weighted average CV^2 within a study and the weighted average CV^2 across a study
-#' @param x Mean of an experimental group
-#' @param sd Standard deviation of an experimental group
-#' @param n The sample size of an experimental group
+#' @param x Mean of an experimental or control group
+#' @param sd Standard deviation of an experimental or control group
+#' @param n The sample size of an experimental  or control group
 #' @param group Study, grouping or cluster variable one wishes to calculate the within and between weighted CV^2. In meta-analysis this will most likely be 'study'.
 #' @param data The dataframe containing the mean, sd, n and grouping variables
 #' @param label A character string specifying the label one wishes to attach to columns to identify the treatment. Otherwise, if not specified it will default to the variable name for x
@@ -947,7 +947,7 @@ data1 <- data1[,-which(colnames(data1)%in%c("vi", "yi_g", "Focal_insect_resolved
 
 Using our function we can now calculate the between-study CV using the data that pass Geary's test while also summarise how much data fail. 
  
-```{r, echo = TRUE, results='hide', tidy=FALSE, tidy.opts=list(width.cutoff=80), class.source='klippy'}
+```{r, echo = TRUE, eval = FALSE, results='hide', tidy=FALSE, tidy.opts=list(width.cutoff=80), class.source='klippy'}
 
 data1 <- cv_avg(x = Control_mean, sd = Control_standard_deviation, n = Control_sample_size, data = data1, geary = TRUE, label = 'ctrl', sub_b = TRUE)
 data1 <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation, n = Experimental_sample_size, data = data1, geary = TRUE, label = 'trt')
@@ -964,6 +964,7 @@ data1 <- cv_avg(x = Experimental_mean, sd = Experimental_standard_deviation, n =
 + Only meta-analyse effects that pass Geary's test. 
 + We want to meta-analyse CV in the control and treatment groups, then we use this CV for replacement of missing data
 + 
+
 
 # **References**
 
