@@ -125,7 +125,7 @@ lnrr_laj <- function(m1, m2, cv1_2, cv2_2, n1, n2, taylor=TRUE){
 v_lnrr_laj <- function(cv1_2, cv2_2, n1, n2,  taylor=TRUE){
   if(taylor){
   ((cv1_2) / n1) + ((cv2_2) / n2) +
-    ((cv1_2)^2 / (2*n1)^2) + ((cv2_2)^2 / (2*n2)^2)
+    ((cv1_2)^2 / (2*n1^2)) + ((cv2_2)^2 / (2*n2^2))
   } else {
     ((cv1_2) / n1) + ((cv2_2) / n2)
   }
